@@ -401,7 +401,7 @@ const BerdozManagementSystem = () => {
     try {
       // Try to delete from API, but don't block on failure
       try {
-        await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/staff/${id}`, { method: 'DELETE' })
+        await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/staff/${id}`, { method: 'DELETE' })
       } catch (apiError) {
         console.log('API not available, deleting staff locally:', apiError.message)
       }
