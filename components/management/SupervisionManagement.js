@@ -41,7 +41,7 @@ const SupervisionManagement = () => {
     setLoading(true)
     try {
       const params = search ? `?search=${encodeURIComponent(search)}` : ''
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/supervision/teacher${params}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/supervision/teacher${params}`)
       if (response.ok) {
         const data = await response.json()
         setTeacherRecords(data)
@@ -59,7 +59,7 @@ const SupervisionManagement = () => {
     setLoading(true)
     try {
       const params = search ? `?search=${encodeURIComponent(search)}` : ''
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/supervision/student${params}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/supervision/student${params}`)
       if (response.ok) {
         const data = await response.json()
         setStudentRecords(data)
@@ -177,8 +177,8 @@ const SupervisionManagement = () => {
     try {
       const method = editingRecord ? 'PUT' : 'POST'
       const url = editingRecord ? 
-        `${process.env.REACT_APP_BACKEND_URL}/api${endpoint}/${editingRecord.id}` : 
-        `${process.env.REACT_APP_BACKEND_URL}/api${endpoint}`
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api${endpoint}/${editingRecord.id}` : 
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api${endpoint}`
       
       const response = await fetch(url, {
         method,
@@ -212,7 +212,7 @@ const SupervisionManagement = () => {
       const endpoint = type === 'teacher' ? '/supervision/teacher' : '/supervision/student'
       
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api${endpoint}/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api${endpoint}/${id}`, {
           method: 'DELETE'
         })
 

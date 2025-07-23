@@ -29,7 +29,7 @@ const PayrollManagement = () => {
     setLoading(true)
     try {
       const params = search ? `?search=${encodeURIComponent(search)}` : ''
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payroll${params}`)
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/payroll${params}`)
       if (response.ok) {
         const data = await response.json()
         setRecords(data)
@@ -128,8 +128,8 @@ const PayrollManagement = () => {
     try {
       const method = editingRecord ? 'PUT' : 'POST'
       const url = editingRecord ? 
-        `${process.env.REACT_APP_BACKEND_URL}/api/payroll/${editingRecord.id}` : 
-        `${process.env.REACT_APP_BACKEND_URL}/api/payroll`
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api/payroll/${editingRecord.id}` : 
+        `${process.env.NEXT_PUBLIC_API_URL || ''}/api/payroll`
       
       const response = await fetch(url, {
         method,
@@ -157,7 +157,7 @@ const PayrollManagement = () => {
     if (window.confirm(`ئایا دڵنیایت لە سڕینەوەی تۆمارەکەی ${employeeName}؟`)) {
       setLoading(true)
       try {
-        const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/payroll/${id}`, {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/payroll/${id}`, {
           method: 'DELETE'
         })
 
