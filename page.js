@@ -204,7 +204,7 @@ const BerdozManagementSystem = () => {
 
   const loadLegendData = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/legend`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/legend`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       })
