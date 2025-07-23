@@ -357,8 +357,8 @@ const BerdozManagementSystem = () => {
       try {
         const method = entry.id.startsWith('staff-') && entry.id.includes(Date.now().toString().slice(-6)) ? 'POST' : 'PUT'
         const url = method === 'POST' ? 
-          `${process.env.REACT_APP_BACKEND_URL}/api/staff` : 
-          `${process.env.REACT_APP_BACKEND_URL}/api/staff/${entry.id}`
+          `${process.env.NEXT_PUBLIC_API_URL || ''}/api/staff` : 
+          `${process.env.NEXT_PUBLIC_API_URL || ''}/api/staff/${entry.id}`
         
         const response = await fetch(url, {
           method,
