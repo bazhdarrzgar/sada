@@ -231,8 +231,8 @@ const BerdozManagementSystem = () => {
       try {
         const method = entry.id.startsWith('local-') || entry.id.startsWith('sample-') ? 'POST' : 'PUT'
         const url = entry.id.startsWith('local-') || entry.id.startsWith('sample-') ? 
-          `${process.env.REACT_APP_BACKEND_URL}/api/calendar` : 
-          `${process.env.REACT_APP_BACKEND_URL}/api/calendar/${entry.id}`
+          `${process.env.NEXT_PUBLIC_API_URL || ''}/api/calendar` : 
+          `${process.env.NEXT_PUBLIC_API_URL || ''}/api/calendar/${entry.id}`
         
         const response = await fetch(url, {
           method,
