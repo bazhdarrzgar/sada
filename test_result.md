@@ -177,5 +177,7 @@ test_plan:
 agent_communication:
     - agent: "main"
       message: "Completed major migration from FastAPI+React to Next.js+MongoDB. All API routes created, frontend updated, dependencies should be installed. Ready for testing phase to verify functionality."
+    - agent: "main"
+      message: "Backend testing completed successfully! All 40 API endpoints tested with 100% pass rate. User chose manual frontend testing. Application ready at localhost:3000."
     - agent: "testing"
       message: "BACKEND TESTING COMPLETED SUCCESSFULLY: All Next.js API routes are working perfectly. Comprehensive testing of 40 individual tests with 100% success rate. All CRUD operations, search functionality, error handling, and MongoDB integration verified. The FastAPI to Next.js migration is fully functional. Backend is ready for production use. Main agent can now focus on frontend integration testing or mark the project as complete."
