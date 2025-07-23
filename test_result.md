@@ -107,27 +107,33 @@ user_problem_statement: "Convert GitHub project https://github.com/bazhdarrzgar/
 backend:
   - task: "Convert FastAPI server to Next.js API routes"
     implemented: true
-    working: false
+    working: true
     file: "app/api/*.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Successfully created all Next.js API routes for Calendar, Legend, Staff, Payroll, Teacher Supervision, and Student Supervision. Converted from Python FastAPI to JavaScript Next.js API routes. Updated MongoDB connection from Motor (async Python) to native MongoDB Node.js driver."
+        - working: true
+          agent: "testing"
+          comment: "COMPREHENSIVE TESTING COMPLETED: All 40 individual tests passed (100% success rate). Tested all API endpoints: Main API info (GET /api), Calendar CRUD (GET/POST /api/calendar, GET/PUT/DELETE /api/calendar/[id]), Legend CRUD (GET/POST /api/legend, GET/PUT/DELETE /api/legend/[id]), Staff CRUD (GET/POST /api/staff, GET/PUT/DELETE /api/staff/[id]), Payroll CRUD with search (GET/POST /api/payroll, GET/PUT/DELETE /api/payroll/[id]), Teacher Supervision CRUD with search (GET/POST /api/supervision/teacher, GET/PUT/DELETE /api/supervision/teacher/[id]), Student Supervision CRUD with search (GET/POST /api/supervision/student, GET/PUT/DELETE /api/supervision/student/[id]). All endpoints return proper JSON responses, handle CRUD operations correctly, implement search functionality where required, perform automatic calculations (payroll totals), handle error cases with appropriate HTTP status codes (404 for non-existent records), and maintain data integrity with UUID-based IDs."
 
   - task: "MongoDB connection setup for Next.js"
     implemented: true  
-    working: false
+    working: true
     file: "lib/mongodb.js"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: "NA"
           agent: "main"
           comment: "Created MongoDB connection utility using Node.js MongoDB driver with proper connection pooling for Next.js environment."
+        - working: true
+          agent: "testing"
+          comment: "MongoDB connection verified successfully. Database 'berdoz_management' is accessible and all required collections are properly created: calendar_entries, legend_entries, staff_records, payroll_records, teacher_supervision, student_supervision. Connection pooling works correctly for Next.js environment with proper environment variable usage (MONGO_URL and DB_NAME)."
 
 frontend:
   - task: "Update API calls to use Next.js routes"
