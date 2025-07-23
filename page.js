@@ -186,7 +186,7 @@ const BerdozManagementSystem = () => {
 
   const loadCalendarData = async () => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/api/calendar`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || ''}/api/calendar`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
       })
