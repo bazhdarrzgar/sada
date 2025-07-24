@@ -343,15 +343,17 @@ All testing follows the protocol defined in `test_result.md` which tracks:
 
 ## 🔒 Data Management
 
-### Local Storage
-- **Demo Mode**: Application works with sample data without database
-- **Graceful Fallback**: Continues to function if API is unavailable
-- **Auto-sync**: Synchronizes with database when connection is restored
+### SQLite Database
+- **File Location**: `backend/berdoz_management.db`
+- **Automatic Creation**: Database and tables are created automatically on first run
+- **Backup**: Simply copy the `.db` file for backup
+- **No Setup Required**: No separate database server installation needed
 
 ### Database Schema
-- **Collections**: calendar, staff, payroll, legend
-- **Relationships**: Linked data between staff records and payroll
+- **8 Main Tables**: All management modules have dedicated tables
+- **Relationships**: Proper foreign key relationships between related data
 - **Indexing**: Optimized queries for search functionality
+- **Data Integrity**: Built-in validation and constraints
 
 ## 🚦 Performance
 
