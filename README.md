@@ -470,4 +470,26 @@ For support, email [support@berdoz.edu] or create an issue in the GitHub reposit
 - Check backend logs for API issues
 - Use browser dev tools for frontend debugging
 
+---
+
+## 📄 Architecture
+
+### System Architecture
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Frontend      │    │   Backend       │    │   Database      │
+│   (Next.js)     │◄──►│   (FastAPI)     │◄──►│   (SQLite)      │
+│   Port: 3000    │    │   Port: 8001    │    │   File-based    │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+```
+
+### Data Flow
+1. **User Interaction** → Frontend (Next.js)
+2. **API Requests** → Backend (FastAPI)
+3. **Database Operations** → SQLite with SQLAlchemy
+4. **Response** → JSON API Response
+5. **UI Update** → React State Management
+
+**Built with ❤️ for Kurdish Educational Institutions**
+
 *For more information, visit our [GitHub repository](https://github.com/bazhdarrzgar/sada)*
