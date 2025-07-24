@@ -1,9 +1,10 @@
 # Berdoz Management System
 
-A comprehensive management system for educational institutions, built with Next.js and MongoDB. This bilingual (Kurdish/English) application features calendar management, staff records, payroll management, annual installments tracking, monthly expenses management, and a modern UI using Tailwind CSS and Radix UI components.
+A comprehensive management system for educational institutions, built with Next.js and SQLite. This bilingual (Kurdish/English) application features calendar management, staff records, payroll management, annual installments tracking, monthly expenses management, and a modern UI using Tailwind CSS and Radix UI components.
 
 ![Berdoz Management System](https://img.shields.io/badge/Next.js-14.2.3-black?style=for-the-badge&logo=next.js)
-![MongoDB](https://img.shields.io/badge/MongoDB-6.6.0-green?style=for-the-badge&logo=mongodb)
+![SQLite](https://img.shields.io/badge/SQLite-3.0-blue?style=for-the-badge&logo=sqlite)
+![FastAPI](https://img.shields.io/badge/FastAPI-0.110.1-green?style=for-the-badge&logo=fastapi)
 ![React](https://img.shields.io/badge/React-18-blue?style=for-the-badge&logo=react)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4.1-38B2AC?style=for-the-badge&logo=tailwind-css)
 
