@@ -297,20 +297,19 @@ All data is stored in SQLite database (`berdoz_management.db`) with the followin
 ## 🔧 Development Scripts
 
 ```bash
-# Development server with hot reload
-yarn dev
+# Frontend Development
+yarn dev                    # Start development server
+yarn build                  # Build for production
+yarn start                  # Start production server
 
-# Development server without hot reload
-yarn dev:no-reload
+# Backend Development
+cd backend
+python server.py           # Start FastAPI backend server
+pip install -r requirements.txt  # Install Python dependencies
 
-# Development with webpack optimization
-yarn dev:webpack
-
-# Production build
-yarn build
-
-# Start production server
-yarn start
+# Database
+# SQLite database file: backend/berdoz_management.db
+# Tables are created automatically on first run
 ```
 
 ## 🧪 Testing
