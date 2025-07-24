@@ -358,15 +358,17 @@ All testing follows the protocol defined in `test_result.md` which tracks:
 ## 🚦 Performance
 
 ### Optimization Features
-- **Server-side Rendering**: Next.js SSR for improved performance
-- **Code Splitting**: Automatic code splitting for faster loads
-- **Image Optimization**: Next.js built-in image optimization
+- **Frontend**: Next.js with server-side rendering for improved performance
+- **Backend**: FastAPI with async SQLite operations
+- **Database**: SQLite with optimized queries and indexing
 - **Caching**: Intelligent caching strategies for API calls
+- **Code Splitting**: Automatic code splitting for faster loads
 
 ### Memory Management
-- **Memory Limits**: NODE_OPTIONS='--max-old-space-size=512' for container optimization
-- **Efficient Rendering**: Optimized React rendering with proper key usage
+- **Efficient Database**: SQLite with minimal memory footprint
+- **Optimized Rendering**: React rendering with proper key usage
 - **State Management**: Minimal re-renders with optimized state updates
+- **Async Operations**: Non-blocking database operations
 
 ## 🤝 Contributing
 
