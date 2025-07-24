@@ -98,7 +98,8 @@ The Berdoz Management System is a complete educational institution management so
 ## 🏗️ Technology Stack
 
 - **Frontend**: Next.js 14.2.3 with React 18
-- **Database**: MongoDB 6.6.0
+- **Backend**: FastAPI 0.110.1 with Python
+- **Database**: SQLite with SQLAlchemy ORM
 - **Styling**: Tailwind CSS 3.4.1 with custom configurations
 - **UI Components**: Radix UI for accessible, unstyled components
 - **Icons**: Lucide React for consistent iconography
