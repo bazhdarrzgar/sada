@@ -139,7 +139,7 @@ The Berdoz Management System is a complete educational institution management so
 ### Prerequisites
 
 - **Node.js** 16.x or higher
-- **MongoDB** (local installation or cloud instance)
+- **Python** 3.11 or higher
 - **Yarn** package manager
 
 ### Installation
@@ -150,29 +150,48 @@ The Berdoz Management System is a complete educational institution management so
    cd sada
    ```
 
-2. **Install dependencies:**
+2. **Install Frontend dependencies:**
    ```bash
    yarn install
    ```
 
-3. **Configure environment variables:**
+3. **Install Backend dependencies:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   ```
+
+4. **Configure environment variables:**
    
-   Create a `.env.local` file in the root directory:
+   **Frontend** - Create/update `.env.local` file in the root directory:
    ```env
-   MONGO_URL=mongodb://localhost:27017
-   DB_NAME=berdoz_management
+   DATABASE_URL="sqlite:///./berdoz_management.db"
    NEXT_PUBLIC_API_URL=http://localhost:3000
    ```
 
-4. **Start the development server:**
-   ```bash
-   yarn dev
+   **Backend** - Create/update `backend/.env` file:
+   ```env
+   DATABASE_URL="sqlite:///./berdoz_management.db"
    ```
 
-5. **Open your browser:**
+5. **Start the Backend server:**
+   ```bash
+   cd backend
+   python server.py
+   # Backend will run on http://localhost:8001
+   ```
+
+6. **Start the Frontend development server:**
+   ```bash
+   cd ..  # Back to root directory
+   yarn dev
+   # Frontend will run on http://localhost:3000
+   ```
+
+7. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-6. **Login to the system:**
+8. **Login to the system:**
    - **Username**: `berdoz`
    - **Password**: `berdoz@code`
 
