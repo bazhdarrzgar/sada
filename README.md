@@ -221,7 +221,7 @@ All data is stored in SQLite database (`berdoz_management.db`) with the followin
 
 ## 📚 API Endpoints
 
-The application implements Next.js API routes under `app/api/`:
+### API Endpoints Structure
 
 ### Calendar Management
 - `GET /api/calendar` - Retrieve all calendar entries
@@ -259,10 +259,17 @@ The application implements Next.js API routes under `app/api/`:
 - `PUT /api/monthly-expenses/[id]` - Update expense information
 - `DELETE /api/monthly-expenses/[id]` - Delete expense record
 
+### Daily Accounts Management
+- `GET /api/daily-accounts` - Retrieve all daily account records
+- `POST /api/daily-accounts` - Create new daily account entry
+- `PUT /api/daily-accounts/[id]` - Update daily account information
+- `DELETE /api/daily-accounts/[id]` - Delete daily account record
+
 ### Legend Management
 - `GET /api/legend` - Retrieve legend entries
 - `POST /api/legend` - Create new legend entry
 - `PUT /api/legend/[id]` - Update legend entry
+- `DELETE /api/legend/[id]` - Delete legend entry
 
 ## 🎨 UI/UX Features
 
