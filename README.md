@@ -116,14 +116,19 @@ The Berdoz Management System is a complete educational institution management so
 │   ├── globals.css        # Global styles
 │   ├── layout.js          # Root layout component
 │   └── page.js            # Main application component
+├── backend/               # FastAPI backend
+│   ├── server.py          # Main FastAPI application with SQLite
+│   ├── requirements.txt   # Python dependencies
+│   ├── .env              # Backend environment variables
+│   └── berdoz_management.db # SQLite database file
 ├── components/            # Reusable UI components
 │   ├── ui/               # Base UI components (buttons, inputs, etc.)
 │   └── management/       # Business logic components
 ├── lib/                   # Utility libraries
-│   ├── mongodb.js        # Database connection
+│   ├── mongodb.js        # Database connection (legacy)
 │   └── utils.js          # Helper functions
 ├── hooks/                 # Custom React hooks
-├── .env.local            # Environment variables
+├── .env.local            # Frontend environment variables
 ├── package.json          # Dependencies and scripts
 ├── tailwind.config.js    # Tailwind CSS configuration
 └── README.md             # Project documentation
