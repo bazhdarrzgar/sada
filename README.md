@@ -440,8 +440,34 @@ For support, email [support@berdoz.edu] or create an issue in the GitHub reposit
 - [ ] **Docker Support**: Containerization for easy deployment
 - [ ] **TypeScript Migration**: Type safety improvements
 
----
+## 🛠️ Troubleshooting
 
-**Built with ❤️ for Kurdish Educational Institutions**
+### Common Issues
+
+1. **Backend not starting:**
+   ```bash
+   cd backend
+   pip install -r requirements.txt
+   python server.py
+   ```
+
+2. **Frontend connection issues:**
+   - Check if backend is running on `http://localhost:8001`
+   - Verify `NEXT_PUBLIC_API_URL` in `.env.local`
+
+3. **Database issues:**
+   - SQLite database is created automatically
+   - Check `backend/berdoz_management.db` file exists
+   - Ensure write permissions in backend directory
+
+4. **Port conflicts:**
+   - Frontend: Change port in `package.json` dev script
+   - Backend: Change port in `server.py` uvicorn.run()
+
+### Development Tips
+- Backend API documentation: `http://localhost:8001/docs`
+- SQLite database location: `backend/berdoz_management.db`
+- Check backend logs for API issues
+- Use browser dev tools for frontend debugging
 
 *For more information, visit our [GitHub repository](https://github.com/bazhdarrzgar/sada)*
