@@ -206,6 +206,21 @@ The application features a secure authentication system:
 
 ## 📚 API Endpoints
 
+The application implements FastAPI backend with SQLite database under `/api`:
+
+### Database Tables
+All data is stored in SQLite database (`berdoz_management.db`) with the following tables:
+- `calendar` - Calendar management entries
+- `staff` - Staff records
+- `payroll` - Payroll management data
+- `supervision` - Teacher and student supervision records
+- `installments` - Annual student installments
+- `monthly_expenses` - Monthly expense tracking
+- `daily_accounts` - Daily account records
+- `legend` - Calendar legend entries
+
+## 📚 API Endpoints
+
 The application implements Next.js API routes under `app/api/`:
 
 ### Calendar Management
