@@ -568,13 +568,15 @@ export default function CalendarPage() {
     // Calculate actual dates for the first entry to use in headers
     const sampleEntry = data[0]
     const currentYear = new Date().getFullYear()
-    let weekDates = []
+    let dateResult = { weeks: [] }
     
     if (sampleEntry) {
-      weekDates = calculateActualDates(sampleEntry.month, currentYear)
+      dateResult = calculateActualDates(sampleEntry.month, currentYear)
     }
     
-    // Define table columns for calendar with dynamic dates
+    const weekDates = dateResult.weeks
+    
+    // Define table columns for calendar with dynamic dates and enhanced email integration
     const columns = [
       {
         key: 'month',
@@ -582,7 +584,16 @@ export default function CalendarPage() {
         align: 'right',
         editable: true,
         truncate: 20,
-        render: (value) => <span className="font-medium">{value}</span>
+        render: (value, row) => (
+          <div className="font-medium">
+            <div>{value}</div>
+            {dateResult.targetDate && (
+              <div className="text-xs text-gray-500 mt-1">
+                📅 {formatDateForEmail(dateResult.targetDate)}
+              </div>
+            )}
+          </div>
+        )
       },
       // Week 1
       {
@@ -591,7 +602,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week1 && row.week1[0]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week1 && row.week1[0]) || ''}</div>
+            {weekDates[0] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[0][0].getDate()}/{weekDates[0][0].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week1-1',
@@ -599,7 +619,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week1 && row.week1[1]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week1 && row.week1[1]) || ''}</div>
+            {weekDates[0] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[0][1].getDate()}/{weekDates[0][1].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week1-2',
@@ -607,7 +636,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week1 && row.week1[2]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week1 && row.week1[2]) || ''}</div>
+            {weekDates[0] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[0][2].getDate()}/{weekDates[0][2].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week1-3',
@@ -615,7 +653,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week1 && row.week1[3]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week1 && row.week1[3]) || ''}</div>
+            {weekDates[0] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[0][3].getDate()}/{weekDates[0][3].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       // Week 2
       {
@@ -624,7 +671,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week2 && row.week2[0]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week2 && row.week2[0]) || ''}</div>
+            {weekDates[1] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[1][0].getDate()}/{weekDates[1][0].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week2-1',
@@ -632,7 +688,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week2 && row.week2[1]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week2 && row.week2[1]) || ''}</div>
+            {weekDates[1] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[1][1].getDate()}/{weekDates[1][1].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week2-2',
@@ -640,7 +705,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week2 && row.week2[2]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week2 && row.week2[2]) || ''}</div>
+            {weekDates[1] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[1][2].getDate()}/{weekDates[1][2].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week2-3',
@@ -648,7 +722,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week2 && row.week2[3]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week2 && row.week2[3]) || ''}</div>
+            {weekDates[1] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[1][3].getDate()}/{weekDates[1][3].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       // Week 3
       {
@@ -657,7 +740,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week3 && row.week3[0]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week3 && row.week3[0]) || ''}</div>
+            {weekDates[2] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[2][0].getDate()}/{weekDates[2][0].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week3-1',
@@ -665,7 +757,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week3 && row.week3[1]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week3 && row.week3[1]) || ''}</div>
+            {weekDates[2] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[2][1].getDate()}/{weekDates[2][1].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week3-2',
@@ -673,7 +774,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week3 && row.week3[2]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week3 && row.week3[2]) || ''}</div>
+            {weekDates[2] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[2][2].getDate()}/{weekDates[2][2].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week3-3',
@@ -681,7 +791,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week3 && row.week3[3]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week3 && row.week3[3]) || ''}</div>
+            {weekDates[2] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[2][3].getDate()}/{weekDates[2][3].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       // Week 4
       {
@@ -690,7 +809,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week4 && row.week4[0]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week4 && row.week4[0]) || ''}</div>
+            {weekDates[3] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[3][0].getDate()}/{weekDates[3][0].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week4-1',
@@ -698,7 +826,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week4 && row.week4[1]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week4 && row.week4[1]) || ''}</div>
+            {weekDates[3] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[3][1].getDate()}/{weekDates[3][1].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week4-2',
@@ -706,7 +843,16 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week4 && row.week4[2]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week4 && row.week4[2]) || ''}</div>
+            {weekDates[3] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[3][2].getDate()}/{weekDates[3][2].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       },
       {
         key: 'week4-3',
@@ -714,24 +860,65 @@ export default function CalendarPage() {
         align: 'center',
         editable: true,
         truncate: 15,
-        render: (value, row) => <span className="text-xs font-medium">{(row.week4 && row.week4[3]) || ''}</span>
+        render: (value, row) => (
+          <div className="text-xs">
+            <div className="font-medium">{(row.week4 && row.week4[3]) || ''}</div>
+            {weekDates[3] && (
+              <div className="text-gray-400 mt-1">
+                📧 {weekDates[3][3].getDate()}/{weekDates[3][3].getMonth() + 1}
+              </div>
+            )}
+          </div>
+        )
       }
     ]
 
     return (
-      <EnhancedTable
-        data={data}
-        columns={columns}
-        editingRow={null} // Disable inline editing
-        onEdit={startEditing}
-        onSave={() => {}} // No inline save
-        onCancel={() => {}} // No inline cancel
-        onDelete={deleteEntry}
-        onCellEdit={() => {}} // No inline cell edit
-        maxRowsPerPage={10}
-        enablePagination={true}
-        className="shadow-lg hover:shadow-xl transition-shadow duration-300"
-      />
+      <div>
+        {/* Enhanced Date Information Panel */}
+        {data.length > 0 && (
+          <div className="mb-6 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg border border-blue-200 dark:border-blue-600">
+            <div className="flex items-center justify-between flex-wrap gap-4">
+              <div>
+                <h3 className="font-semibold text-blue-800 dark:text-blue-200 mb-2">
+                  📅 Current Month Schedule Overview
+                </h3>
+                <p className="text-sm text-blue-600 dark:text-blue-300">
+                  <strong>Month:</strong> {sampleEntry?.month} | 
+                  <strong> Predicted Date:</strong> {dateResult.targetDate ? formatDateForEmail(dateResult.targetDate) : 'N/A'} |
+                  <strong> Email Integration:</strong> ✅ Active
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Button 
+                  size="sm" 
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                  onClick={() => {
+                    // This could trigger a preview of today's email
+                    alert('Email preview functionality - would show today\'s scheduled tasks')
+                  }}
+                >
+                  📧 Preview Today's Email
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <EnhancedTable
+          data={data}
+          columns={columns}
+          editingRow={null} // Disable inline editing
+          onEdit={startEditing}
+          onSave={() => {}} // No inline save
+          onCancel={() => {}} // No inline cancel
+          onDelete={deleteEntry}
+          onCellEdit={() => {}} // No inline cell edit
+          maxRowsPerPage={10}
+          enablePagination={true}
+          className="shadow-lg hover:shadow-xl transition-shadow duration-300"
+        />
+      </div>
     )
   }
 
