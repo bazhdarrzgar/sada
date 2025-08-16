@@ -66,6 +66,13 @@ export default function Dashboard() {
           icon: Shield,
           href: '/supervision',
           description: 'Teacher and student monitoring'
+        },
+        {
+          title: 'پاس',
+          subtitle: 'Bus Management',
+          icon: Bus,
+          href: '/bus',
+          description: 'Bus transportation management for students, teachers, and drivers'
         }
       ]
     },
