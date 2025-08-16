@@ -5,7 +5,7 @@ import { useAuth } from '@/components/auth/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { ThemeToggle } from '@/components/ui/theme-toggle'
-import { LogOut, User, Calendar, Users, DollarSign, Shield, CreditCard, Receipt, FileText, Building2, ChefHat, GraduationCap, UserX, FileCheck, Activity, ClipboardCheck, Search, ChevronDown, ChevronRight } from 'lucide-react'
+import { LogOut, User, Calendar, Users, DollarSign, Shield, CreditCard, Receipt, FileText, Building2, ChefHat, GraduationCap, UserX, FileCheck, Activity, ClipboardCheck, Search, ChevronDown, ChevronRight, Bus } from 'lucide-react'
 import Link from 'next/link'
 
 export default function Dashboard() {
