@@ -617,10 +617,13 @@ export default function BusPage() {
                 زیادکردنی تۆماری پاس
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto" aria-describedby="bus-form-description">
               <DialogHeader>
                 <DialogTitle>زیادکردنی تۆماری پاسی نوێ / Add New Bus Record</DialogTitle>
               </DialogHeader>
+              <p id="bus-form-description" className="sr-only">
+                Form to add new bus transportation record with student, teacher, and driver information
+              </p>
               <div className="space-y-6">
                 {/* Student Info Section */}
                 <div className="p-4 border rounded-lg bg-blue-50 dark:bg-blue-900/20">
