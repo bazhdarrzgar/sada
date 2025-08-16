@@ -47,32 +47,79 @@ export default function CalendarPage() {
     week4: ['', '', '', '']
   })
 
-  // Function to calculate actual dates for each week and day
+  // Enhanced function to calculate actual dates for each week and day
   const calculateActualDates = (monthStr, year) => {
     const monthNames = {
       'January': 0, 'February': 1, 'March': 2, 'April': 3, 'May': 4, 'June': 5,
       'July': 6, 'August': 7, 'September': 8, 'October': 9, 'November': 10, 'December': 11,
+      'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
+      'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11,
       '1-Jan': 0, '1-Feb': 1, '1-Mar': 2, '1-Apr': 3, '1-May': 4, '1-Jun': 5,
-      '1-Jul': 6, '1-Aug': 7, '1-Sep': 8, '1-Oct': 9, '1-Nov': 10, '1-Dec': 11
+      '1-Jul': 6, '1-Aug': 7, '1-Sep': 8, '1-Oct': 9, '1-Nov': 10, '1-Dec': 11,
+      // Kurdish month names support
+      'کانونی دووەم': 0, 'شوبات': 1, 'ئازار': 2, 'نیسان': 3, 'ئایار': 4, 'حوزەیران': 5,
+      'تەمووز': 6, 'ئاب': 7, 'ئەیلوول': 8, 'تشرینی یەکەم': 9, 'تشرینی دووەم': 10, 'کانونی یەکەم': 11
     }
     
-    // Extract month from various formats
+    // Enhanced date extraction logic
     let month = 0
-    for (const [key, value] of Object.entries(monthNames)) {
-      if (monthStr.includes(key)) {
-        month = value
-        break
+    let day = 1
+    
+    // Handle different date formats: "15-Jun", "Jun-2024", "1-Jun", etc.
+    if (monthStr.includes('-')) {
+      const parts = monthStr.split('-')
+      if (parts.length === 2) {
+        // Check if first part is a number (day) or second part is a year
+        const firstPart = parts[0]
+        const secondPart = parts[1]
+        
+        if (!isNaN(firstPart) && isNaN(secondPart)) {
+          // Format: "15-Jun"
+          day = parseInt(firstPart)
+          for (const [key, value] of Object.entries(monthNames)) {
+            if (secondPart.includes(key)) {
+              month = value
+              break
+            }
+          }
+        } else if (isNaN(firstPart) && !isNaN(secondPart)) {
+          // Format: "Jun-2024" or similar
+          for (const [key, value] of Object.entries(monthNames)) {
+            if (firstPart.includes(key)) {
+              month = value
+              break
+            }
+          }
+        } else {
+          // Fallback to original logic
+          for (const [key, value] of Object.entries(monthNames)) {
+            if (monthStr.includes(key)) {
+              month = value
+              break
+            }
+          }
+        }
+      }
+    } else {
+      // Handle month names without dashes
+      for (const [key, value] of Object.entries(monthNames)) {
+        if (monthStr.includes(key)) {
+          month = value
+          break
+        }
       }
     }
     
     const currentYear = year || new Date().getFullYear()
-    const firstDay = new Date(currentYear, month, 1)
-    const firstSunday = new Date(firstDay)
+    const targetDate = new Date(currentYear, month, day)
     
-    // Find the first Sunday of the month
-    const dayOfWeek = firstDay.getDay() // 0 = Sunday, 1 = Monday, etc.
+    // Find the first Sunday of the month containing our target date
+    const firstDayOfMonth = new Date(currentYear, month, 1)
+    const firstSunday = new Date(firstDayOfMonth)
+    
+    const dayOfWeek = firstDayOfMonth.getDay() // 0 = Sunday, 1 = Monday, etc.
     if (dayOfWeek !== 0) {
-      firstSunday.setDate(firstDay.getDate() - dayOfWeek)
+      firstSunday.setDate(firstDayOfMonth.getDate() - dayOfWeek)
     }
     
     // Calculate dates for 4 weeks, 4 days each (Sun, Mon, Tue, Wed)
@@ -87,7 +134,13 @@ export default function CalendarPage() {
       weeks.push(weekDates)
     }
     
-    return weeks
+    return {
+      weeks: weeks,
+      targetDate: targetDate,
+      monthName: monthStr,
+      calculatedMonth: month,
+      calculatedDay: day
+    }
   }
 
   // Function to get actual date for email integration
