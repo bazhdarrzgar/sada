@@ -1043,7 +1043,96 @@ export default function CalendarPage() {
         titleKu="دەستکاریکردنی تۆماری ساڵنامە"
       />
 
-      {/* Interactive Code Reference Section */}
+      {/* Enhanced Email Integration Controls */}
+      <Card className="mt-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 border-green-200 dark:border-green-700">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
+            <h3 className="text-lg font-semibold text-green-800 dark:text-green-200 flex items-center gap-2">
+              <span>📧</span>
+              Email Integration & Date Prediction
+              <span className="text-sm font-normal text-gray-600 dark:text-gray-300">/ پەیوەندی ئیمەیڵ و پێشبینی ڕێکەوت</span>
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Date Prediction Info */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+              <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                🎯 Smart Date Prediction
+              </h4>
+              <div className="text-sm space-y-2">
+                <p><strong>✅ Enhanced Format Support:</strong></p>
+                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1 ml-2">
+                  <li>Standard: "1-Jun", "15-Jul", "1-Aug"</li>
+                  <li>Full dates: "June-2024", "July-2024"</li>
+                  <li>Kurdish months: "حوزەیران", "تەمووز", "ئاب"</li>
+                  <li>Auto-calculation: Week numbers → Real dates</li>
+                </ul>
+                <div className="mt-3 p-2 bg-blue-50 dark:bg-blue-900/30 rounded text-blue-700 dark:text-blue-300">
+                  <p><strong>🔄 Auto-Updates:</strong> Dates are automatically calculated based on month and week information</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Email Integration Info */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-4 border">
+              <h4 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center gap-2">
+                📨 Email Notification Features
+              </h4>
+              <div className="text-sm space-y-2">
+                <p><strong>✅ Automated System:</strong></p>
+                <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 space-y-1 ml-2">
+                  <li>Daily notifications at 6:00 AM Baghdad time</li>
+                  <li>Smart code extraction from calendar entries</li>
+                  <li>Task descriptions with code dictionary</li>
+                  <li>Date-specific email content</li>
+                </ul>
+                <div className="mt-3 p-2 bg-green-50 dark:bg-green-900/30 rounded text-green-700 dark:text-green-300">
+                  <p><strong>🎯 Integration:</strong> Each calendar cell with date prediction is connected to email system</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Live Date Preview */}
+          {filteredData.length > 0 && (
+            <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-600">
+              <h4 className="font-semibold text-blue-800 dark:text-blue-200 mb-3">
+                🗓️ Live Date Prediction Preview for "{filteredData[0]?.month}"
+              </h4>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs">
+                {(() => {
+                  const result = calculateActualDates(filteredData[0]?.month, new Date().getFullYear())
+                  return result.weeks.map((week, weekIndex) => (
+                    <div key={weekIndex} className="bg-white dark:bg-gray-800 p-2 rounded border">
+                      <div className="font-semibold mb-1">Week {weekIndex + 1}</div>
+                      {week.map((date, dayIndex) => {
+                        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed']
+                        return (
+                          <div key={dayIndex} className="flex justify-between">
+                            <span className="text-gray-600 dark:text-gray-300">{dayNames[dayIndex]}:</span>
+                            <span className="font-medium">{date.getDate()}/{date.getMonth() + 1}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ))
+                })()}
+              </div>
+              <div className="mt-3 text-xs text-gray-600 dark:text-gray-400 flex items-center gap-2">
+                <span>🔄</span>
+                <span>Dates update automatically based on month field. Email system uses these predictions for notifications.</span>
+              </div>
+            </div>
+          )}
+
+          <div className="mt-4 text-xs text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/30 p-3 rounded-lg">
+            <span className="font-semibold">💡 How it works:</span> Enter month (e.g., "1-Jun") → System predicts all week dates → Email notifications use exact dates for each task code.
+            <br />
+            <span className="font-semibold">چۆن کاردەکات:</span> مانگ بنووسە (وەک "1-Jun") ← سیستەم هەموو ڕێکەوتەکانی هەفتە پێشبینی دەکات ← ئاگادارکردنەوەی ئیمەیڵ ڕێکەوتی وردی بەکاردەهێنێت.
+          </div>
+        </CardContent>
+      </Card>
       <Card className="mt-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border-blue-200 dark:border-blue-700">
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-4">
