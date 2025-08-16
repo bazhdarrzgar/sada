@@ -145,9 +145,9 @@ export default function CalendarPage() {
 
   // Function to get actual date for email integration
   const getActualDateForCell = (monthStr, weekIndex, dayIndex, year) => {
-    const weekDates = calculateActualDates(monthStr, year || new Date().getFullYear())
-    if (weekDates[weekIndex] && weekDates[weekIndex][dayIndex]) {
-      return weekDates[weekIndex][dayIndex]
+    const result = calculateActualDates(monthStr, year || new Date().getFullYear())
+    if (result.weeks[weekIndex] && result.weeks[weekIndex][dayIndex]) {
+      return result.weeks[weekIndex][dayIndex]
     }
     return null
   }
