@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-import { Upload, X, Eye, Download, Video, Play, Pause, Volume2, VolumeX } from 'lucide-react'
+import { Upload, X, Eye, Download, Video, Play, Pause, Volume2, VolumeX, Maximize, Minimize, SkipBack, SkipForward, Settings } from 'lucide-react'
 
 export const VideoUpload = ({ 
   videos = [], 
