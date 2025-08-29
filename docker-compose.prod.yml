@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # MongoDB Database Service
+  mongodb:
+    image: mongo:7.0
+    container_name: sada_mongodb_prod
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_DATABASE: sada
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_prod:/data/db
+      - mongodb_config_prod:/data/configdb
+    networks:
+      - sada_network_prod
+    command: mongod --auth
+
+  # Next.js Application Service
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: sada_app_prod
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://admin:${MONGO_ROOT_PASSWORD}@mongodb:27017/sada?authSource=admin
+      - MONGO_URL=mongodb://admin:${MONGO_ROOT_PASSWORD}@mongodb:27017/sada?authSource=admin
+      - NEXT_TELEMETRY_DISABLED=1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mongodb
+    networks:
+      - sada_network_prod
+    volumes:
+      - ./public/upload:/app/public/upload
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Nginx Reverse Proxy (Optional)
+  nginx:
+    image: nginx:alpine
+    container_name: sada_nginx_prod
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - app
+    networks:
+      - sada_network_prod
+    profiles:
+      - nginx
+
+# Define volumes for persistent data
+volumes:
+  mongodb_data_prod:
+    driver: local
+  mongodb_config_prod:
+    driver: local
+
+# Define networks
+networks:
+  sada_network_prod:
+    driver: bridge
