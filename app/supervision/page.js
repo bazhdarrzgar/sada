@@ -8,7 +8,7 @@ import { Card } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { Search, Plus, Edit, Trash2, Eye, Languages, RefreshCw } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Eye } from 'lucide-react'
 import { useIsMobile } from "@/hooks/use-mobile"
 import PageLayout from '@/components/layout/PageLayout'
 import { DownloadButton } from '@/components/ui/download-button'
