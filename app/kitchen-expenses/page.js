@@ -7,7 +7,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Search, Plus, Edit, Trash2, Save, X, ChefHat, Filter, Image as ImageIcon, Download, Languages, RefreshCw } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Save, X, ChefHat, Filter, Image as ImageIcon, Download } from 'lucide-react'
 import { useIsMobile } from "@/hooks/use-mobile"
 import PageLayout from '@/components/layout/PageLayout'
 import { DownloadButton } from '@/components/ui/download-button'
