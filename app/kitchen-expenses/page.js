@@ -617,22 +617,7 @@ export default function KitchenExpensesPage() {
             />
           </div>
           <div className="flex items-center gap-4">
-            {/* Language Toggle Button */}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleTranslateInterface}
-              className={`relative h-10 px-3 rounded-full border-2 border-transparent hover:border-green-200 dark:hover:border-green-400 hover:bg-gradient-to-r hover:from-green-50 hover:to-blue-50 dark:hover:from-green-900/30 dark:hover:to-blue-900/30 transition-all duration-300 ease-in-out hover:shadow-lg hover:scale-105 active:scale-95 group flex items-center gap-2 ${isTranslating ? 'animate-pulse' : ''}`}
-              disabled={isTranslating}
-            >
-              <div className="relative overflow-hidden flex items-center gap-2">
-                <RefreshCw className={`h-4 w-4 text-green-600 group-hover:text-green-500 transition-all duration-300 ${isTranslating ? 'animate-spin' : 'group-hover:rotate-12 group-hover:scale-110'}`} />
-                <Languages className="h-4 w-4 text-blue-600 group-hover:text-blue-500 transition-all duration-300 group-hover:rotate-12 group-hover:scale-110" />
-                <span className="text-sm font-medium group-hover:scale-105 transition-transform duration-200">
-                  {language === 'kurdish' ? 'EN' : 'کوردی'}
-                </span>
-              </div>
-            </Button>
+
 
             <DownloadButton 
               data={filteredData}
