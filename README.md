@@ -329,10 +329,15 @@ Required Settings:
 |--------|---------|----------|
 | **Payroll Management** | بەڕێوەبردنی موچە | Salary processing, tax calculations, bank integration |
 | **Annual Installments** | قیستی ساڵانە | Fee collection, payment tracking, automated reminders |
-| **Daily Accounts** | حساباتی ڕۆژانە | Transaction logging, financial reporting, audit trails |
+| **Daily Accounts** | حساباتی ڕۆژانە | Transaction logging, financial reporting, audit trails, weekly summaries |
 | **Monthly Expenses** | خەرجی مانگانە | Budget management, expense categorization, approval workflows |
 | **Building Expenses** | مەسروفی بینا | Infrastructure costs, maintenance tracking, vendor management |
 | **Kitchen Expenses** | خەرجی خواردنگە | Food service management, inventory tracking, nutritional planning |
+
+### 🛡️ Supervision & Security
+| Module | Kurdish | Features |
+|--------|---------|----------|
+| **Supervision System** | سیستەمی چاودێری | Teacher and student supervision, violation tracking, punishment records |
 
 ### 🔍 Utility & Search
 | Module | Kurdish | Features |
