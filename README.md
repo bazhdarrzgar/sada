@@ -10,7 +10,7 @@
 [![Status](https://img.shields.io/badge/Status-Production_Ready-brightgreen?style=for-the-badge)](https://github.com/bazhdarrzgar/sada)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
-**🌟 A comprehensive bilingual (Kurdish/English) school management system with 17+ modules, enhanced calendar scheduling, automated email notifications, and professional video management capabilities.**
+**🌟 A comprehensive bilingual (Kurdish/English) school management system with 17+ modules, enhanced calendar scheduling, automated email notifications, professional video management capabilities, and streamlined interface controls.**
 
 [🚀 Quick Start](#-quick-start) • [📖 Documentation](#-features) • [🐳 Docker Setup](#-docker-deployment) • [🔧 API Reference](#-api-documentation) • [🤝 Contributing](#-contributing)
 
