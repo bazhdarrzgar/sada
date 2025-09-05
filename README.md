@@ -35,6 +35,7 @@
 
 ## 📋 Table of Contents
 
+- [🔧 Recent Updates & Customizations](#-recent-updates--customizations)
 - [✨ Features](#-features)
 - [🚀 Quick Start](#-quick-start)
 - [🐳 Docker Deployment](#-docker-deployment)
