@@ -40,13 +40,6 @@ export default function LoginForm() {
     }
   }
 
-  const handleDemoLogin = () => {
-    login({
-      username: 'admin',
-      role: 'admin',
-      id: 1
-    })
-  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
@@ -115,17 +108,6 @@ export default function LoginForm() {
                 {loading ? 'Signing In...' : 'Sign In / چوونەژوورەوە'}
               </Button>
               
-              <div className="text-center">
-                <p className="text-sm text-gray-500 mb-2">For testing purposes:</p>
-                <Button
-                  type="button"
-                  onClick={handleDemoLogin}
-                  variant="outline"
-                  className="w-full h-10 text-sm"
-                >
-                  Demo Login (Any Credentials)
-                </Button>
-              </div>
             </form>
 
             <div className="mt-6 pt-4 border-t text-center">
