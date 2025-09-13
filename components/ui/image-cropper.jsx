@@ -4,7 +4,7 @@ import React, { useState, useRef, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { Slider } from '@/components/ui/slider'
-import { Crop, RotateCcw, ZoomIn, ZoomOut, Check, X } from 'lucide-react'
+import { Crop, RotateCcw, ZoomIn, ZoomOut, Check, X, RotateCw, Move, Grid3X3, Maximize } from 'lucide-react'
 
 const ImageCropper = ({ 
   isOpen, 
