@@ -369,22 +369,51 @@ const ProfileManager = ({ children }) => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6">
-                {/* Avatar Section */}
+                {/* Enhanced Avatar Section */}
                 <div className="flex items-center gap-6">
-                  <div className="relative">
-                    <Avatar className="h-24 w-24">
+                  <div className="relative group">
+                    {/* Avatar with enhanced loading and preview */}
+                    <Avatar className="h-24 w-24 ring-2 ring-gray-200 dark:ring-gray-700 transition-all duration-300 group-hover:ring-blue-400 dark:group-hover:ring-blue-500">
                       <AvatarImage 
-                        src={localProfile?.avatar} 
+                        key={avatarKey} // Force re-render
+                        src={imagePreview || localProfile?.avatar} 
                         alt={localProfile?.displayName}
-                        className="object-cover"
+                        className="object-cover transition-all duration-300"
+                        onLoad={() => {
+                          // Force re-render when image loads
+                          setAvatarKey(prev => prev + 1)
+                        }}
+                        onError={() => {
+                          console.log('Avatar image failed to load')
+                          setImagePreview(null)
+                        }}
                       />
                       <AvatarFallback className="text-2xl font-bold bg-gradient-to-br from-blue-500 to-purple-600 text-white">
                         {localProfile?.displayName?.charAt(0) || 'B'}
                       </AvatarFallback>
                     </Avatar>
+                    
+                    {/* Upload progress indicator */}
+                    {imageUploadProgress > 0 && imageUploadProgress < 100 && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                        <div className="text-white text-sm font-medium">
+                          {imageUploadProgress}%
+                        </div>
+                      </div>
+                    )}
+                    
+                    {/* Loading overlay */}
+                    {isLoading && (
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full">
+                        <Loader2 className="h-6 w-6 text-white animate-spin" />
+                      </div>
+                    )}
+                    
+                    {/* Enhanced upload button */}
                     <label
                       htmlFor="avatar-upload"
-                      className="absolute -bottom-2 -right-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer shadow-lg transition-colors"
+                      className="absolute -bottom-2 -right-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl group-hover:bg-blue-700"
+                      title="Change profile picture"
                     >
                       <Camera className="h-4 w-4" />
                     </label>
@@ -394,6 +423,7 @@ const ProfileManager = ({ children }) => {
                       accept="image/*"
                       onChange={handleAvatarUpload}
                       className="hidden"
+                      disabled={isLoading}
                     />
                   </div>
                   <div className="flex-1">
@@ -403,6 +433,21 @@ const ProfileManager = ({ children }) => {
                       <Crown className="h-3 w-3 mr-1" />
                       {localProfile?.role}
                     </Badge>
+                    {/* Upload status */}
+                    {imageUploadProgress > 0 && imageUploadProgress < 100 && (
+                      <div className="mt-2">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <Loader2 className="h-3 w-3 animate-spin" />
+                          Uploading image... {imageUploadProgress}%
+                        </div>
+                        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5 mt-1">
+                          <div 
+                            className="bg-blue-600 h-1.5 rounded-full transition-all duration-300" 
+                            style={{ width: `${imageUploadProgress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
 
