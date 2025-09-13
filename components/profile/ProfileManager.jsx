@@ -205,12 +205,22 @@ const ProfileManager = ({ children }) => {
         // Create cache-busting URL
         const cacheBustingUrl = `${data.avatarUrl}?t=${Date.now()}`
         
+        setImageUploadProgress(85)
+        
+        // Preload the new image to ensure it's ready
+        try {
+          await preloadImage(cacheBustingUrl)
+          console.log('New avatar image preloaded successfully')
+        } catch (preloadError) {
+          console.warn('Failed to preload new avatar:', preloadError)
+        }
+        
         // Update local profile state with immediate preview
         setLocalProfile(prev => ({ ...prev, avatar: data.avatarUrl }))
         setImagePreview(cacheBustingUrl)
         setAvatarKey(Date.now()) // Force refresh
         
-        setImageUploadProgress(90)
+        setImageUploadProgress(95)
         
         // Update profile context
         await updateProfile({ ...localProfile, avatar: data.avatarUrl })
@@ -218,10 +228,10 @@ const ProfileManager = ({ children }) => {
         setImageUploadProgress(100)
         toast.success('Avatar updated successfully!')
         
-        // Force a re-render of the avatar after a short delay
-        setTimeout(() => {
-          setAvatarKey(Date.now())
-        }, 500)
+        // Multiple refresh attempts to ensure visibility
+        setTimeout(() => setAvatarKey(Date.now()), 100)
+        setTimeout(() => setAvatarKey(Date.now()), 500)
+        setTimeout(() => setAvatarKey(Date.now()), 1000)
         
       } else {
         throw new Error('Failed to upload avatar')
@@ -232,7 +242,7 @@ const ProfileManager = ({ children }) => {
     } finally {
       setIsLoading(false)
       setSelectedImageSrc(null)
-      setTimeout(() => setImageUploadProgress(0), 1000)
+      setTimeout(() => setImageUploadProgress(0), 1500)
     }
   }
 
