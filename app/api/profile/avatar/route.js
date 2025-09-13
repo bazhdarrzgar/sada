@@ -80,6 +80,19 @@ export async function POST(request) {
           console.warn('⚠️ Could not set directory permissions (might not be needed):', permError.message)
         }
       }
+      
+      // Verify directory is writable
+      try {
+        await access(uploadDir, constants.W_OK)
+        console.log('✅ Avatar upload directory is writable')
+      } catch (writeCheckError) {
+        console.error('❌ Avatar upload directory is not writable:', writeCheckError)
+        return NextResponse.json({ 
+          error: 'Upload directory is not writable',
+          details: writeCheckError.message 
+        }, { status: 500 })
+      }
+      
     } catch (dirError) {
       console.error('❌ Failed to create upload directory:', dirError)
       return NextResponse.json({ 
