@@ -103,10 +103,41 @@ const ImageCropper = ({
     const canvas = canvasRef.current
     if (!canvas) return
 
+    setIsProcessing(true)
+    
+    // Create high-quality output
+    const outputCanvas = document.createElement('canvas')
+    const outputCtx = outputCanvas.getContext('2d')
+    const outputSize = 512 // Higher resolution output
+    
+    outputCanvas.width = outputSize
+    outputCanvas.height = outputSize
+    
+    // Enable high-quality rendering
+    outputCtx.imageSmoothingEnabled = true
+    outputCtx.imageSmoothingQuality = 'high'
+    
+    // Draw the cropped area to the output canvas
+    const image = imageRef.current
+    if (image) {
+      outputCtx.save()
+      outputCtx.translate(outputSize / 2, outputSize / 2)
+      outputCtx.rotate((rotation * Math.PI) / 180)
+      outputCtx.scale(scale, scale)
+      outputCtx.translate(position.x, position.y)
+      
+      const imgWidth = image.naturalWidth
+      const imgHeight = image.naturalHeight
+      outputCtx.drawImage(image, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight)
+      
+      outputCtx.restore()
+    }
+    
     // Use higher quality for better results
-    canvas.toBlob((blob) => {
+    outputCanvas.toBlob((blob) => {
+      setIsProcessing(false)
       onCropComplete(blob)
-    }, 'image/jpeg', 0.95) // Increased quality from 0.9 to 0.95
+    }, 'image/jpeg', 0.98) // Increased quality even more
   }
 
   const resetTransform = () => {
