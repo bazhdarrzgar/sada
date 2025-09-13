@@ -12,7 +12,7 @@ const ImageCropper = ({
   imageSrc, 
   onCropComplete,
   aspectRatio = 1, // 1 for square (circle)
-  cropSize = { width: 300, height: 300 }
+  cropSize = { width: 400, height: 400 } // Increased size for better preview
 }) => {
   const [scale, setScale] = useState(0.5) // Start with a smaller default scale
   const [position, setPosition] = useState({ x: 0, y: 0 })
@@ -20,6 +20,8 @@ const ImageCropper = ({
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [rotation, setRotation] = useState(0)
   const [initialScale, setInitialScale] = useState(0.5) // Store the calculated initial scale
+  const [showGrid, setShowGrid] = useState(false) // Grid overlay toggle
+  const [isProcessing, setIsProcessing] = useState(false) // Processing state
   const canvasRef = useRef(null)
   const imageRef = useRef(null)
   const containerRef = useRef(null)
