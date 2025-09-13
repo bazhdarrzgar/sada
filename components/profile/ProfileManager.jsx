@@ -74,6 +74,7 @@ const ProfileManager = ({ children }) => {
   const [imagePreview, setImagePreview] = useState(null)
   const [imageUploadProgress, setImageUploadProgress] = useState(0)
   const [avatarKey, setAvatarKey] = useState(Date.now()) // Force re-render of avatar
+  const [refreshingAvatar, setRefreshingAvatar] = useState(false)
 
   // Password change state
   const [passwordData, setPasswordData] = useState({
