@@ -35,6 +35,10 @@ const ImageCropper = ({
     canvas.width = width
     canvas.height = height
     
+    // Enable image smoothing for better quality
+    ctx.imageSmoothingEnabled = true
+    ctx.imageSmoothingQuality = 'high'
+    
     // Clear canvas
     ctx.clearRect(0, 0, width, height)
     
@@ -45,7 +49,7 @@ const ImageCropper = ({
     ctx.scale(scale, scale)
     ctx.translate(position.x, position.y)
     
-    // Draw image centered
+    // Draw image centered with better quality
     const imgWidth = image.naturalWidth
     const imgHeight = image.naturalHeight
     ctx.drawImage(image, -imgWidth / 2, -imgHeight / 2, imgWidth, imgHeight)
