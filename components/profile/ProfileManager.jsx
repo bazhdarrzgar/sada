@@ -53,6 +53,11 @@ const ProfileManager = ({ children }) => {
   const [showImageCropper, setShowImageCropper] = useState(false)
   const [selectedImageSrc, setSelectedImageSrc] = useState(null)
   const [localProfile, setLocalProfile] = useState(null)
+  
+  // Enhanced image preview state
+  const [imagePreview, setImagePreview] = useState(null)
+  const [imageUploadProgress, setImageUploadProgress] = useState(0)
+  const [avatarKey, setAvatarKey] = useState(Date.now()) // Force re-render of avatar
 
   // Password change state
   const [passwordData, setPasswordData] = useState({
