@@ -525,46 +525,6 @@ const ProfileManager = ({ children }) => {
                   </div>
                 </div>
 
-                {/* Image Preview Panel */}
-                {(imagePreview || localProfile?.avatar) && (
-                  <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-                    <div className="flex items-center gap-3 mb-3">
-                      <ImageIcon className="h-4 w-4 text-gray-600 dark:text-gray-400" />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Current Profile Picture
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <div className="relative">
-                        <EnhancedImage
-                          key={`preview-${avatarKey}`}
-                          src={imagePreview || localProfile?.avatar}
-                          alt="Profile preview"
-                          className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600 shadow-sm"
-                          showRefresh={true}
-                          onLoad={() => {
-                            console.log('Preview image loaded successfully')
-                          }}
-                          onError={() => {
-                            console.log('Preview image failed to load')
-                          }}
-                        />
-                        {refreshingAvatar && (
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-lg">
-                            <Loader2 className="h-4 w-4 text-white animate-spin" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 text-sm text-gray-600 dark:text-gray-400">
-                        <p>This is how your profile picture appears to others.</p>
-                        <p className="text-xs mt-1">
-                          If the image doesn't display correctly, try refreshing it with the green button.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
                 <Separator />
 
                 {/* Basic Information */}
