@@ -40,6 +40,7 @@ import {
 import { useAuth } from '@/components/auth/AuthContext'
 import { useProfile } from '@/components/profile/ProfileContext'
 import ImageCropper from '@/components/ui/image-cropper'
+import EnhancedImage from '@/components/ui/enhanced-image'
 import { toast } from 'sonner'
 
 // Utility function to preload and cache images
