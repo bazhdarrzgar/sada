@@ -97,9 +97,10 @@ const ImageCropper = ({
     const canvas = canvasRef.current
     if (!canvas) return
 
+    // Use higher quality for better results
     canvas.toBlob((blob) => {
       onCropComplete(blob)
-    }, 'image/jpeg', 0.9)
+    }, 'image/jpeg', 0.95) // Increased quality from 0.9 to 0.95
   }
 
   const resetTransform = () => {
