@@ -468,14 +468,28 @@ const ProfileManager = ({ children }) => {
                       </div>
                     )}
                     
-                    {/* Enhanced upload button */}
-                    <label
-                      htmlFor="avatar-upload"
-                      className="absolute -bottom-2 -right-2 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl group-hover:bg-blue-700"
-                      title="Change profile picture"
-                    >
-                      <Camera className="h-4 w-4" />
-                    </label>
+                    {/* Action buttons */}
+                    <div className="absolute -bottom-2 -right-2 flex gap-1">
+                      {/* Upload button */}
+                      <label
+                        htmlFor="avatar-upload"
+                        className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl group-hover:bg-blue-700"
+                        title="Change profile picture"
+                      >
+                        <Camera className="h-4 w-4" />
+                      </label>
+                      
+                      {/* Refresh button */}
+                      <button
+                        onClick={refreshAvatar}
+                        disabled={refreshingAvatar || isLoading}
+                        className="p-2 bg-green-600 hover:bg-green-700 text-white rounded-full shadow-lg transition-all duration-200 hover:scale-110 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Refresh avatar"
+                      >
+                        <RefreshCw className={`h-4 w-4 ${refreshingAvatar ? 'animate-spin' : ''}`} />
+                      </button>
+                    </div>
+                    
                     <input
                       id="avatar-upload"
                       type="file"
