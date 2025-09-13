@@ -536,17 +536,17 @@ const ProfileManager = ({ children }) => {
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="relative">
-                        <img
+                        <EnhancedImage
                           key={`preview-${avatarKey}`}
                           src={imagePreview || localProfile?.avatar}
                           alt="Profile preview"
                           className="w-16 h-16 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-600 shadow-sm"
-                          onError={(e) => {
-                            console.log('Preview image failed to load')
-                            e.target.style.display = 'none'
-                          }}
+                          showRefresh={true}
                           onLoad={() => {
                             console.log('Preview image loaded successfully')
+                          }}
+                          onError={() => {
+                            console.log('Preview image failed to load')
                           }}
                         />
                         {refreshingAvatar && (
