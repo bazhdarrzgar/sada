@@ -76,8 +76,21 @@ const ProfileManager = ({ children }) => {
   useEffect(() => {
     if (profile) {
       setLocalProfile(profile)
+      // Update image preview when profile changes
+      if (profile.avatar) {
+        setImagePreview(profile.avatar)
+        setAvatarKey(Date.now()) // Force avatar refresh
+      }
     }
   }, [profile])
+
+  // Enhanced avatar refresh effect
+  useEffect(() => {
+    if (localProfile?.avatar && localProfile.avatar !== imagePreview) {
+      setImagePreview(localProfile.avatar)
+      setAvatarKey(Date.now())
+    }
+  }, [localProfile?.avatar])
 
   const handleProfileUpdate = async () => {
     setIsLoading(true)
