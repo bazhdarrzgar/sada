@@ -109,6 +109,38 @@ const ProfileManager = ({ children }) => {
     }
   }, [localProfile?.avatar])
 
+  // Manual avatar refresh function
+  const refreshAvatar = async () => {
+    setRefreshingAvatar(true)
+    try {
+      // Refresh profile data from server
+      await refreshProfile()
+      
+      // Force avatar refresh
+      setAvatarKey(Date.now())
+      
+      // Clear cache and reload image
+      if (localProfile?.avatar) {
+        const cacheBustingUrl = `${localProfile.avatar}?t=${Date.now()}`
+        setImagePreview(cacheBustingUrl)
+        
+        // Preload the refreshed image
+        try {
+          await preloadImage(cacheBustingUrl)
+        } catch (error) {
+          console.warn('Failed to preload refreshed avatar:', error)
+        }
+      }
+      
+      toast.success('Avatar refreshed successfully!')
+    } catch (error) {
+      toast.error('Failed to refresh avatar')
+      console.error('Error refreshing avatar:', error)
+    } finally {
+      setRefreshingAvatar(false)
+    }
+  }
+
   const handleProfileUpdate = async () => {
     setIsLoading(true)
     try {
