@@ -1,0 +1,50 @@
+# Development Dockerfile for hot reload and development workflow
+FROM node:18-alpine
+
+# Install additional tools for development
+RUN apk add --no-cache \
+    libc6-compat \
+    git \
+    curl
+
+WORKDIR /app
+
+# Copy package files for better layer caching
+COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
+
+# Install dependencies with development packages
+RUN \
+  if [ -f yarn.lock ]; then \
+    yarn install --prefer-offline; \
+  elif [ -f package-lock.json ]; then \
+    npm ci --prefer-offline; \
+  elif [ -f pnpm-lock.yaml ]; then \
+    corepack enable pnpm && pnpm install; \
+  else \
+    echo "❌ No lockfile found" && exit 1; \
+  fi
+
+# Copy source code (use .dockerignore to exclude unnecessary files)
+COPY . .
+
+# Create uploads directory
+RUN mkdir -p public/upload && chown -R node:node public/upload
+
+# Switch to non-root user
+USER node
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables for development
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3000 || exit 1
+
+# Start development server with hot reload
+CMD ["yarn", "dev"]
