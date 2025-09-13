@@ -170,26 +170,45 @@ const ProfileManager = ({ children }) => {
   const handleCropComplete = async (croppedBlob) => {
     setIsLoading(true)
     setShowImageCropper(false)
+    setImageUploadProgress(10)
     
     try {
       const formData = new FormData()
       formData.append('avatar', croppedBlob, 'avatar.jpg')
+
+      setImageUploadProgress(30)
 
       const response = await fetch('/api/profile/avatar', {
         method: 'POST',
         body: formData
       })
 
+      setImageUploadProgress(70)
+
       if (response.ok) {
         const data = await response.json()
         
-        // Update local profile state
+        // Create cache-busting URL
+        const cacheBustingUrl = `${data.avatarUrl}?t=${Date.now()}`
+        
+        // Update local profile state with immediate preview
         setLocalProfile(prev => ({ ...prev, avatar: data.avatarUrl }))
+        setImagePreview(cacheBustingUrl)
+        setAvatarKey(Date.now()) // Force refresh
+        
+        setImageUploadProgress(90)
         
         // Update profile context
         await updateProfile({ ...localProfile, avatar: data.avatarUrl })
         
+        setImageUploadProgress(100)
         toast.success('Avatar updated successfully!')
+        
+        // Force a re-render of the avatar after a short delay
+        setTimeout(() => {
+          setAvatarKey(Date.now())
+        }, 500)
+        
       } else {
         throw new Error('Failed to upload avatar')
       }
@@ -199,6 +218,7 @@ const ProfileManager = ({ children }) => {
     } finally {
       setIsLoading(false)
       setSelectedImageSrc(null)
+      setTimeout(() => setImageUploadProgress(0), 1000)
     }
   }
 
