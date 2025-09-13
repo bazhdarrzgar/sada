@@ -33,7 +33,9 @@ import {
   Upload,
   AlertTriangle,
   CheckCircle,
-  Loader2
+  Loader2,
+  RefreshCw,
+  ImageIcon
 } from 'lucide-react'
 import { useAuth } from '@/components/auth/AuthContext'
 import { useProfile } from '@/components/profile/ProfileContext'
