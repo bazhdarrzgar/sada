@@ -40,6 +40,20 @@ import { useProfile } from '@/components/profile/ProfileContext'
 import ImageCropper from '@/components/ui/image-cropper'
 import { toast } from 'sonner'
 
+// Utility function to preload and cache images
+const preloadImage = (src) => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous' // Handle CORS issues
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
+
+// Image cache for better performance
+const imageCache = new Map()
+
 const ProfileManager = ({ children }) => {
   const { user } = useAuth()
   const { profile, loading: profileLoading, updateProfile, refreshProfile } = useProfile()
