@@ -179,18 +179,15 @@ export default function SupervisionPage() {
     }
   }
 
-  const resetNewEntry = () => {
-    setNewEntry({
-      type: 'teacher',
-      name: '',
-      subject: '',
-      department: '',
-      grade: '',
-      violationType: '',
-      punishmentType: '',
-      supervisionLocation: '',
-      notes: ''
-    })
+  // Handle Add Entry with smooth scrolling
+  const handleAddEntry = () => {
+    // First scroll to center quickly
+    scrollToCenterFast()
+    
+    // Small delay to ensure smooth scrolling starts, then open dialog
+    setTimeout(() => {
+      setIsAddDialogOpen(true)
+    }, 100) // Quick delay to allow scroll to start
   }
 
   const handleCellEdit = (rowIndex, field, value) => {
