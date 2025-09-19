@@ -190,6 +190,20 @@ export default function SupervisionPage() {
     }, 100) // Quick delay to allow scroll to start
   }
 
+  const resetNewEntry = () => {
+    setNewEntry({
+      type: 'teacher',
+      name: '',
+      subject: '',
+      department: '',
+      grade: '',
+      violationType: '',
+      punishmentType: '',
+      supervisionLocation: '',
+      notes: ''
+    })
+  }
+
   const handleCellEdit = (rowIndex, field, value) => {
     const updatedData = [...supervisionData]
     updatedData[rowIndex][field] = value
