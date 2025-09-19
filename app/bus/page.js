@@ -1327,10 +1327,16 @@ export default function BusPage() {
                       {selectedRecord.driverLicensePhoto && (Array.isArray(selectedRecord.driverLicensePhoto) ? selectedRecord.driverLicensePhoto.length > 0 : selectedRecord.driverLicensePhoto.url) ? (
                         <button
                           onClick={() => {
-                            const images = Array.isArray(selectedRecord.driverLicensePhoto) ? selectedRecord.driverLicensePhoto : [selectedRecord.driverLicensePhoto]
-                            setPreviewImages(images)
-                            setPreviewImage(images[0])
-                            setCurrentImageIndex(0)
+                            // First scroll to center quickly
+                            scrollToCenterFast()
+                            
+                            // Small delay to ensure smooth scrolling starts, then open preview
+                            setTimeout(() => {
+                              const images = Array.isArray(selectedRecord.driverLicensePhoto) ? selectedRecord.driverLicensePhoto : [selectedRecord.driverLicensePhoto]
+                              setPreviewImages(images)
+                              setPreviewImage(images[0])
+                              setCurrentImageIndex(0)
+                            }, 100) // Quick delay to allow scroll to start
                           }}
                           className="flex items-center justify-center w-12 h-12 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg border-2 border-blue-200 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-500 text-blue-600 dark:text-blue-400 transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md group relative"
                           title="Click to preview license photo"
