@@ -199,20 +199,38 @@ export default function SupervisionPage() {
     setSupervisionData(updatedData)
   }
 
-  const startEditing = (index, filteredData = null) => {
-    let entry
-    if (filteredData) {
-      // If filtered data is provided, get the entry directly from it
-      entry = filteredData[index]
-    } else {
-      // Fallback to the original supervisionData
-      entry = supervisionData[index]
-    }
+  // Utility function to scroll to center of viewport smoothly and quickly
+  const scrollToCenterFast = () => {
+    const viewportHeight = window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
+    const centerPosition = Math.max(0, (documentHeight - viewportHeight) / 2)
     
-    // Determine the editing type based on the entry's type field
-    setEditingType(entry.type || 'teacher')
-    setEditingData(entry)
-    setIsEditModalOpen(true)
+    window.scrollTo({
+      top: centerPosition,
+      behavior: 'smooth'
+    })
+  }
+
+  const startEditing = (index, filteredData = null) => {
+    // First scroll to center quickly
+    scrollToCenterFast()
+    
+    // Small delay to ensure smooth scrolling starts, then open modal
+    setTimeout(() => {
+      let entry
+      if (filteredData) {
+        // If filtered data is provided, get the entry directly from it
+        entry = filteredData[index]
+      } else {
+        // Fallback to the original supervisionData
+        entry = supervisionData[index]
+      }
+      
+      // Determine the editing type based on the entry's type field
+      setEditingType(entry.type || 'teacher')
+      setEditingData(entry)
+      setIsEditModalOpen(true)
+    }, 100) // Quick delay to allow scroll to start
   }
 
   const saveRowEdit = (rowIndex) => {
