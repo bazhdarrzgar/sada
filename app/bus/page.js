@@ -333,10 +333,28 @@ export default function BusPage() {
     setBusData(updatedData)
   }
 
+  // Utility function to scroll to center of viewport smoothly and quickly
+  const scrollToCenterFast = () => {
+    const viewportHeight = window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
+    const centerPosition = Math.max(0, (documentHeight - viewportHeight) / 2)
+    
+    window.scrollTo({
+      top: centerPosition,
+      behavior: 'smooth'
+    })
+  }
+
   const startEditing = (index) => {
-    const entry = busData[index]
-    setEditingData(entry)
-    setIsEditModalOpen(true)
+    // First scroll to center quickly
+    scrollToCenterFast()
+    
+    // Small delay to ensure smooth scrolling starts, then open modal
+    setTimeout(() => {
+      const entry = busData[index]
+      setEditingData(entry)
+      setIsEditModalOpen(true)
+    }, 100) // Quick delay to allow scroll to start
   }
 
   const saveRowEdit = (rowIndex) => {
