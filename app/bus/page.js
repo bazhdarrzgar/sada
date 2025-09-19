@@ -414,12 +414,18 @@ export default function BusPage() {
     return (
       <button
         onClick={() => {
-          if (onPreview) {
-            setPreviewImages(imageArray)
-            setPreviewImage(firstImage)
-            setCurrentImageIndex(0)
-            onPreview(firstImage)
-          }
+          // First scroll to center quickly
+          scrollToCenterFast()
+          
+          // Small delay to ensure smooth scrolling starts, then open preview
+          setTimeout(() => {
+            if (onPreview) {
+              setPreviewImages(imageArray)
+              setPreviewImage(firstImage)
+              setCurrentImageIndex(0)
+              onPreview(firstImage)
+            }
+          }, 100) // Quick delay to allow scroll to start
         }}
         className="flex items-center justify-center w-10 h-10 bg-blue-50 dark:bg-blue-900/30 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-lg border-2 border-blue-200 dark:border-blue-700 hover:border-blue-400 dark:hover:border-blue-500 text-blue-600 dark:text-blue-400 transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md group relative"
         title={`Click to preview ${altText}${imageArray.length > 1 ? ` (${imageArray.length} images)` : ''}`}
