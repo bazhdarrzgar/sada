@@ -374,10 +374,27 @@ export default function BusPage() {
     setEditingData(null)
   }
 
+  // Handle Add Entry with smooth scrolling
+  const handleAddEntry = () => {
+    // First scroll to center quickly
+    scrollToCenterFast()
+    
+    // Small delay to ensure smooth scrolling starts, then open dialog
+    setTimeout(() => {
+      setIsAddDialogOpen(true)
+    }, 100) // Quick delay to allow scroll to start
+  }
+
   const viewDetails = (index) => {
-    const entry = busData[index]
-    setSelectedRecord(entry)
-    setIsDetailModalOpen(true)
+    // First scroll to center quickly
+    scrollToCenterFast()
+    
+    // Small delay to ensure smooth scrolling starts, then open modal
+    setTimeout(() => {
+      const entry = busData[index]
+      setSelectedRecord(entry)
+      setIsDetailModalOpen(true)
+    }, 100) // Quick delay to allow scroll to start
   }
 
   // Helper function to render images with eye icon for preview
