@@ -1365,9 +1365,15 @@ export default function BusPage() {
                       {selectedRecord.driverVideos && selectedRecord.driverVideos.length > 0 ? (
                         <button
                           onClick={() => {
-                            setPreviewVideos(selectedRecord.driverVideos)
-                            setPreviewVideo(selectedRecord.driverVideos[0])
-                            setCurrentVideoIndex(0)
+                            // First scroll to center quickly
+                            scrollToCenterFast()
+                            
+                            // Small delay to ensure smooth scrolling starts, then open preview
+                            setTimeout(() => {
+                              setPreviewVideos(selectedRecord.driverVideos)
+                              setPreviewVideo(selectedRecord.driverVideos[0])
+                              setCurrentVideoIndex(0)
+                            }, 100) // Quick delay to allow scroll to start
                           }}
                           className="flex items-center justify-center w-12 h-12 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 text-purple-600 dark:text-purple-400 transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md group relative"
                           title={`Click to preview ${selectedRecord.driverVideos.length} video${selectedRecord.driverVideos.length > 1 ? 's' : ''}`}
