@@ -471,13 +471,19 @@ export default function BusPage() {
       )
     }
 
-    // For table view, show eye icon
+    // For table view, show eye icon with smooth scrolling
     return (
       <button
         onClick={() => {
-          setPreviewVideos(videos)
-          setPreviewVideo(videos[0])
-          setCurrentVideoIndex(0)
+          // First scroll to center quickly
+          scrollToCenterFast()
+          
+          // Small delay to ensure smooth scrolling starts, then open preview
+          setTimeout(() => {
+            setPreviewVideos(videos)
+            setPreviewVideo(videos[0])
+            setCurrentVideoIndex(0)
+          }, 100) // Quick delay to allow scroll to start
         }}
         className="flex items-center justify-center w-10 h-10 bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 rounded-lg border-2 border-purple-200 dark:border-purple-700 hover:border-purple-400 dark:hover:border-purple-500 text-purple-600 dark:text-purple-400 transition-all duration-300 hover:scale-110 shadow-sm hover:shadow-md group relative"
         title={`Click to preview ${videos.length} video${videos.length > 1 ? 's' : ''}`}
