@@ -10,7 +10,11 @@ RUN apk add --no-cache \
     python3 \
     make \
     g++ \
-    sqlite
+    gcc \
+    musl-dev \
+    sqlite \
+    sqlite-dev \
+    git
 
 WORKDIR /app
 
