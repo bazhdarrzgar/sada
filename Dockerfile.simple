@@ -1,7 +1,7 @@
 # Simple Production Dockerfile for Sada School Management System
 # This version prioritizes getting the build working over strict lockfile enforcement
 
-FROM node:18-alpine AS base
+FROM node:20-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
