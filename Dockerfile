@@ -21,9 +21,12 @@ WORKDIR /app
 # Copy package files for better layer caching
 COPY package.json yarn.lock ./
 
-# Install dependencies
+# Set Python path for native module compilation
+ENV PYTHON=/usr/bin/python3
+
+# Install dependencies with extended timeout
 RUN echo "✅ Installing with yarn..." && \
-    yarn --frozen-lockfile --production=false
+    yarn install --frozen-lockfile --production=false --network-timeout 1000000
 
 # Rebuild the source code only when needed
 FROM base AS builder
