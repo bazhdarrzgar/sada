@@ -329,62 +329,7 @@ const ProfileManager = ({ children }) => {
     }
   }
 
-  const handleRestoreUpload = async () => {
-    if (!restoreFile) {
-      toast.error('Please select a backup file first')
-      return
-    }
-    
-    setRestoreLoading(true)
-    setBackupProgress('Uploading and restoring backup...')
-    
-    try {
-      const formData = new FormData()
-      formData.append('backupFile', restoreFile)
-      
-      const response = await fetch('/api/restore', {
-        method: 'POST',
-        body: formData
-      })
-      
-      const result = await response.json()
-      
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to restore backup')
-      }
-      
-      const message = result.restoredTables 
-        ? `Backup restored successfully! Restored ${result.restoredTables} tables with ${result.totalRecords} records.`
-        : 'Backup restored successfully!';
-      toast.success(message)
-      setBackupProgress('Restore completed!')
-      setRestoreFile(null)
-      
-      // Reload the page after successful restore
-      setTimeout(() => {
-        window.location.reload()
-      }, 2000)
-      
-    } catch (error) {
-      console.error('Restore error:', error)
-      toast.error('Failed to restore backup: ' + error.message)
-      setBackupProgress('')
-    } finally {
-      setRestoreLoading(false)
-      setTimeout(() => setBackupProgress(''), 3000)
-    }
-  }
-
-  const handleFileChange = (event) => {
-    const file = event.target.files[0]
-    if (file && file.type === 'application/zip') {
-      setRestoreFile(file)
-      toast.success(`Selected backup file: ${file.name}`)
-    } else {
-      toast.error('Please select a valid ZIP backup file')
-      setRestoreFile(null)
-    }
-  }
+  // Restore functionality removed as per user request
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
