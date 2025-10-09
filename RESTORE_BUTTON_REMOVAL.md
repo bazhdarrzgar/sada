@@ -114,11 +114,13 @@ Users can:
 
 ## API Endpoints
 
-Note: The `/api/restore` endpoint may still exist in the backend but is no longer accessible from the frontend UI. If you want to completely remove the restore feature, you should also:
+✅ **Complete Removal:** The `/api/restore` endpoint has been completely removed from the backend:
 
-1. Remove or disable the `/api/restore` endpoint in the backend
-2. Remove any restore-related backend functions
-3. Remove restore-related API route files
+1. ✅ Deleted `/app/app/api/restore/route.js` 
+2. ✅ Deleted `/app/app/api/restore/test/route.js`
+3. ✅ Removed restore directory entirely
+4. ✅ Removed deprecated `export const config` that was causing build errors
+5. ✅ Removed restore headers from `next.config.js`
 
 ## Testing Recommendations
 
