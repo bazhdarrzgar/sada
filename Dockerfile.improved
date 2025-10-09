@@ -18,7 +18,7 @@ RUN apk add --no-cache \
     sqlite-dev \
     git
 
-WORKDIR /app
+WORKDIR /home/app
 
 # Copy package files for better layer caching
 COPY package.json yarn.lock* ./
