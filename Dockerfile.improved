@@ -101,14 +101,17 @@ RUN mkdir -p ./public/upload/{uploads,images,videos,documents} && \
     chmod -R 755 ./public/upload
 
 # Copy standalone output and static files with proper ownership
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/static ./.next/static
 
 # Copy database files if they exist
-COPY --from=builder --chown=nextjs:nodejs /app/database ./database
+COPY --from=builder --chown=nextjs:nodejs /home/app/database ./database
 
 # Copy scripts if needed
-COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /home/app/scripts ./scripts
+
+# Ensure proper ownership of home directory
+RUN chown -R nextjs:nodejs /home/app
 
 # Switch to non-root user
 USER nextjs
