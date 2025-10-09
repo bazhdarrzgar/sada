@@ -84,11 +84,9 @@ const ProfileManager = ({ children }) => {
     confirmPassword: ''
   })
 
-  // Backup/Restore state
+  // Backup state
   const [backupLoading, setBackupLoading] = useState(false)
-  const [restoreLoading, setRestoreLoading] = useState(false)
   const [backupProgress, setBackupProgress] = useState('')
-  const [restoreFile, setRestoreFile] = useState(null)
 
   // Sync profile data from context
   useEffect(() => {
