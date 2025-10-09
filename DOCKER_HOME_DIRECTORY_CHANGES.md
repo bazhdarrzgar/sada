@@ -103,12 +103,22 @@ These changes are backward compatible for the application code, but if you have:
 - Scripts with hardcoded `/app` paths, update them accordingly
 - docker-compose.yml files with path references, update them
 
-## Example docker-compose.yml Update
+## docker-compose.yml Updated
 
-If using docker-compose, update volume mounts:
+The `docker-compose.yml` file has been updated with the new paths:
 
+**Production service (app):**
 ```yaml
 volumes:
+  - sqlite_data:/home/app/database
+  - upload_data:/home/app/public/upload
+```
+
+**Development service (app-dev):**
+```yaml
+volumes:
+  - .:/home/app
+  - /home/app/node_modules
   - ./database:/home/app/database
   - ./public/upload:/home/app/public/upload
 ```
