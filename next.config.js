@@ -41,15 +41,6 @@ const nextConfig = {
         ]
       },
       {
-        source: '/api/restore',
-        headers: [
-          {
-            key: 'Content-Type',
-            value: 'application/json'
-          }
-        ]
-      },
-      {
         source: '/api/backup',
         headers: [
           {
