@@ -20,9 +20,9 @@ services:
       - sada_network
     volumes:
       # Mount SQLite database for persistence
-      - sqlite_data:/app/database
+      - sqlite_data:/home/app/database
       # Mount uploads directory for file persistence
-      - upload_data:/app/public/upload
+      - upload_data:/home/app/public/upload
     healthcheck:
       test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
       interval: 30s
