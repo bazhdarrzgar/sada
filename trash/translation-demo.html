@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced Translation Features Demo - Sada Project</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-screen p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">🌐 Enhanced Translation Features</h1>
+            <p class="text-lg text-gray-600">Demonstration of Translation Improvements for Sada Project</p>
+        </div>
+
+        <!-- Enhanced Translation Button Demo -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4 text-center">🔍 Supervision System</h2>
+                <div class="space-y-4">
+                    <!-- Translation Button -->
+                    <button onclick="toggleLanguage('supervision')" 
+                            class="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                        </svg>
+                        <span class="font-medium" id="supervision-btn">EN</span>
+                        <span class="text-xs opacity-80">Switch to English</span>
+                    </button>
+                    
+                    <!-- Sample Table Headers -->
+                    <div class="border rounded-lg overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-2 border-b">
+                            <div class="text-sm font-semibold text-center" id="supervision-header">
+                                <span>چاودێری سیستەم</span>
+                                <span class="text-xs opacity-70 ml-2">(Supervision System)</span>
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span id="supervision-teacher">ناوی مامۆستا (Teacher Name)</span>
+                                <span class="text-gray-500">Ahmad Ali</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span id="supervision-subject">بابەت (Subject)</span>
+                                <span class="text-gray-500">بیرکاری</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span id="supervision-department">بەش (Department)</span>
+                                <span class="text-gray-500">زانست</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4 text-center">📋 Activities Management</h2>
+                <div class="space-y-4">
+                    <!-- Translation Button -->
+                    <button onclick="toggleLanguage('activities')" 
+                            class="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                        </svg>
+                        <span class="font-medium" id="activities-btn">کوردی</span>
+                        <span class="text-xs opacity-80">گۆڕین بۆ کوردی</span>
+                    </button>
+                    
+                    <!-- Sample Table Headers -->
+                    <div class="border rounded-lg overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-2 border-b">
+                            <div class="text-sm font-semibold text-center" id="activities-header">
+                                <span>Activities Management</span>
+                                <span class="text-xs opacity-70 ml-2">(بەڕێوەبردنی چالاکیەکان)</span>
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span id="activities-type">Activity Type (جۆری چالاکی)</span>
+                                <span class="text-gray-500">Sports Day</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span id="activities-date">Preparation Date (بەرواری ئامادەکاری)</span>
+                                <span class="text-gray-500">2024-09-15</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span id="activities-content">Content (ناوەرۆک)</span>
+                                <span class="text-gray-500">School competition</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4 text-center">📝 Exam Supervision</h2>
+                <div class="space-y-4">
+                    <!-- Translation Button -->
+                    <button onclick="toggleLanguage('exam')" 
+                            class="flex items-center gap-2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 w-full justify-center">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                        </svg>
+                        <span class="font-medium" id="exam-btn">EN</span>
+                        <span class="text-xs opacity-80">Switch to English</span>
+                    </button>
+                    
+                    <!-- Sample Table Headers -->
+                    <div class="border rounded-lg overflow-hidden">
+                        <div class="bg-gray-50 px-4 py-2 border-b">
+                            <div class="text-sm font-semibold text-center" id="exam-header">
+                                <span>چاودێریکردنی تاقیکردنەوە</span>
+                                <span class="text-xs opacity-70 ml-2">(Exam Supervision)</span>
+                            </div>
+                        </div>
+                        <div class="p-4 space-y-2">
+                            <div class="flex justify-between text-sm">
+                                <span id="exam-subject">بابەت (Subject)</span>
+                                <span class="text-gray-500">زمانی کوردی</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span id="exam-stage">پۆل (Stage)</span>
+                                <span class="text-gray-500">پۆلی حەوتەم</span>
+                            </div>
+                            <div class="flex justify-between text-sm">
+                                <span id="exam-supervisor">ناوی چاودێریکەر (Supervisor Name)</span>
+                                <span class="text-gray-500">کاروان احمد</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Showcase -->
+        <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+            <h2 class="text-2xl font-bold text-center mb-6">✨ Enhanced Translation Features Implemented</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="text-center p-4 bg-green-50 rounded-lg">
+                    <div class="text-3xl mb-2">🔄</div>
+                    <h3 class="font-semibold text-gray-800">Enhanced Language Toggle</h3>
+                    <p class="text-sm text-gray-600 mt-2">Prominent translate buttons with visual feedback and animation</p>
+                </div>
+                <div class="text-center p-4 bg-blue-50 rounded-lg">
+                    <div class="text-3xl mb-2">📊</div>
+                    <h3 class="font-semibold text-gray-800">Bilingual Column Headers</h3>
+                    <p class="text-sm text-gray-600 mt-2">Table columns show both languages for better understanding</p>
+                </div>
+                <div class="text-center p-4 bg-purple-50 rounded-lg">
+                    <div class="text-3xl mb-2">⚡</div>
+                    <h3 class="font-semibold text-gray-800">Smooth Transitions</h3>
+                    <p class="text-sm text-gray-600 mt-2">Loading animations and smooth language switching</p>
+                </div>
+                <div class="text-center p-4 bg-orange-50 rounded-lg">
+                    <div class="text-3xl mb-2">🎯</div>
+                    <h3 class="font-semibold text-gray-800">Success Notifications</h3>
+                    <p class="text-sm text-gray-600 mt-2">Visual confirmation when language changes</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementation Details -->
+        <div class="mt-8 bg-gray-50 rounded-2xl p-8">
+            <h2 class="text-2xl font-bold text-center mb-6">🛠️ Implementation Summary</h2>
+            <div class="space-y-4 text-sm">
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-semibold text-green-600 mb-2">✅ Supervision System Enhancement</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                        <li>Added prominent translation button with Kurdish/English toggle</li>
+                        <li>Enhanced table column headers with bilingual display</li>
+                        <li>Added visual feedback and success notifications</li>
+                        <li>Implemented smooth animations for better UX</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-semibold text-blue-600 mb-2">✅ Activities Management Enhancement</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                        <li>Added dedicated translate button with color-coded styling</li>
+                        <li>Enhanced column headers show both language versions</li>
+                        <li>Added loading states and transition animations</li>
+                        <li>Implemented success notifications for language switching</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <h3 class="font-semibold text-purple-600 mb-2">✅ Exam Supervision Enhancement</h3>
+                    <ul class="list-disc list-inside space-y-1 text-gray-700">
+                        <li>Added enhanced translation functionality</li>
+                        <li>Bilingual table headers with responsive display</li>
+                        <li>Visual feedback system for language changes</li>
+                        <li>Improved accessibility and user experience</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification-container" class="fixed top-4 right-4 z-50"></div>
+
+    <script>
+        // Language states for each section
+        const languageStates = {
+            supervision: 'kurdish',
+            activities: 'english', 
+            exam: 'kurdish'
+        };
+
+        // Translation data
+        const translations = {
+            supervision: {
+                kurdish: {
+                    header: 'چاودێری سیستەم',
+                    headerEn: 'Supervision System',
+                    teacher: 'ناوی مامۆستا',
+                    teacherEn: 'Teacher Name',
+                    subject: 'بابەت',
+                    subjectEn: 'Subject',
+                    department: 'بەش',
+                    departmentEn: 'Department',
+                    btnText: 'EN',
+                    btnTooltip: 'Switch to English'
+                },
+                english: {
+                    header: 'Supervision System',
+                    headerEn: 'چاودێری سیستەم',
+                    teacher: 'Teacher Name',
+                    teacherEn: 'ناوی مامۆستا',
+                    subject: 'Subject',
+                    subjectEn: 'بابەت',
+                    department: 'Department',
+                    departmentEn: 'بەش',
+                    btnText: 'کوردی',
+                    btnTooltip: 'گۆڕین بۆ کوردی'
+                }
+            },
+            activities: {
+                kurdish: {
+                    header: 'بەڕێوەبردنی چالاکیەکان',
+                    headerEn: 'Activities Management',
+                    type: 'جۆری چالاکی',
+                    typeEn: 'Activity Type',
+                    date: 'بەرواری ئامادەکاری',
+                    dateEn: 'Preparation Date',
+                    content: 'ناوەرۆک',
+                    contentEn: 'Content',
+                    btnText: 'EN',
+                    btnTooltip: 'Switch to English'
+                },
+                english: {
+                    header: 'Activities Management',
+                    headerEn: 'بەڕێوەبردنی چالاکیەکان',
+                    type: 'Activity Type',
+                    typeEn: 'جۆری چالاکی',
+                    date: 'Preparation Date',
+                    dateEn: 'بەرواری ئامادەکاری',
+                    content: 'Content',
+                    contentEn: 'ناوەرۆک',
+                    btnText: 'کوردی',
+                    btnTooltip: 'گۆڕین بۆ کوردی'
+                }
+            },
+            exam: {
+                kurdish: {
+                    header: 'چاودێریکردنی تاقیکردنەوە',
+                    headerEn: 'Exam Supervision',
+                    subject: 'بابەت',
+                    subjectEn: 'Subject',
+                    stage: 'پۆل',
+                    stageEn: 'Stage',
+                    supervisor: 'ناوی چاودێریکەر',
+                    supervisorEn: 'Supervisor Name',
+                    btnText: 'EN',
+                    btnTooltip: 'Switch to English'
+                },
+                english: {
+                    header: 'Exam Supervision',
+                    headerEn: 'چاودێریکردنی تاقیکردنەوە',
+                    subject: 'Subject',
+                    subjectEn: 'بابەت',
+                    stage: 'Stage',
+                    stageEn: 'پۆل',
+                    supervisor: 'Supervisor Name',
+                    supervisorEn: 'ناوی چاودێریکەر',
+                    btnText: 'کوردی',
+                    btnTooltip: 'گۆڕین بۆ کوردی'
+                }
+            }
+        };
+
+        function toggleLanguage(section) {
+            // Toggle language state
+            languageStates[section] = languageStates[section] === 'kurdish' ? 'english' : 'kurdish';
+            const currentLang = languageStates[section];
+            const trans = translations[section][currentLang];
+            
+            // Update button
+            const btn = document.getElementById(`${section}-btn`);
+            const btnParent = btn.parentElement;
+            btn.textContent = trans.btnText;
+            btnParent.querySelector('.text-xs').textContent = trans.btnTooltip;
+            
+            // Update content based on section
+            if (section === 'supervision') {
+                updateSupervisionContent(trans);
+            } else if (section === 'activities') {
+                updateActivitiesContent(trans);
+            } else if (section === 'exam') {
+                updateExamContent(trans);
+            }
+            
+            // Show notification
+            showNotification(currentLang);
+        }
+
+        function updateSupervisionContent(trans) {
+            document.getElementById('supervision-header').innerHTML = 
+                `<span>${trans.header}</span><span class="text-xs opacity-70 ml-2">(${trans.headerEn})</span>`;
+            document.getElementById('supervision-teacher').textContent = 
+                `${trans.teacher} (${trans.teacherEn})`;
+            document.getElementById('supervision-subject').textContent = 
+                `${trans.subject} (${trans.subjectEn})`;
+            document.getElementById('supervision-department').textContent = 
+                `${trans.department} (${trans.departmentEn})`;
+        }
+
+        function updateActivitiesContent(trans) {
+            document.getElementById('activities-header').innerHTML = 
+                `<span>${trans.header}</span><span class="text-xs opacity-70 ml-2">(${trans.headerEn})</span>`;
+            document.getElementById('activities-type').textContent = 
+                `${trans.type} (${trans.typeEn})`;
+            document.getElementById('activities-date').textContent = 
+                `${trans.date} (${trans.dateEn})`;
+            document.getElementById('activities-content').textContent = 
+                `${trans.content} (${trans.contentEn})`;
+        }
+
+        function updateExamContent(trans) {
+            document.getElementById('exam-header').innerHTML = 
+                `<span>${trans.header}</span><span class="text-xs opacity-70 ml-2">(${trans.headerEn})</span>`;
+            document.getElementById('exam-subject').textContent = 
+                `${trans.subject} (${trans.subjectEn})`;
+            document.getElementById('exam-stage').textContent = 
+                `${trans.stage} (${trans.stageEn})`;
+            document.getElementById('exam-supervisor').textContent = 
+                `${trans.supervisor} (${trans.supervisorEn})`;
+        }
+
+        function showNotification(language) {
+            const notification = document.createElement('div');
+            notification.className = 'bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0 mb-2';
+            notification.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-sm font-medium">
+                        ${language === 'kurdish' ? 'زمان گۆڕدرا بۆ کوردی!' : 'Language switched to English!'}
+                    </span>
+                </div>
+            `;
+            
+            const container = document.getElementById('notification-container');
+            container.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => container.removeChild(notification), 300);
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
