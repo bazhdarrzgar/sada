@@ -68,18 +68,18 @@ RUN apk add --no-cache \
     sqlite \
     libc6-compat
 
-WORKDIR /app
+WORKDIR /home/app
 
 # Set production environment
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# Create non-root user for security with home directory
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S -D -H -u 1001 -h /home/app -s /sbin/nologin -G nodejs nextjs
 
 # Copy public assets
-COPY --from=builder /app/public ./public
+COPY --from=builder /home/app/public ./public
 
 # Create .next directory with proper permissions
 RUN mkdir -p .next && \
