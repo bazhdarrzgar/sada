@@ -48,13 +48,13 @@ services:
       - sada_network
     volumes:
       # Mount entire app for hot reload
-      - .:/app
+      - .:/home/app
       # Exclude node_modules from mount to use container's version
-      - /app/node_modules
+      - /home/app/node_modules
       # Persist database
-      - ./database:/app/database
+      - ./database:/home/app/database
       # Persist uploads
-      - ./public/upload:/app/public/upload
+      - ./public/upload:/home/app/public/upload
     profiles:
       - dev
     healthcheck:
