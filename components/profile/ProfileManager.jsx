@@ -709,69 +709,6 @@ const ProfileManager = ({ children }) => {
                     )}
                   </Button>
                 </div>
-
-                <Separator />
-
-                {/* Restore Section */}
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Upload className="h-5 w-5 text-green-600" />
-                    <h3 className="text-lg font-semibold">Restore Data</h3>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Upload a backup file to restore your system data. This will replace all current data.
-                  </p>
-
-                  <div className="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                    <div className="flex items-center gap-2 mb-2">
-                      <AlertTriangle className="h-4 w-4 text-red-600" />
-                      <h4 className="font-medium text-red-900 dark:text-red-100">Warning</h4>
-                    </div>
-                    <p className="text-sm text-red-800 dark:text-red-200">
-                      Restoring data will permanently replace all existing data in the system. Make sure to create a backup before proceeding.
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="backup-file" className="text-sm font-medium">
-                        Select Backup File (.zip)
-                      </Label>
-                      <input
-                        id="backup-file"
-                        type="file"
-                        accept=".zip"
-                        onChange={handleFileChange}
-                        className="mt-2 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                      />
-                      {restoreFile && (
-                        <p className="mt-2 text-sm text-green-600">
-                          Selected: {restoreFile.name} ({(restoreFile.size / 1024 / 1024).toFixed(2)} MB)
-                        </p>
-                      )}
-                    </div>
-
-                    <Button 
-                      type="button"
-                      onClick={handleRestoreUpload}
-                      disabled={!restoreFile || restoreLoading}
-                      variant="destructive"
-                      className="w-full"
-                    >
-                      {restoreLoading ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Restoring Data...
-                        </>
-                      ) : (
-                        <>
-                          <Upload className="h-4 w-4 mr-2" />
-                          Restore Backup
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </TabsContent>
