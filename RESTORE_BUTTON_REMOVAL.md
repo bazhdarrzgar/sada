@@ -5,8 +5,10 @@ The restore functionality has been completely removed from the ProfileManager co
 
 ## Changes Made
 
-### File Modified
-- **`/app/components/profile/ProfileManager.jsx`**
+### Files Modified
+1. **`/app/components/profile/ProfileManager.jsx`** - Frontend component
+2. **`/app/next.config.js`** - Next.js configuration
+3. **Deleted:** `/app/app/api/restore/` - Entire restore API directory
 
 ### Specific Changes
 
