@@ -70,6 +70,40 @@ The entire restore section has been removed from the UI, including:
 </CardTitle>
 ```
 
+#### 5. Next.js Configuration (`next.config.js`)
+
+**Removed deprecated API config:**
+```javascript
+// REMOVED - This was deprecated in Next.js 14
+api: {
+  bodyParser: {
+    sizeLimit: '50mb',
+  },
+  responseLimit: '50mb',
+},
+```
+
+**Removed restore endpoint headers:**
+```javascript
+// REMOVED
+{
+  source: '/api/restore',
+  headers: [
+    {
+      key: 'Content-Type',
+      value: 'application/json'
+    }
+  ]
+}
+```
+
+#### 6. Backend API Route Deleted
+
+**Completely removed:**
+- `/app/app/api/restore/route.js` - Main restore API route (283 lines)
+- `/app/app/api/restore/test/route.js` - Test restore route
+- Entire `/app/app/api/restore/` directory
+
 ## What Remains (Backup Functionality)
 
 The backup functionality is fully intact and includes:
