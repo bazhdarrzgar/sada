@@ -8,14 +8,6 @@ const nextConfig = {
     serverComponentsExternalPackages: ['multer', 'better-sqlite3']
   },
   
-  // Configure API routes with larger body size limit
-  api: {
-    bodyParser: {
-      sizeLimit: '50mb',
-    },
-    responseLimit: '50mb',
-  },
-  
   // Configure static file serving
   staticPageGenerationTimeout: 1000,
   
