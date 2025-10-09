@@ -19,7 +19,7 @@ RUN apk add --no-cache \
     git \
     curl
 
-WORKDIR /app
+WORKDIR /home/app
 
 # Copy package files
 COPY package.json yarn.lock* ./
@@ -42,10 +42,10 @@ RUN apk add --no-cache \
     sqlite \
     sqlite-dev
 
-WORKDIR /app
+WORKDIR /home/app
 
 # Copy dependencies from previous stage
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /home/app/node_modules ./node_modules
 
 # Copy source code
 COPY . .
@@ -55,7 +55,7 @@ ENV PYTHON=/usr/bin/python3
 
 # Remove and reinstall better-sqlite3 from source to ensure correct Node version
 RUN echo "🔨 Building better-sqlite3 from source..." && \
-    rm -rf /app/node_modules/better-sqlite3 && \
+    rm -rf /home/app/node_modules/better-sqlite3 && \
     npm install better-sqlite3@12.4.1 --build-from-source --verbose && \
     echo "✅ better-sqlite3 built successfully for Node $(node -v)"
 
@@ -73,18 +73,18 @@ RUN apk add --no-cache \
     sqlite \
     libc6-compat
 
-WORKDIR /app
+WORKDIR /home/app
 
 # Set production environment
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# Create non-root user with home directory
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S -D -H -u 1001 -h /home/app -s /sbin/nologin -G nodejs nextjs
 
 # Copy public assets
-COPY --from=builder /app/public ./public
+COPY --from=builder /home/app/public ./public
 
 # Create necessary directories with proper permissions
 RUN mkdir -p .next && chown nextjs:nodejs .next
@@ -94,10 +94,13 @@ RUN mkdir -p ./public/upload/{uploads,images,videos,documents} && \
     chmod -R 755 ./public/upload
 
 # Copy built application
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/database ./database
-COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /home/app/database ./database
+COPY --from=builder --chown=nextjs:nodejs /home/app/scripts ./scripts
+
+# Ensure proper ownership
+RUN chown -R nextjs:nodejs /home/app
 
 # Switch to non-root user
 USER nextjs

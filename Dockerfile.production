@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /home/app
 
 # Set Python path
 ENV PYTHON=/usr/bin/python3
@@ -41,12 +41,12 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-dev \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /home/app
 
 ENV PYTHON=/usr/bin/python3
 
 # Copy node_modules from deps
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /home/app/node_modules ./node_modules
 
 # Copy all source files
 COPY . .
@@ -67,28 +67,28 @@ RUN apt-get update && apt-get install -y \
     libsqlite3-0 \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
+WORKDIR /home/app
 
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Create user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 nextjs
+# Create user with home directory
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/app nextjs
 
 # Copy public assets
-COPY --from=builder /app/public ./public
+COPY --from=builder /home/app/public ./public
 
 # Create directories
 RUN mkdir -p .next database public/upload/{uploads,images,videos,documents} /tmp/sada_temp && \
-    chown -R nextjs:nodejs .next database public/upload /tmp/sada_temp && \
+    chown -R nextjs:nodejs /home/app .next database public/upload /tmp/sada_temp && \
     chmod -R 755 database public/upload /tmp/sada_temp
 
 # Copy built application
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/database ./database
-COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /home/app/database ./database
+COPY --from=builder --chown=nextjs:nodejs /home/app/scripts ./scripts
 
 USER nextjs
 
