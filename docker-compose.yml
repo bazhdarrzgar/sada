@@ -1,0 +1,77 @@
+# Docker Compose configuration for Sada School Management System with SQLite
+version: '3.8'
+
+services:
+  # Next.js Application Service (Production)
+  app:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: sada_app
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - PORT=3000
+      - HOSTNAME=0.0.0.0
+    ports:
+      - "3000:3000"
+    networks:
+      - sada_network
+    volumes:
+      # Mount SQLite database for persistence
+      - sqlite_data:/home/app/database
+      # Mount uploads directory for file persistence
+      - upload_data:/home/app/public/upload
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Development version (optional - for development with hot reload)
+  app-dev:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: sada_app_dev
+    restart: unless-stopped
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+    ports:
+      - "3001:3000"
+    networks:
+      - sada_network
+    volumes:
+      # Mount entire app for hot reload
+      - .:/home/app
+      # Exclude node_modules from mount to use container's version
+      - /home/app/node_modules
+      # Persist database
+      - ./database:/home/app/database
+      # Persist uploads
+      - ./public/upload:/home/app/public/upload
+    profiles:
+      - dev
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+# Define volumes for persistent data
+volumes:
+  sqlite_data:
+    driver: local
+  upload_data:
+    driver: local
+
+# Define networks
+networks:
+  sada_network:
+    driver: bridge

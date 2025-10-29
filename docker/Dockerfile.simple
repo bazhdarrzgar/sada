@@ -1,0 +1,111 @@
+# Simple Production Dockerfile for Sada School Management System
+# This version prioritizes getting the build working over strict lockfile enforcement
+
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+
+# Install comprehensive build tools
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    gcc \
+    musl-dev \
+    sqlite \
+    sqlite-dev \
+    git \
+    curl
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json yarn.lock* ./
+
+# Set Python path for native module compilation
+ENV PYTHON=/usr/bin/python3
+
+# Install dependencies without frozen lockfile to handle any inconsistencies
+RUN echo "✅ Installing dependencies..." && \
+    yarn install --production=false --network-timeout 1000000
+
+# Rebuild the source code only when needed
+FROM base AS builder
+
+# Install build tools
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    sqlite \
+    sqlite-dev
+
+WORKDIR /app
+
+# Copy dependencies from previous stage
+COPY --from=deps /app/node_modules ./node_modules
+
+# Copy source code
+COPY . .
+
+# Disable Next.js telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the application
+RUN yarn build
+
+# Production image
+FROM base AS runner
+
+# Install SQLite runtime
+RUN apk add --no-cache \
+    sqlite \
+    libc6-compat
+
+WORKDIR /app
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs
+
+# Copy public assets
+COPY --from=builder /app/public ./public
+
+# Create necessary directories with proper permissions
+RUN mkdir -p .next && chown nextjs:nodejs .next
+RUN mkdir -p ./database && chown -R nextjs:nodejs ./database && chmod -R 755 ./database
+RUN mkdir -p ./public/upload/{uploads,images,videos,documents} && \
+    chown -R nextjs:nodejs ./public/upload && \
+    chmod -R 755 ./public/upload
+
+# Copy built application
+COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/database ./database
+COPY --from=builder --chown=nextjs:nodejs /app/scripts ./scripts
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Set runtime environment
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000', (res) => { \
+    if (res.statusCode === 200) process.exit(0); \
+    else process.exit(1); \
+  }).on('error', () => process.exit(1));"
+
+# Start the application
+CMD ["node", "server.js"]

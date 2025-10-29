@@ -1,0 +1,106 @@
+# Optimized Production Dockerfile for Sada with better-sqlite3 fix
+FROM node:20-slim AS base
+
+# Install dependencies stage
+FROM base AS deps
+
+# Install ALL required build tools for better-sqlite3
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    gcc \
+    sqlite3 \
+    libsqlite3-dev \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home/app
+
+# Set Python path
+ENV PYTHON=/usr/bin/python3
+
+# Copy package files
+COPY package.json yarn.lock ./
+
+# Install dependencies and build better-sqlite3 from source
+RUN yarn install --frozen-lockfile --production=false --network-timeout 1000000 && \
+    cd node_modules/better-sqlite3 && \
+    node-gyp rebuild && \
+    cd ../..
+
+# Builder stage
+FROM base AS builder
+
+# Install build tools
+RUN apt-get update && apt-get install -y \
+    python3 \
+    make \
+    g++ \
+    sqlite3 \
+    libsqlite3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home/app
+
+ENV PYTHON=/usr/bin/python3
+
+# Copy node_modules from deps
+COPY --from=deps /home/app/node_modules ./node_modules
+
+# Copy all source files
+COPY . .
+
+# Verify better-sqlite3 works
+RUN node -e "const Database = require('better-sqlite3'); console.log('✅ better-sqlite3 works!');"
+
+# Disable telemetry and build
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN yarn build
+
+# Production runner stage
+FROM base AS runner
+
+# Install runtime dependencies
+RUN apt-get update && apt-get install -y \
+    sqlite3 \
+    libsqlite3-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /home/app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create user with home directory
+RUN groupadd --system --gid 1001 nodejs && \
+    useradd --system --uid 1001 --gid nodejs --home /home/app nextjs
+
+# Copy public assets
+COPY --from=builder /home/app/public ./public
+
+# Create directories
+RUN mkdir -p .next database public/upload/{uploads,images,videos,documents} /tmp/sada_temp && \
+    chown -R nextjs:nodejs /home/app .next database public/upload /tmp/sada_temp && \
+    chmod -R 755 database public/upload /tmp/sada_temp
+
+# Copy built application
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /home/app/database ./database
+COPY --from=builder --chown=nextjs:nodejs /home/app/scripts ./scripts
+
+USER nextjs
+
+EXPOSE 3000
+
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000', (res) => { \
+    if (res.statusCode === 200) process.exit(0); \
+    else process.exit(1); \
+  }).on('error', () => process.exit(1));"
+
+CMD ["node", "server.js"]

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>General Search Features Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .demo-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .feature-title {
+            color: #1e40af;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 8px;
+            margin-bottom: 16px;
+        }
+        .feature-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .feature-list li {
+            padding: 8px 0;
+            border-left: 4px solid #10b981;
+            padding-left: 16px;
+            margin: 8px 0;
+            background: #f0fdf4;
+        }
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: monospace;
+            overflow-x: auto;
+        }
+        .success-badge {
+            background: #10b981;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .kurdish {
+            direction: rtl;
+            text-align: right;
+            font-size: 18px;
+            color: #059669;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 General Search Enhanced Features</h1>
+    <p class="success-badge">✅ Successfully Implemented</p>
+
+    <div class="demo-card">
+        <h2 class="feature-title">🚀 New Features Added</h2>
+        
+        <h3>1. 📊 Clickable Table Rows - Navigation to Original Tables</h3>
+        <ul class="feature-list">
+            <li><strong>Click any row</strong> → Navigate to the original table/page for that collection</li>
+            <li><strong>Smart routing</strong> → Automatic navigation to correct pages:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>Staff Records → /staff</li>
+                    <li>Teachers → /teachers</li>
+                    <li>Activities → /activities</li>
+                    <li>Payroll → /payroll</li>
+                    <li>And all other collections...</li>
+                </ul>
+            </li>
+            <li><strong>Visual feedback</strong> → Row hover effects and cursor pointer</li>
+            <li><strong>Action button</strong> → "بینین" (View) button in each row</li>
+        </ul>
+
+        <h3>2. 📥 Download Data in Multiple Formats</h3>
+        <ul class="feature-list">
+            <li><strong>Format Selection Menu</strong> → Dropdown menu with 3 options:
+                <ul style="margin-left: 20px; margin-top: 8px;">
+                    <li>📊 <strong>Excel (XLSX)</strong> - Professional spreadsheet format</li>
+                    <li>📄 <strong>CSV</strong> - Comma-separated values for any program</li>
+                    <li>💾 <strong>JSON</strong> - Raw data format for developers</li>
+                </ul>
+            </li>
+            <li><strong>Smart data cleaning</strong> → Removes internal fields (id, created_at, etc.)</li>
+            <li><strong>Proper file naming</strong> → Files named by collection (e.g., "staff_records_search_results.xlsx")</li>
+            <li><strong>Kurdish support</strong> → Handles Kurdish text in all formats</li>
+        </ul>
+    </div>
+
+    <div class="demo-card">
+        <h2 class="feature-title">💻 Technical Implementation</h2>
+        
+        <h3>Navigation Function:</h3>
+        <div class="code-block">
+const navigateToCollection = (collection) => {
+  const routes = {
+    'staff_records': '/staff',
+    'teachers': '/teachers',
+    'activities': '/activities',
+    // ... all collections mapped
+  }
+  router.push(routes[collection])
+}
+        </div>
+
+        <h3>Download Functions:</h3>
+        <div class="code-block">
+// Excel export with dynamic XLSX import
+const downloadAsXLSX = async (data, collectionName) => {
+  const XLSX = await import('xlsx')
+  const wb = XLSX.utils.book_new()
+  const ws = XLSX.utils.json_to_sheet(cleanData)
+  XLSX.utils.book_append_sheet(wb, ws, collectionName)
+  XLSX.writeFile(wb, `${collectionName}_search_results.xlsx`)
+}
+
+// CSV export with proper escaping
+const downloadAsCSV = (data, collectionName) => {
+  const csvContent = [csvHeader, ...csvRows].join('\n')
+  // Download logic...
+}
+        </div>
+    </div>
+
+    <div class="demo-card">
+        <h2 class="feature-title">🎨 User Experience Improvements</h2>
+        
+        <ul class="feature-list">
+            <li><strong>Interactive Tables</strong> → Click anywhere on a row to navigate</li>
+            <li><strong>Download Button</strong> → Clearly visible download option for each table</li>
+            <li><strong>Format Selection</strong> → Clean dropdown menu to choose format</li>
+            <li><strong>Visual Feedback</strong> → Hover effects and clear action buttons</li>
+            <li><strong>Kurdish Instructions</strong> → Updated help text in Kurdish</li>
+        </ul>
+
+        <div class="kurdish">
+            کلیک لەسەر ڕیزەکان بۆ چوونە لاپەڕەی سەرەکی
+        </div>
+        <p><em>Translation: "Click on rows to go to the main page"</em></p>
+    </div>
+
+    <div class="demo-card">
+        <h2 class="feature-title">🔧 How to Use</h2>
+        
+        <ol style="font-size: 16px; line-height: 1.6;">
+            <li><strong>Search:</strong> Type in the search box (real-time results)</li>
+            <li><strong>Navigate:</strong> Click any table row to go to the original page</li>
+            <li><strong>Download:</strong> Click "داونلۆد" button and select format:
+                <ul style="margin-top: 8px;">
+                    <li>Excel (XLSX) - For spreadsheet analysis</li>
+                    <li>CSV - For importing to other systems</li>
+                    <li>JSON - For developers/technical use</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div class="demo-card">
+        <h2 class="feature-title">✅ Features Status</h2>
+        
+        <table style="width: 100%; border-collapse: collapse;">
+            <tr style="background: #f3f4f6;">
+                <th style="padding: 12px; text-align: left; border: 1px solid #d1d5db;">Feature</th>
+                <th style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">Status</th>
+                <th style="padding: 12px; text-align: left; border: 1px solid #d1d5db;">Description</th>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Real-time Search</td>
+                <td style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">✅</td>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Search as you type functionality</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Table Results</td>
+                <td style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">✅</td>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Professional table format with Kurdish headers</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Clickable Rows</td>
+                <td style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">✅</td>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Navigate to original collection pages</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Excel Download</td>
+                <td style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">✅</td>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">XLSX format with proper formatting</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">CSV Download</td>
+                <td style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">✅</td>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">CSV format with proper escaping</td>
+            </tr>
+            <tr>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">JSON Download</td>
+                <td style="padding: 12px; text-align: center; border: 1px solid #d1d5db;">✅</td>
+                <td style="padding: 12px; border: 1px solid #d1d5db;">Raw JSON data format</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding: 20px; background: #1e40af; color: white; border-radius: 8px;">
+        <h2>🎉 All Features Successfully Implemented!</h2>
+        <p>Your General Search now has clickable navigation and multi-format download capabilities.</p>
+    </div>
+</body>
+</html>

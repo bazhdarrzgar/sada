@@ -1,0 +1,123 @@
+# Simple Production Dockerfile for Sada School Management System
+# This version prioritizes getting the build working over strict lockfile enforcement
+
+FROM node:20-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+
+# Install comprehensive build tools
+RUN apk add --no-cache \
+    libc6-compat \
+    python3 \
+    make \
+    g++ \
+    gcc \
+    musl-dev \
+    sqlite \
+    sqlite-dev \
+    git \
+    curl
+
+WORKDIR /home/app
+
+# Copy package files
+COPY package.json yarn.lock* ./
+
+# Set Python path for native module compilation
+ENV PYTHON=/usr/bin/python3
+
+# Install dependencies without frozen lockfile and skip native module builds
+RUN echo "✅ Installing dependencies..." && \
+    yarn install --production=false --network-timeout 1000000 --ignore-scripts
+
+# Rebuild the source code only when needed
+FROM base AS builder
+
+# Install build tools
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    sqlite \
+    sqlite-dev
+
+WORKDIR /home/app
+
+# Copy dependencies from previous stage
+COPY --from=deps /home/app/node_modules ./node_modules
+
+# Copy source code
+COPY . .
+
+# Set Python path for native module compilation
+ENV PYTHON=/usr/bin/python3
+
+# Remove and reinstall better-sqlite3 from source to ensure correct Node version
+RUN echo "🔨 Building better-sqlite3 from source..." && \
+    rm -rf /home/app/node_modules/better-sqlite3 && \
+    npm install better-sqlite3@12.4.1 --build-from-source --verbose && \
+    echo "✅ better-sqlite3 built successfully for Node $(node -v)"
+
+# Disable Next.js telemetry
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Build the application
+RUN yarn build
+
+# Production image
+FROM base AS runner
+
+# Install SQLite runtime
+RUN apk add --no-cache \
+    sqlite \
+    libc6-compat
+
+WORKDIR /home/app
+
+# Set production environment
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+# Create non-root user with home directory
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S -D -H -u 1001 -h /home/app -s /sbin/nologin -G nodejs nextjs
+
+# Copy public assets
+COPY --from=builder /home/app/public ./public
+
+# Create necessary directories with proper permissions
+RUN mkdir -p .next && chown nextjs:nodejs .next
+RUN mkdir -p ./database && chown -R nextjs:nodejs ./database && chmod -R 755 ./database
+RUN mkdir -p ./public/upload/{uploads,images,videos,documents} && \
+    chown -R nextjs:nodejs ./public/upload && \
+    chmod -R 755 ./public/upload
+
+# Copy built application
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/standalone ./
+COPY --from=builder --chown=nextjs:nodejs /home/app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /home/app/database ./database
+COPY --from=builder --chown=nextjs:nodejs /home/app/scripts ./scripts
+
+# Ensure proper ownership
+RUN chown -R nextjs:nodejs /home/app
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Set runtime environment
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000', (res) => { \
+    if (res.statusCode === 200) process.exit(0); \
+    else process.exit(1); \
+  }).on('error', () => process.exit(1));"
+
+# Start the application
+CMD ["node", "server.js"]

@@ -1,0 +1,50 @@
+# Development Dockerfile for Sada with SQLite - hot reload enabled
+FROM node:20-alpine
+
+# Install development tools and build dependencies for better-sqlite3
+RUN apk add --no-cache \
+    libc6-compat \
+    git \
+    curl \
+    python3 \
+    make \
+    g++ \
+    sqlite
+
+WORKDIR /home/app
+
+# Copy package files for better layer caching
+COPY package.json yarn.lock ./
+
+# Install dependencies with development packages
+RUN yarn install --prefer-offline
+
+# Copy source code
+COPY . .
+
+# Create non-root user and set proper home directory
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S -D -H -u 1001 -h /home/app -s /sbin/nologin -G nodejs nextjs
+
+# Create necessary directories with proper permissions
+RUN mkdir -p database public/upload && \
+    chown -R nextjs:nodejs /home/app
+
+# Switch to non-root user
+USER nextjs
+
+# Expose port
+EXPOSE 3000
+
+# Set environment variables for development
+ENV NODE_ENV=development
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV CHOKIDAR_USEPOLLING=true
+ENV WATCHPACK_POLLING=true
+
+# Health check for development
+HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:3000 || exit 1
+
+# Start development server with hot reload
+CMD ["yarn", "dev"]
