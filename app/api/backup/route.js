@@ -20,6 +20,23 @@ export async function GET() {
     
     console.log('Database file found at:', dbPath);
     
+    // Import better-sqlite3 to checkpoint the WAL
+    const Database = require('better-sqlite3');
+    const db = new Database(dbPath);
+    
+    // Checkpoint the WAL to ensure all data is in the main database file
+    // This is critical for complete data backup
+    try {
+      db.pragma('wal_checkpoint(TRUNCATE)');
+      console.log('✅ WAL checkpointed successfully - all data consolidated');
+    } catch (checkpointError) {
+      console.warn('WAL checkpoint warning:', checkpointError.message);
+    }
+    
+    // Close the database connection
+    db.close();
+    console.log('Database connection closed after checkpoint');
+    
     // Create backup metadata
     const backupData = {
       metadata: {
