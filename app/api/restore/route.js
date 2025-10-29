@@ -131,6 +131,33 @@ export async function POST(request) {
       console.log('No upload directory found in backup');
     }
     
+    // Verify and checkpoint the restored database
+    try {
+      const Database = require('better-sqlite3');
+      const restoredDb = new Database(dbPath);
+      
+      // Checkpoint to ensure all data is properly loaded
+      restoredDb.pragma('wal_checkpoint(TRUNCATE)');
+      console.log('✅ Restored database checkpointed successfully');
+      
+      // Verify database integrity
+      const integrityCheck = restoredDb.pragma('integrity_check');
+      if (integrityCheck[0].integrity_check === 'ok') {
+        console.log('✅ Database integrity verified');
+      } else {
+        console.warn('⚠️ Database integrity check:', integrityCheck);
+      }
+      
+      // Get table count for verification
+      const tables = restoredDb.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
+      console.log(`✅ Restored database contains ${tables.length} tables`);
+      
+      restoredDb.close();
+      console.log('Restored database connection closed');
+    } catch (verifyError) {
+      console.warn('Database verification warning:', verifyError.message);
+    }
+    
     // Cleanup temp directory
     if (tempDir) {
       try {
