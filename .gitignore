@@ -559,3 +559,4 @@ node_modules/@next/swc-linux-arm64-musl/next-swc.linux-arm64-musl.node
 *.env.*
 node_modules/@next/swc-linux-x64-musl/next-swc.linux-x64-musl.node
 node_modules/@next/swc-linux-x64-gnu/next-swc.linux-x64-gnu.node
+sada142.zip
