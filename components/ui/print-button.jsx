@@ -15,7 +15,8 @@ export function PrintButton({
   className = "",
   variant = "outline",
   size = "default",
-  language: propLanguage // Accept language as prop
+  language: propLanguage, // Accept language as prop
+  showTotal = false // New prop to enable total row
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const { language: globalLanguage } = useLanguage()
@@ -33,7 +34,7 @@ export function PrintButton({
     
     try {
       // Prepare table data
-      let tableColumns, tableRows
+      let tableColumns, tableRows, totalRow = null
       
       if (columns.length > 0) {
         // Use provided columns configuration
@@ -47,6 +48,41 @@ export function PrintButton({
           }
           return value || ''
         }))
+        
+        // Calculate totals if showTotal is enabled
+        if (showTotal && data.length > 0) {
+          totalRow = columns.map((col, index) => {
+            if (index === 0) {
+              // First column shows "کۆی گشتی"
+              return 'کۆی گشتی'
+            }
+            
+            // Check if this column contains numeric data
+            const hasNumericData = data.some(row => {
+              const value = row[col.key]
+              return !isNaN(parseFloat(value)) && isFinite(value)
+            })
+            
+            if (hasNumericData) {
+              // Calculate sum for numeric columns
+              const sum = data.reduce((acc, row) => {
+                const value = parseFloat(row[col.key]) || 0
+                return acc + value
+              }, 0)
+              
+              // Apply the same render function if available
+              if (col.render && typeof col.render === 'function') {
+                const rendered = col.render(sum)
+                return typeof rendered === 'number' ? rendered.toLocaleString() : rendered
+              }
+              
+              return sum.toLocaleString()
+            }
+            
+            // Empty cell for non-numeric columns
+            return ''
+          })
+        }
       } else {
         // Auto-detect columns from data
         if (data.length > 0) {
@@ -149,6 +185,23 @@ export function PrintButton({
               background-color: #ffffff;
             }
             
+            .total-row {
+              background-color: #dbeafe !important;
+              font-weight: bold;
+              font-size: 13px;
+              border-top: 3px solid #2563eb;
+            }
+            
+            .total-row td {
+              padding: 10px 6px;
+              background-color: #dbeafe;
+            }
+            
+            .total-row td:first-child {
+              color: #1e40af;
+              font-size: 14px;
+            }
+            
             .number {
               font-family: 'Arial', monospace;
               text-align: right;
@@ -202,6 +255,14 @@ export function PrintButton({
                     }).join('')}
                   </tr>`
                 ).join('')}
+                ${totalRow ? `
+                  <tr class="total-row">
+                    ${totalRow.map((cell, index) => {
+                      const isNumber = index > 0 && !isNaN(parseFloat(cell.toString().replace(/,/g, ''))) && cell.toString().match(/[\d,]+/);
+                      return `<td class="${isNumber ? 'number' : ''}">${cell}</td>`
+                    }).join('')}
+                  </tr>
+                ` : ''}
               </tbody>
             </table>
           </div>

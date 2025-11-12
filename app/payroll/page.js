@@ -867,6 +867,7 @@ export default function PayrollPage() {
               { key: 'total', header: t('payroll.fields.total', 'kurdish'), render: (value) => value.toLocaleString() },
               { key: 'notes', header: t('payroll.fields.notes', 'kurdish') }
             ]}
+            showTotal={true}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           />
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>

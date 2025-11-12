@@ -912,6 +912,7 @@ export default function KitchenExpensesPage() {
                 { key: 'purpose', header: 'مەبەست' },
                 { key: 'notes', header: 'تێبینی' }
               ]}
+              showTotal={true}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             />
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
