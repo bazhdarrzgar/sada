@@ -974,6 +974,7 @@ export default function BuildingExpensesPage() {
                 { key: 'month', header: t('buildingExpenses.fields.month', 'kurdish') },
                 { key: 'notes', header: t('buildingExpenses.fields.notes', 'kurdish') }
               ]}
+              showTotal={true}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             />
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
