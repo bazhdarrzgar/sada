@@ -16,7 +16,8 @@ export function PrintButton({
   variant = "outline",
   size = "default",
   language: propLanguage, // Accept language as prop
-  showTotal = false // New prop to enable total row
+  showTotal = false, // New prop to enable total row
+  totalColumn = 'total' // Column key to calculate total for (default: 'total')
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const { language: globalLanguage } = useLanguage()
@@ -51,37 +52,30 @@ export function PrintButton({
         
         // Calculate totals if showTotal is enabled
         if (showTotal && data.length > 0) {
-          totalRow = columns.map((col, index) => {
-            if (index === 0) {
-              // First column shows "کۆی گشتی"
-              return 'کۆی گشتی'
+          // Find the specified column to calculate total for
+          const targetColumnIndex = columns.findIndex(col => col.key === totalColumn)
+          
+          if (targetColumnIndex !== -1) {
+            // Calculate sum for the specified column
+            const totalSum = data.reduce((acc, row) => {
+              const value = parseFloat(row[totalColumn]) || 0
+              return acc + value
+            }, 0)
+            
+            // Apply the same render function if available
+            const targetColumn = columns[targetColumnIndex]
+            let displaySum = totalSum.toLocaleString()
+            
+            if (targetColumn.render && typeof targetColumn.render === 'function') {
+              displaySum = targetColumn.render(totalSum)
             }
             
-            // Check if this column contains numeric data
-            const hasNumericData = data.some(row => {
-              const value = row[col.key]
-              return !isNaN(parseFloat(value)) && isFinite(value)
-            })
-            
-            if (hasNumericData) {
-              // Calculate sum for numeric columns
-              const sum = data.reduce((acc, row) => {
-                const value = parseFloat(row[col.key]) || 0
-                return acc + value
-              }, 0)
-              
-              // Apply the same render function if available
-              if (col.render && typeof col.render === 'function') {
-                const rendered = col.render(sum)
-                return typeof rendered === 'number' ? rendered.toLocaleString() : rendered
-              }
-              
-              return sum.toLocaleString()
+            totalRow = {
+              columnIndex: targetColumnIndex,
+              columnHeader: targetColumn.header,
+              sum: displaySum
             }
-            
-            // Empty cell for non-numeric columns
-            return ''
-          })
+          }
         }
       } else {
         // Auto-detect columns from data
@@ -185,21 +179,28 @@ export function PrintButton({
               background-color: #ffffff;
             }
             
-            .total-row {
-              background-color: #dbeafe !important;
-              font-weight: bold;
-              font-size: 13px;
-              border-top: 3px solid #2563eb;
-            }
-            
-            .total-row td {
-              padding: 10px 6px;
+            .total-summary {
+              margin-top: 20px;
+              padding: 15px;
               background-color: #dbeafe;
+              border: 2px solid #2563eb;
+              border-radius: 8px;
+              text-align: center;
             }
             
-            .total-row td:first-child {
-              color: #1e40af;
+            .total-summary-label {
               font-size: 14px;
+              font-weight: bold;
+              color: #1e40af;
+              margin-bottom: 5px;
+            }
+            
+            .total-summary-value {
+              font-size: 16px;
+              font-weight: bold;
+              color: #1e3a8a;
+              font-family: 'Arial', monospace;
+              direction: ltr;
             }
             
             .number {
@@ -255,17 +256,16 @@ export function PrintButton({
                     }).join('')}
                   </tr>`
                 ).join('')}
-                ${totalRow ? `
-                  <tr class="total-row">
-                    ${totalRow.map((cell, index) => {
-                      const isNumber = index > 0 && !isNaN(parseFloat(cell.toString().replace(/,/g, ''))) && cell.toString().match(/[\d,]+/);
-                      return `<td class="${isNumber ? 'number' : ''}">${cell}</td>`
-                    }).join('')}
-                  </tr>
-                ` : ''}
               </tbody>
             </table>
           </div>
+          
+          ${totalRow ? `
+            <div class="total-summary">
+              <div class="total-summary-label">${totalRow.columnHeader}</div>
+              <div class="total-summary-value">${totalRow.sum}</div>
+            </div>
+          ` : ''}
         </body>
         </html>
       `
