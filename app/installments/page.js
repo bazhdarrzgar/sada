@@ -876,6 +876,7 @@ export default function InstallmentsPage() {
               { key: 'remaining', header: t('annualInstallments.fields.remaining', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
               { key: 'notes', header: t('annualInstallments.fields.notes', 'kurdish') }
             ]}
+            showTotal={true}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           />
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
