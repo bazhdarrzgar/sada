@@ -1037,7 +1037,7 @@ export default function MonthlyExpensesPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
-                <h2 className="text-2xl font-bold mb-2">خەرجی مانگانە</h2>
+                <h2 className="text-2xl font-bold mb-2">پوختی حساباتی مانگانە</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">تکایە ناوی بەکارهێنەر و وشەی تێپەڕ بنووسە</p>
               </div>
               
@@ -1216,8 +1216,10 @@ export default function MonthlyExpensesPage() {
             <PrintButton 
               data={filteredData}
               filename="monthly-expenses-records"
-              title={t('monthlyExpenses.title', language)}
-              titleKu={t('monthlyExpenses.title', 'kurdish')}
+              title="خەرجی مانگانە"
+              titleKu="پوختی حساباتی مانگانە"
+              selectedMonth={selectedMonth}
+              selectedYear={selectedYear}
               columns={[
                 { key: 'year', header: t('monthlyExpenses.fields.year', 'kurdish') },
                 { key: 'month', header: t('monthlyExpenses.fields.month', 'kurdish') },
@@ -1225,6 +1227,8 @@ export default function MonthlyExpensesPage() {
                 { key: 'staffSalary', header: t('monthlyExpenses.fields.staffSalary', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'expenses', header: t('monthlyExpenses.fields.expenses', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'buildingRent', header: t('monthlyExpenses.fields.buildingRent', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'dramaFee', header: t('monthlyExpenses.fields.dramaFee', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'socialSupport', header: t('monthlyExpenses.fields.socialSupport', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'electricity', header: t('monthlyExpenses.fields.electricity', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'books', header: t('monthlyExpenses.fields.books', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'clothes', header: t('monthlyExpenses.fields.clothes', 'kurdish'), render: (value) => value.toLocaleString() },

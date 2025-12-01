@@ -17,13 +17,53 @@ export function PrintButton({
   size = "default",
   language: propLanguage, // Accept language as prop
   showTotal = false, // New prop to enable total row
-  totalColumn = 'total' // Column key to calculate total for (default: 'total')
+  totalColumn = 'total', // Column key to calculate total for (default: 'total')
+  selectedMonth = null, // Month to display in print header
+  selectedYear = null // Year to display in print header
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const { language: globalLanguage } = useLanguage()
   
   // Use prop language if provided, fallback to global language
   const currentLanguage = propLanguage || globalLanguage
+
+  // Month name mappings
+  const getMonthName = (monthNumber) => {
+    const monthMappings = {
+      english: {
+        1: 'January',
+        2: 'February',
+        3: 'March',
+        4: 'April',
+        5: 'May',
+        6: 'June',
+        7: 'July',
+        8: 'August',
+        9: 'September',
+        10: 'October',
+        11: 'November',
+        12: 'December'
+      },
+      kurdish: {
+        1: 'رێبەندان (January)',
+        2: 'رەشەمێ (February)',
+        3: 'نەورۆز / خاکەلێوە (March)',
+        4: 'بانەمەڕ (April)',
+        5: 'جۆزەردان (May)',
+        6: 'پووشپەڕ (June)',
+        7: 'خەرمانان (July)',
+        8: 'گەلاوێژ (August)',
+        9: 'رەزبەر (September)',
+        10: 'گەڵاڕێزان / خەزەڵوەر (October)',
+        11: 'سەرماوەز (November)',
+        12: 'بەفرانبار (December)'
+      }
+    }
+    return {
+      english: monthMappings.english[monthNumber] || `Month ${monthNumber}`,
+      kurdish: monthMappings.kurdish[monthNumber] || `مانگ ${monthNumber}`
+    }
+  }
 
   const generatePrintablePage = () => {
     if (!data || data.length === 0) {
@@ -96,6 +136,28 @@ export function PrintButton({
         day: 'numeric'
       })
 
+      // Generate month/year display text
+      let periodText = ''
+      if (selectedMonth && selectedYear) {
+        const monthNames = getMonthName(parseInt(selectedMonth))
+        periodText = `
+          <div class="period-info">
+            <div class="period-ku">${monthNames.kurdish} - ${selectedYear}</div>
+            <div class="period-en">${monthNames.english} ${selectedYear}</div>
+          </div>
+        `
+      } else if (selectedYear) {
+        periodText = `<div class="period-info"><div class="period-en">Year: ${selectedYear}</div></div>`
+      } else if (selectedMonth) {
+        const monthNames = getMonthName(parseInt(selectedMonth))
+        periodText = `
+          <div class="period-info">
+            <div class="period-ku">${monthNames.kurdish}</div>
+            <div class="period-en">${monthNames.english}</div>
+          </div>
+        `
+      }
+
       const printContent = `
         <!DOCTYPE html>
         <html dir="rtl" lang="ku">
@@ -143,6 +205,27 @@ export function PrintButton({
             .date {
               font-size: 11px;
               color: #6b7280;
+            }
+            
+            .period-info {
+              margin: 10px 0;
+              padding: 10px;
+              background-color: #f0f9ff;
+              border-radius: 6px;
+              border: 1px solid #2563eb;
+            }
+            
+            .period-ku {
+              font-size: 15px;
+              font-weight: bold;
+              color: #1e40af;
+              margin-bottom: 3px;
+            }
+            
+            .period-en {
+              font-size: 13px;
+              font-weight: 600;
+              color: #4b5563;
             }
             
             .table-container {
@@ -236,6 +319,7 @@ export function PrintButton({
           <div class="print-header">
             ${titleKu ? `<div class="title-ku">${titleKu}</div>` : ''}
             <div class="title-en">${title}</div>
+            ${periodText}
             <div class="date">Generated on: ${currentDate}</div>
           </div>
           
