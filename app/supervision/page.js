@@ -789,6 +789,7 @@ export default function SupervisionPage() {
               { key: 'subject', header: t('supervision.fields.subject', 'kurdish') },
               { key: 'department', header: t('supervision.fields.department', 'kurdish') },
               { key: 'grade', header: t('supervision.fields.grade', 'kurdish') },
+              { key: 'supervisionLocation', header: t('supervision.fields.supervisionLocation', 'kurdish') },
               { key: 'violationType', header: t('supervision.fields.violationType', 'kurdish') },
               { key: 'punishmentType', header: t('supervision.fields.punishmentType', 'kurdish') },
               { key: 'notes', header: t('supervision.fields.notes', 'kurdish') }

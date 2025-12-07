@@ -819,7 +819,10 @@ export default function BusPage() {
               { key: 'capacity', header: t('fields.capacity', 'kurdish') },
               { key: 'driverName', header: t('fields.driverName', 'kurdish') },
               { key: 'studentCount', header: t('fields.studentCount', 'kurdish') },
-              { key: 'teacherCount', header: t('fields.teacherCount', 'kurdish') }
+              { key: 'teacherCount', header: t('fields.teacherCount', 'kurdish') },
+              { key: 'driverPhone', header: t('fields.driverPhone', 'kurdish') },
+              { key: 'driverLicense', header: t('fields.driverLicense', 'kurdish') },
+              { key: 'notes', header: t('fields.notes', 'kurdish') }
             ]}
             className="bg-blue-600 hover:bg-blue-700 text-white"
             language={localLanguage}

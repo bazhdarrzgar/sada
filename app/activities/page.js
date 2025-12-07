@@ -630,6 +630,8 @@ export default function ActivitiesPage() {
               { key: 'preparationDate', header: t('activities.fields.preparationDate', 'kurdish') },
               { key: 'content', header: t('activities.fields.content', 'kurdish') },
               { key: 'startDate', header: t('activities.fields.startDate', 'kurdish') },
+              { key: 'whoDidIt', header: t('activities.fields.whoDidIt', 'kurdish') },
+              { key: 'helper', header: t('activities.fields.helper', 'kurdish') },
               { key: 'notes', header: t('activities.fields.notes', 'kurdish') }
             ]}
             className="bg-blue-600 hover:bg-blue-700 text-white"
