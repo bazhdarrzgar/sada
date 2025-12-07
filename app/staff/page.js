@@ -796,6 +796,8 @@ export default function StaffPage() {
               { key: 'dateOfBirth', header: t('staffRecords.fields.dateOfBirth', 'kurdish') },
               { key: 'certificate', header: t('staffRecords.fields.certificate', 'kurdish') },
               { key: 'education', header: t('staffRecords.fields.education', 'kurdish') },
+              { key: 'certificateImages', header: 'شەهادە', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' },
+              { key: 'cv', header: 'CV', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' },
               { key: 'notes', header: t('staffRecords.fields.notes', 'kurdish') }
             ]}
             className="bg-blue-600 hover:bg-blue-700 text-white"

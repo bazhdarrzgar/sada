@@ -1159,7 +1159,8 @@ export default function DailyAccountsPage() {
               { key: 'date', header: 'بەروار' },
               { key: 'checkNumber', header: 'ژمارە پسووڵە' },
               { key: 'amount', header: 'بڕی پارە', render: (value) => value.toLocaleString() + ' د.ع' },
-              { key: 'notes', header: 'تێبینی' }
+              { key: 'notes', header: 'تێبینی' },
+              { key: 'receiptImages', header: 'وێنەی پسووڵە', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' }
             ]}
             showTotal={true}
             totalColumn="amount"

@@ -910,6 +910,7 @@ export default function KitchenExpensesPage() {
                 { key: 'month', header: 'مانگ' },
                 { key: 'year', header: 'ساڵ' },
                 { key: 'purpose', header: 'مەبەست' },
+                { key: 'receiptImages', header: 'وەسڵ', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' },
                 { key: 'notes', header: 'تێبینی' }
               ]}
               showTotal={true}

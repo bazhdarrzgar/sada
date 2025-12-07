@@ -898,6 +898,8 @@ export default function TeachersPage() {
               { key: 'startDate', header: 'دەست بەکاربوون' },
               { key: 'bloodType', header: 'جۆری خوێن' },
               { key: 'previousInstitution', header: 'دامەزراوەی پێشوو' },
+              { key: 'certificateImages', header: 'شەهادە', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' },
+              { key: 'cv', header: 'CV', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' },
               { key: 'notes', header: 'تێبینی' }
             ]}
             className="bg-blue-600 hover:bg-blue-700 text-white"

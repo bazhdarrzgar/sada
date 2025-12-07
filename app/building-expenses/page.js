@@ -972,7 +972,8 @@ export default function BuildingExpensesPage() {
                 { key: 'cost', header: t('buildingExpenses.fields.cost', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() + ' د.ع' },
                 { key: 'year', header: t('buildingExpenses.fields.year', 'kurdish') },
                 { key: 'month', header: t('buildingExpenses.fields.month', 'kurdish') },
-                { key: 'notes', header: t('buildingExpenses.fields.notes', 'kurdish') }
+                { key: 'notes', header: t('buildingExpenses.fields.notes', 'kurdish') },
+                { key: 'images', header: 'وەسڵ', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' }
               ]}
               showTotal={true}
               className="bg-blue-600 hover:bg-blue-700 text-white"
