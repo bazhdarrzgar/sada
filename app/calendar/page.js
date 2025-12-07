@@ -900,10 +900,22 @@ export default function CalendarPage() {
             titleKu="بەڕێوەبردنی ساڵنامە"
             columns={[
               { key: 'month', header: 'Date' },
-              { key: 'week1', header: 'W/1', render: (value) => Array.isArray(value) ? value.join(', ') : value },
-              { key: 'week2', header: 'W/2', render: (value) => Array.isArray(value) ? value.join(', ') : value },
-              { key: 'week3', header: 'W/3', render: (value) => Array.isArray(value) ? value.join(', ') : value },
-              { key: 'week4', header: 'W/4', render: (value) => Array.isArray(value) ? value.join(', ') : value }
+              { key: 'week1-0', header: 'W1/Sun', render: (value, row) => (row.week1 && row.week1[0]) || '' },
+              { key: 'week1-1', header: 'W1/Mon', render: (value, row) => (row.week1 && row.week1[1]) || '' },
+              { key: 'week1-2', header: 'W1/Tue', render: (value, row) => (row.week1 && row.week1[2]) || '' },
+              { key: 'week1-3', header: 'W1/Wed', render: (value, row) => (row.week1 && row.week1[3]) || '' },
+              { key: 'week2-0', header: 'W2/Sun', render: (value, row) => (row.week2 && row.week2[0]) || '' },
+              { key: 'week2-1', header: 'W2/Mon', render: (value, row) => (row.week2 && row.week2[1]) || '' },
+              { key: 'week2-2', header: 'W2/Tue', render: (value, row) => (row.week2 && row.week2[2]) || '' },
+              { key: 'week2-3', header: 'W2/Wed', render: (value, row) => (row.week2 && row.week2[3]) || '' },
+              { key: 'week3-0', header: 'W3/Sun', render: (value, row) => (row.week3 && row.week3[0]) || '' },
+              { key: 'week3-1', header: 'W3/Mon', render: (value, row) => (row.week3 && row.week3[1]) || '' },
+              { key: 'week3-2', header: 'W3/Tue', render: (value, row) => (row.week3 && row.week3[2]) || '' },
+              { key: 'week3-3', header: 'W3/Wed', render: (value, row) => (row.week3 && row.week3[3]) || '' },
+              { key: 'week4-0', header: 'W4/Sun', render: (value, row) => (row.week4 && row.week4[0]) || '' },
+              { key: 'week4-1', header: 'W4/Mon', render: (value, row) => (row.week4 && row.week4[1]) || '' },
+              { key: 'week4-2', header: 'W4/Tue', render: (value, row) => (row.week4 && row.week4[2]) || '' },
+              { key: 'week4-3', header: 'W4/Wed', render: (value, row) => (row.week4 && row.week4[3]) || '' }
             ]}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           />

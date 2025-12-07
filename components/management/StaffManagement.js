@@ -5,6 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { Search, Plus, Edit, Trash2, Users } from 'lucide-react';
+import { DownloadButton } from '@/components/ui/download-button';
+import { PrintButton } from '@/components/ui/print-button';
 
 const columns = [
   { key: 'full_name', label: 'ناوی تەواو' },
@@ -165,13 +167,41 @@ const StaffManagement = () => {
                 className="pl-10"
               />
             </div>
-            <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={() => openModal()} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-gray-900" disabled={loading}>
-                  <Plus className="h-4 w-4" />
-                  زیادکردنی تۆمارێکی نوێ
-                </Button>
-              </DialogTrigger>
+            <div className="flex items-center gap-4">
+              <DownloadButton 
+                data={records}
+                filename="staff-records"
+                className="bg-green-600 hover:bg-green-700 text-white"
+              />
+              <PrintButton 
+                data={records}
+                filename="staff-records"
+                title="Staff Records"
+                titleKu="تۆمارەکانی ستاف"
+                columns={[
+                  { key: 'full_name', header: 'ناوی تەواو' },
+                  { key: 'mobile', header: 'مۆبایل' },
+                  { key: 'residence', header: 'نیشتەجێبوون' },
+                  { key: 'gender', header: 'ڕەگەز' },
+                  { key: 'id_number', header: 'ژ.وەسەڵ' },
+                  { key: 'certificate', header: 'بروانامە' },
+                  { key: 'age', header: 'تەمەن' },
+                  { key: 'school', header: 'قوتابخانە' },
+                  { key: 'preparatory', header: 'ئامادەیی' },
+                  { key: 'date', header: 'بەروار' },
+                  { key: 'department', header: 'بەش' },
+                  { key: 'pass', header: 'پاس' },
+                  { key: 'contract', header: 'عەقد' }
+                ]}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              />
+              <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                <DialogTrigger asChild>
+                  <Button onClick={() => openModal()} className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 dark:text-gray-900" disabled={loading}>
+                    <Plus className="h-4 w-4" />
+                    زیادکردنی تۆمارێکی نوێ
+                  </Button>
+                </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
                   <DialogTitle>{editingRecord ? 'دەستکاری تۆمار' : 'زیادکردنی تۆمارێکی نوێ'}</DialogTitle>
