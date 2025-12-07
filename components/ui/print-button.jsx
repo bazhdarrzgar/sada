@@ -254,12 +254,34 @@ export function PrintButton({
               font-size: 12px;
             }
             
+            .row-number {
+              background-color: #1e40af;
+              color: white;
+              font-weight: bold;
+              width: 50px;
+              min-width: 50px;
+            }
+            
+            .row-number-cell {
+              font-weight: bold;
+              color: #1e40af;
+              background-color: #e0f2fe;
+            }
+            
             tr:nth-child(even) {
               background-color: #f8fafc;
             }
             
             tr:nth-child(odd) {
               background-color: #ffffff;
+            }
+            
+            tr:nth-child(even) .row-number-cell {
+              background-color: #dbeafe;
+            }
+            
+            tr:nth-child(odd) .row-number-cell {
+              background-color: #e0f2fe;
             }
             
             .total-summary {
@@ -327,12 +349,14 @@ export function PrintButton({
             <table>
               <thead>
                 <tr>
+                  <th class="row-number">#</th>
                   ${tableColumns.map(col => `<th>${col}</th>`).join('')}
                 </tr>
               </thead>
               <tbody>
-                ${tableRows.map(row => 
+                ${tableRows.map((row, rowIndex) => 
                   `<tr>
+                    <td class="row-number-cell">${rowIndex + 1}</td>
                     ${row.map((cell, index) => {
                       // Check if this is a number column by looking at the cell content
                       const isNumber = !isNaN(parseFloat(cell.toString().replace(/,/g, ''))) && cell.toString().match(/[\d,]+/);
