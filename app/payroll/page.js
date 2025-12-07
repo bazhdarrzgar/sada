@@ -865,6 +865,8 @@ export default function PayrollPage() {
               { key: 'deduction', header: t('payroll.fields.deduction', 'kurdish'), render: (value) => value.toLocaleString() },
               { key: 'bonus', header: t('payroll.fields.bonus', 'kurdish'), render: (value) => value.toLocaleString() },
               { key: 'total', header: t('payroll.fields.total', 'kurdish'), render: (value) => value.toLocaleString() },
+              { key: 'month', header: t('payroll.fields.month', 'kurdish') },
+              { key: 'year', header: t('payroll.fields.year', 'kurdish') },
               { key: 'notes', header: t('payroll.fields.notes', 'kurdish') }
             ]}
             showTotal={true}

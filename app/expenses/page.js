@@ -1235,6 +1235,7 @@ export default function MonthlyExpensesPage() {
                 { key: 'travel', header: t('monthlyExpenses.fields.travel', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'transportation', header: t('monthlyExpenses.fields.transportation', 'kurdish'), render: (value) => value.toLocaleString() },
                 { key: 'total', header: t('monthlyExpenses.fields.total', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'receiptImages', header: t('monthlyExpenses.fields.receiptImages', 'kurdish') },
                 { key: 'notes', header: t('monthlyExpenses.fields.notes', 'kurdish') }
               ]}
               showTotal={true}

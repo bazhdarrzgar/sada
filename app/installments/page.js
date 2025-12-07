@@ -872,8 +872,15 @@ export default function InstallmentsPage() {
               { key: 'grade', header: t('annualInstallments.fields.grade', 'kurdish') },
               { key: 'installmentType', header: t('annualInstallments.fields.installmentType', 'kurdish') },
               { key: 'annualAmount', header: t('annualInstallments.fields.annualAmount', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
+              { key: 'firstInstallment', header: t('annualInstallments.fields.firstInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
+              { key: 'secondInstallment', header: t('annualInstallments.fields.secondInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
+              { key: 'thirdInstallment', header: t('annualInstallments.fields.thirdInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
+              { key: 'fourthInstallment', header: t('annualInstallments.fields.fourthInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
+              { key: 'fifthInstallment', header: t('annualInstallments.fields.fifthInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
+              { key: 'sixthInstallment', header: t('annualInstallments.fields.sixthInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
               { key: 'totalReceived', header: t('annualInstallments.fields.totalReceived', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
               { key: 'remaining', header: t('annualInstallments.fields.remaining', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
+              { key: 'receiptImages', header: t('annualInstallments.fields.receiptImages', 'kurdish') },
               { key: 'notes', header: t('annualInstallments.fields.notes', 'kurdish') }
             ]}
             showTotal={true}
