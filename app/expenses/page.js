@@ -339,7 +339,7 @@ export default function MonthlyExpensesPage() {
     // Scroll to center before opening modal
     await scrollToCenter()
     
-    const entry = expensesData[index]
+    const entry = filteredData[index]
     setEditingData(entry)
     setIsEditModalOpen(true)
   }

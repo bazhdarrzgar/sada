@@ -299,7 +299,7 @@ export default function InstallmentsPage() {
     // First scroll to center, then open modal after a brief delay
     scrollToCenter()
     setTimeout(() => {
-      const entry = installmentsData[index]
+      const entry = filteredData[index]
       setEditingData(entry)
       setIsEditModalOpen(true)
     }, 300) // Small delay to allow scroll to start

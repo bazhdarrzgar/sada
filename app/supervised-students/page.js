@@ -248,7 +248,7 @@ export default function SupervisedStudentsPage() {
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      const entry = studentsData[index]
+      const entry = filteredData[index]
       setEditingData(entry)
       setIsEditModalOpen(true)
     }, 100)

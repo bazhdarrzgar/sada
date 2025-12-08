@@ -261,7 +261,7 @@ export default function PayrollPage() {
     
     // Small delay to allow smooth scroll to start before opening modal
     setTimeout(() => {
-      const entry = payrollData[index]
+      const entry = filteredData[index]
       setEditingData(entry)
       setIsEditModalOpen(true)
     }, 200)
