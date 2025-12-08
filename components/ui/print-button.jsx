@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Printer } from 'lucide-react'
 import { useLanguage } from '@/components/ui/language-toggle'
 import { t } from '@/lib/translations'
@@ -22,6 +23,7 @@ export function PrintButton({
   selectedYear = null // Year to display in print header
 }) {
   const [isLoading, setIsLoading] = useState(false)
+  const [showOrientationDialog, setShowOrientationDialog] = useState(false)
   const { language: globalLanguage } = useLanguage()
   
   // Use prop language if provided, fallback to global language
@@ -65,13 +67,14 @@ export function PrintButton({
     }
   }
 
-  const generatePrintablePage = () => {
+  const generatePrintablePage = (orientation = 'portrait') => {
     if (!data || data.length === 0) {
       alert(t('common.noDataToPrint', currentLanguage))
       return
     }
 
     setIsLoading(true)
+    setShowOrientationDialog(false)
     
     try {
       // Prepare table data
@@ -315,6 +318,11 @@ export function PrintButton({
             }
             
             @media print {
+              @page {
+                size: ${orientation === 'landscape' ? 'A4 landscape' : 'A4 portrait'};
+                margin: 15mm;
+              }
+              
               body {
                 padding: 10px;
               }
@@ -406,16 +414,63 @@ export function PrintButton({
     }
   }
 
+  const handlePrintClick = () => {
+    if (!data || data.length === 0) {
+      alert(t('common.noDataToPrint', currentLanguage))
+      return
+    }
+    setShowOrientationDialog(true)
+  }
+
   return (
-    <Button 
-      variant={variant} 
-      size={size}
-      className={`flex items-center gap-2 ${className}`}
-      disabled={isLoading || !data || data.length === 0}
-      onClick={generatePrintablePage}
-    >
-      <Printer className="h-4 w-4" />
-      {isLoading ? t('common.printing', currentLanguage) : t('common.print', currentLanguage)}
-    </Button>
+    <>
+      <Button 
+        variant={variant} 
+        size={size}
+        className={`flex items-center gap-2 ${className}`}
+        disabled={isLoading || !data || data.length === 0}
+        onClick={handlePrintClick}
+      >
+        <Printer className="h-4 w-4" />
+        {isLoading ? t('common.printing', currentLanguage) : t('common.print', currentLanguage)}
+      </Button>
+
+      <Dialog open={showOrientationDialog} onOpenChange={setShowOrientationDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-center text-lg font-bold">
+              {currentLanguage === 'kurdish' ? 'هەڵبژاردنی ئاراستەی چاپکردن' : 'Select Print Orientation'}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 p-4">
+            <Button
+              onClick={() => generatePrintablePage('portrait')}
+              className="w-full h-20 text-lg font-semibold bg-blue-600 hover:bg-blue-700 text-white"
+              disabled={isLoading}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <span>{currentLanguage === 'kurdish' ? 'درێژی' : 'Portrait'}</span>
+                <span className="text-sm font-normal opacity-90">
+                  {currentLanguage === 'kurdish' ? '(ستوونی)' : '(Vertical)'}
+                </span>
+              </div>
+            </Button>
+            
+            <Button
+              onClick={() => generatePrintablePage('landscape')}
+              className="w-full h-20 text-lg font-semibold bg-green-600 hover:bg-green-700 text-white"
+              disabled={isLoading}
+            >
+              <div className="flex flex-col items-center gap-1">
+                <span>{currentLanguage === 'kurdish' ? 'پانی' : 'Landscape'}</span>
+                <span className="text-sm font-normal opacity-90">
+                  {currentLanguage === 'kurdish' ? '(ئاسۆیی)' : '(Horizontal)'}
+                </span>
+              </div>
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   )
 }
