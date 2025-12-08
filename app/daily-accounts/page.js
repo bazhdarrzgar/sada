@@ -1149,6 +1149,8 @@ export default function DailyAccountsPage() {
             filename="daily-accounts-records"
             title="Daily Accounts"
             titleKu="حساباتی رۆژانه"
+            selectedMonth={mainFilter.month || null}
+            selectedYear={mainFilter.year || null}
             columns={[
               { key: 'number', header: 'ژمارە' },
               { key: 'week', header: 'هەفتە' },

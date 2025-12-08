@@ -967,6 +967,8 @@ export default function BuildingExpensesPage() {
               filename="building-expenses-records"
               title={t('buildingExpenses.title', language)}
               titleKu={t('buildingExpenses.title', 'kurdish')}
+              selectedMonth={selectedMonth !== "all-months" ? selectedMonth : null}
+              selectedYear={selectedYear !== "all-years" ? selectedYear : null}
               columns={[
                 { key: 'item', header: t('buildingExpenses.fields.item', 'kurdish') },
                 { key: 'cost', header: t('buildingExpenses.fields.cost', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() + ' د.ع' },

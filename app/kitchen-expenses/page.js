@@ -903,6 +903,8 @@ export default function KitchenExpensesPage() {
               filename="kitchen-expenses-records"
               title="Kitchen Expenses"
               titleKu="خەرجی خواردنگە"
+              selectedMonth={tableFilterMonth !== "ALL_MONTHS" ? tableFilterMonth.replace('مانگی ', '') : null}
+              selectedYear={tableFilterYear !== "ALL_YEARS" ? tableFilterYear : null}
               columns={[
                 { key: 'item', header: 'شت و مه کی' },
                 { key: 'cost', header: 'تێچوو', render: (value) => parseFloat(value).toLocaleString() + ' د.ع' },

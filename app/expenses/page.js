@@ -1218,8 +1218,8 @@ export default function MonthlyExpensesPage() {
               filename="monthly-expenses-records"
               title="خەرجی مانگانە"
               titleKu="پوختی حساباتی مانگانە"
-              selectedMonth={selectedMonth}
-              selectedYear={selectedYear}
+              selectedMonth={selectedMonth !== "all-months" ? selectedMonth : null}
+              selectedYear={selectedYear !== "all-years" ? selectedYear : null}
               columns={[
                 { key: 'year', header: t('monthlyExpenses.fields.year', 'kurdish') },
                 { key: 'month', header: t('monthlyExpenses.fields.month', 'kurdish') },

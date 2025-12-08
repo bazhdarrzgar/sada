@@ -858,6 +858,8 @@ export default function PayrollPage() {
             filename="payroll-records"
             title={t('payroll.title', language)}
             titleKu={t('payroll.title', 'kurdish')}
+            selectedMonth={selectedMonth !== "all-months" ? selectedMonth : null}
+            selectedYear={selectedYear !== "all-years" ? selectedYear : null}
             columns={[
               { key: 'employeeName', header: t('payroll.fields.employeeName', 'kurdish') },
               { key: 'salary', header: t('payroll.fields.salary', 'kurdish'), render: (value) => value.toLocaleString() },
