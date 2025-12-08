@@ -303,13 +303,30 @@ export default function KitchenExpensesPage() {
   }
 
   const startEditing = async (entryId) => {
+    // Close any existing modal first to ensure clean state
+    setIsEditModalOpen(false)
+    setEditingData(null)
+    
+    // Small delay to ensure modal is fully closed
+    await new Promise(resolve => setTimeout(resolve, 100))
+    
     // Scroll to center before opening modal
     await scrollToCenter()
     
+    // Find entry from the full dataset using ID
     const entry = expensesData.find(item => item.id === entryId)
+    
     if (entry) {
-      setEditingData(entry)
+      // Create a deep copy to avoid reference issues
+      const entryCopy = JSON.parse(JSON.stringify(entry))
+      setEditingData(entryCopy)
+      
+      // Small delay before opening to ensure state is set
+      await new Promise(resolve => setTimeout(resolve, 50))
       setIsEditModalOpen(true)
+    } else {
+      console.error('Entry not found with ID:', entryId)
+      alert('Error: Could not find the expense record. Please refresh the page.')
     }
   }
 
@@ -703,7 +720,7 @@ export default function KitchenExpensesPage() {
     return (
       <>
         <EnhancedTable
-          key={tableKey}
+          key={`${tableKey}-${searchTerm}-${tableFilterYear}-${tableFilterMonth}`}
           data={data}
           columns={columns}
           editingRow={null} // Disable inline editing
@@ -1112,18 +1129,21 @@ export default function KitchenExpensesPage() {
       )}
 
       {/* Edit Modal */}
-      <EditModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false)
-          setEditingData(null)
-        }}
-        data={editingData}
-        fields={editFields}
-        onSave={handleModalSave}
-        title="Edit Kitchen Expense"
-        titleKu="دەستکاریکردنی خەرجی خواردنگە"
-      />
+      {isEditModalOpen && editingData && (
+        <EditModal
+          isOpen={isEditModalOpen}
+          onClose={() => {
+            setIsEditModalOpen(false)
+            setEditingData(null)
+          }}
+          data={editingData}
+          fields={editFields}
+          onSave={handleModalSave}
+          title="Edit Kitchen Expense"
+          titleKu="دەستکاریکردنی خەرجی خواردنگە"
+          key={editingData.id} // Force re-mount when editing different entry
+        />
+      )}
 
       {/* Enhanced Image Preview Dialog */}
       <Dialog open={!!previewImage} onOpenChange={() => {
