@@ -292,7 +292,7 @@ const EnhancedTable = ({
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              onClick={() => onEdit(actualRowIndex)}
+                              onClick={() => onEdit(row.id || actualRowIndex)}
                               className="h-8 w-8 p-0 border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
                             >
                               <Edit className="h-4 w-4" />
