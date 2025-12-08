@@ -302,13 +302,15 @@ export default function KitchenExpensesPage() {
     })
   }
 
-  const startEditing = async (index) => {
+  const startEditing = async (entryId) => {
     // Scroll to center before opening modal
     await scrollToCenter()
     
-    const entry = expensesData[index]
-    setEditingData(entry)
-    setIsEditModalOpen(true)
+    const entry = expensesData.find(item => item.id === entryId)
+    if (entry) {
+      setEditingData(entry)
+      setIsEditModalOpen(true)
+    }
   }
 
   // Handle Add Dialog with smooth scrolling
@@ -490,7 +492,7 @@ export default function KitchenExpensesPage() {
   function ExpensesCardView({ data }) {
     return (
       <div className="space-y-4">
-        {data.map((entry, idx) => (
+        {data.map((entry) => (
           <Card key={entry.id} className="p-4 theme-card glow-button hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300 dark:hover:border-blue-500 group">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -559,7 +561,7 @@ export default function KitchenExpensesPage() {
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  onClick={() => startEditing(idx)} 
+                  onClick={() => startEditing(entry.id)} 
                   disabled={isSaving || isDeleting}
                   className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
                 >

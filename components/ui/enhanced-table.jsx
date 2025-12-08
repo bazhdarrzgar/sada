@@ -206,7 +206,7 @@ const EnhancedTable = ({
           <tbody>
             {currentData.map((row, rowIndex) => {
               const actualRowIndex = enablePagination ? startIndex + rowIndex : rowIndex
-              const isEditing = editingRow === actualRowIndex
+              const isEditing = editingRow === row.id
               
               return (
                 <tr 
@@ -229,7 +229,7 @@ const EnhancedTable = ({
                     >
                       {isEditing && column.editable ? (
                         column.editComponent ? (
-                          column.editComponent(row, (value) => onCellEdit(actualRowIndex, column.key, value))
+                          column.editComponent(row, (value) => onCellEdit(row.id, column.key, value))
                         ) : (
                           <Input
                             value={(() => {
@@ -240,7 +240,7 @@ const EnhancedTable = ({
                               }
                               return row[column.key] || ''
                             })()}
-                            onChange={(e) => onCellEdit(actualRowIndex, column.key, e.target.value)}
+                            onChange={(e) => onCellEdit(row.id, column.key, e.target.value)}
                             className="w-full text-center dark:bg-gray-800 dark:text-gray-100 border-gray-300 dark:border-gray-600"
                             type={column.type || 'text'}
                           />
@@ -273,7 +273,7 @@ const EnhancedTable = ({
                             <Button 
                               size="sm" 
                               variant="default" 
-                              onClick={() => onSave(actualRowIndex)}
+                              onClick={() => onSave(row.id)}
                               className="h-8 w-8 p-0 bg-green-600 hover:bg-green-700 text-white shadow-sm hover:shadow-md transition-all duration-200"
                             >
                               <Save className="h-4 w-4" />
@@ -292,7 +292,7 @@ const EnhancedTable = ({
                             <Button 
                               size="sm" 
                               variant="outline" 
-                              onClick={() => onEdit(row.id || actualRowIndex)}
+                              onClick={() => onEdit(row.id)}
                               className="h-8 w-8 p-0 border-blue-300 dark:border-blue-600 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200"
                             >
                               <Edit className="h-4 w-4" />

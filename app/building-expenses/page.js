@@ -286,25 +286,28 @@ export default function BuildingExpensesPage() {
     })
   }
 
-  const handleCellEdit = (rowIndex, field, value) => {
-    const updatedData = [...expensesData]
-    updatedData[rowIndex][field] = value
+  const handleCellEdit = (entryId, field, value) => {
+    const updatedData = expensesData.map(item => 
+      item.id === entryId ? { ...item, [field]: value } : item
+    )
     setExpensesData(updatedData)
   }
 
-  const startInlineEditing = (index) => {
-    setEditingRow(index)
+  const startInlineEditing = (entryId) => {
+    setEditingRow(entryId)
   }
 
-  const saveRowEdit = (rowIndex) => {
+  const saveRowEdit = (entryId) => {
     // Prevent multiple submissions
     if (isSaving) {
       console.log('Save already in progress, ignoring duplicate click')
       return
     }
     
-    const entry = expensesData[rowIndex]
-    saveEntry(entry)
+    const entry = expensesData.find(item => item.id === entryId)
+    if (entry) {
+      saveEntry(entry)
+    }
     setEditingRow(null)
   }
 
@@ -323,15 +326,17 @@ export default function BuildingExpensesPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (entryId) => {
     // First scroll to center quickly, then open modal
     scrollToCenter()
     
     // Small delay to allow smooth scroll to start before opening modal
     setTimeout(() => {
-      const entry = expensesData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      const entry = expensesData.find(item => item.id === entryId)
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      }
     }, 200)
   }
 
@@ -570,7 +575,7 @@ export default function BuildingExpensesPage() {
   function ExpensesCardView({ data }) {
     return (
       <div className="space-y-4">
-        {data.map((entry, idx) => (
+        {data.map((entry) => (
           <Card key={entry.id} className="p-4 theme-card glow-button hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300 dark:hover:border-blue-500 group">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -611,7 +616,7 @@ export default function BuildingExpensesPage() {
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  onClick={() => startEditing(idx)} 
+                  onClick={() => startEditing(entry.id)} 
                   disabled={isSaving || isDeleting}
                   className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
                 >

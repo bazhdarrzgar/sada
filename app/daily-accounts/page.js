@@ -410,13 +410,15 @@ export default function DailyAccountsPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (entryId) => {
     // First scroll to center, then open modal after a brief delay
     scrollToCenter()
     setTimeout(() => {
-      const entry = dailyAccountsData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      const entry = dailyAccountsData.find(item => item.id === entryId)
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      }
     }, 300) // Small delay to allow scroll to start
   }
 
@@ -604,7 +606,7 @@ export default function DailyAccountsPage() {
   function DailyAccountsCardView({ data }) {
     return (
       <div className="space-y-4">
-        {data.map((entry, idx) => (
+        {data.map((entry) => (
           <Card key={entry.id} className="p-4 theme-card glow-button hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300 dark:hover:border-blue-500 group">
             <div className="space-y-3">
               <div className="flex justify-between items-center">
@@ -690,7 +692,7 @@ export default function DailyAccountsPage() {
                 <Button 
                   size="sm" 
                   variant="outline" 
-                  onClick={() => startEditing(idx)} 
+                  onClick={() => startEditing(entry.id)} 
                   disabled={isSaving || isDeleting}
                   className="hover:bg-blue-50 dark:hover:bg-blue-900/30 border-blue-200 dark:border-blue-700 text-blue-700 dark:text-blue-300 transition-colors duration-200"
                 >
