@@ -117,11 +117,18 @@ export default function EmployeeLeavesPage() {
 
   const saveEntry = async (entry) => {
     // Prevent multiple submissions
-    if (isSaving) return
+    if (isSaving) {
+      console.log('Already saving, ignoring duplicate submission')
+      return
+    }
+    
+    console.log('saveEntry called with:', entry)
+    console.log('Entry has ID:', entry.id)
     
     setIsSaving(true)
     try {
       if (!entry.id) {
+        console.log('Creating new entry (no ID found)')
         // Create new entry
         const response = await fetch('/api/employee-leaves', {
           method: 'POST',
@@ -130,9 +137,13 @@ export default function EmployeeLeavesPage() {
         })
         if (response.ok) {
           const newLeave = await response.json()
+          console.log('Created new leave:', newLeave)
           setLeavesData(prev => [newLeave, ...prev])
+        } else {
+          console.error('Failed to create entry, status:', response.status)
         }
       } else {
+        console.log('Updating existing entry with ID:', entry.id)
         // Update existing entry
         const response = await fetch(`/api/employee-leaves/${entry.id}`, {
           method: 'PUT',
@@ -141,6 +152,7 @@ export default function EmployeeLeavesPage() {
         })
         if (response.ok) {
           const updatedLeave = await response.json()
+          console.log('Updated leave:', updatedLeave)
           // For updates, keep in same position for instant visual feedback
           setLeavesData(prev => {
             const existingIndex = prev.findIndex(item => item.id === entry.id)
@@ -151,11 +163,15 @@ export default function EmployeeLeavesPage() {
             }
             return prev
           })
+        } else {
+          console.error('Failed to update entry, status:', response.status)
         }
       }
 
       setIsAddDialogOpen(false)
       setEditingRow(null)
+      setIsEditModalOpen(false)
+      setEditingData(null)
       resetNewEntry()
     } catch (error) {
       console.error('Failed to save entry:', error)
@@ -202,8 +218,17 @@ export default function EmployeeLeavesPage() {
     // Find entry by ID from the complete leavesData array
     const entry = leavesData.find(item => item.id === id)
     if (entry) {
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      console.log('Starting edit for entry:', entry)
+      // Create a deep copy to ensure all data is preserved
+      const entryToEdit = JSON.parse(JSON.stringify(entry))
+      console.log('Entry to edit with ID:', entryToEdit.id)
+      setEditingData(entryToEdit)
+      // Use setTimeout to ensure state is updated before modal opens
+      setTimeout(() => {
+        setIsEditModalOpen(true)
+      }, 50)
+    } else {
+      console.error('Entry not found with ID:', id)
     }
   }
 
