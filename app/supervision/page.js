@@ -249,20 +249,14 @@ export default function SupervisionPage() {
     })
   }
 
-  const startEditing = (index, filteredData = null) => {
+  const startEditing = (index, dataSource = null) => {
     // First scroll to center quickly
     scrollToCenterFast()
     
     // Small delay to ensure smooth scrolling starts, then open modal
     setTimeout(() => {
-      let entry
-      if (filteredData) {
-        // If filtered data is provided, get the entry directly from it
-        entry = filteredData[index]
-      } else {
-        // Fallback to the original supervisionData
-        entry = supervisionData[index]
-      }
+      // Always use the provided dataSource if available, otherwise use supervisionData
+      const entry = dataSource ? dataSource[index] : supervisionData[index]
       
       // Determine the editing type based on the entry's type field
       setEditingType(entry.type || 'teacher')

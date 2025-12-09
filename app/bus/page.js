@@ -351,7 +351,8 @@ export default function BusPage() {
     
     // Small delay to ensure smooth scrolling starts, then open modal
     setTimeout(() => {
-      const entry = busData[index]
+      // Use filteredData instead of busData to get the correct entry
+      const entry = filteredData[index]
       setEditingData(entry)
       setIsEditModalOpen(true)
     }, 100) // Quick delay to allow scroll to start
@@ -535,7 +536,14 @@ export default function BusPage() {
                   <Eye className="h-4 w-4" />
                   {t('buttons.viewDetails', localLanguage)}
                 </Button>
-                <Button size="sm" variant="outline" onClick={() => startEditing(idx)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
+                <Button size="sm" variant="outline" onClick={() => {
+                  // Pass entry directly instead of index to ensure correct data
+                  scrollToCenterFast()
+                  setTimeout(() => {
+                    setEditingData(entry)
+                    setIsEditModalOpen(true)
+                  }, 100)
+                }} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button size="sm" variant="destructive" onClick={() => deleteEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
