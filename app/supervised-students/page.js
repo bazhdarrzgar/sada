@@ -242,14 +242,34 @@ export default function SupervisedStudentsPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (idOrIndex) => {
     // Scroll to center first
     scrollToCenter()
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      const entry = filteredData[index]
-      setEditingData(entry)
+      // Check if idOrIndex is actually an ID (string) or index (number)
+      let entry
+      
+      if (typeof idOrIndex === 'string') {
+        // It's an ID from the EnhancedTable, find the entry by ID
+        entry = filteredData.find(item => item.id === idOrIndex)
+      } else {
+        // It's an index from the card view, use it directly
+        entry = filteredData[idOrIndex]
+      }
+      
+      if (!entry) {
+        console.error('Could not find entry for editing:', idOrIndex)
+        return
+      }
+      
+      console.log('Starting to edit entry:', entry)
+      console.log('Entry ID:', entry.id)
+      
+      // Create a deep copy to avoid reference issues
+      const entryCopy = { ...entry }
+      setEditingData(entryCopy)
       setIsEditModalOpen(true)
     }, 100)
   }
