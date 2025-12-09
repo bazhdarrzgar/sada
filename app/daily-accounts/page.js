@@ -291,12 +291,19 @@ export default function DailyAccountsPage() {
       return
     }
     
+    console.log('saveEntry called with:', {
+      hasId: !!entry.id,
+      id: entry.id,
+      isUpdate: entry.id && !entry.id.startsWith('daily-')
+    })
+    
     setIsSaving(true)
     try {
       let response
       
       if (entry.id && !entry.id.startsWith('daily-')) {
         // Update existing entry
+        console.log('Updating entry with id:', entry.id)
         response = await fetch(`/api/daily-accounts/${entry.id}`, {
           method: 'PUT',
           headers: {
@@ -415,8 +422,12 @@ export default function DailyAccountsPage() {
     scrollToCenter()
     setTimeout(() => {
       const entry = dailyAccountsData.find(item => item.id === entryId)
+      console.log('startEditing:', { entryId, foundEntry: !!entry, entryHasId: entry?.id })
       if (entry) {
-        setEditingData(entry)
+        // Create a deep copy to prevent any reference issues
+        const entryCopy = JSON.parse(JSON.stringify(entry))
+        console.log('Setting editingData with id:', entryCopy.id)
+        setEditingData(entryCopy)
         setIsEditModalOpen(true)
       }
     }, 300) // Small delay to allow scroll to start

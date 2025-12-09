@@ -29,7 +29,8 @@ export const EditModal = ({
 
   useEffect(() => {
     if (isOpen && data) {
-      setEditData({ ...data })
+      // Deep copy to ensure all fields including nested ones are preserved
+      setEditData(JSON.parse(JSON.stringify(data)))
     } else if (!isOpen) {
       // Clear data when modal closes
       setEditData({})
@@ -55,7 +56,15 @@ export const EditModal = ({
   const handleSave = () => {
     if (isSaving || isSavingRef.current) return // Prevent multiple clicks with both ref and state
     isSavingRef.current = true
-    onSave(editData)
+    // Ensure critical fields like id are preserved from original data
+    const dataToSave = {
+      ...editData,
+      // Explicitly preserve id and other system fields from original data if they exist
+      ...(data?.id && { id: data.id }),
+      ...(data?.created_at && { created_at: data.created_at }),
+      ...(data?.updated_at && { updated_at: data.updated_at })
+    }
+    onSave(dataToSave)
     // Reset ref after a delay to allow parent to handle save
     setTimeout(() => {
       isSavingRef.current = false
