@@ -14,10 +14,22 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Staff record not found' }, { status: 404 })
     }
     
-    const { _id, pass, ...rest } = record
+    // Return with frontend expected field names
     return NextResponse.json({
-      ...rest,
-      pass_grade: pass || ''
+      id: record.id,
+      full_name: record.fullName,
+      mobile: record.mobile,
+      residence: record.address,
+      gender: record.gender,
+      id_number: record.id_number || '',
+      certificate: record.certificate,
+      age: record.age,
+      school: record.education,
+      preparatory: record.preparatory || '',
+      date: record.date,
+      department: record.department,
+      pass: record.pass,
+      contract: record.contract
     })
   } catch (error) {
     console.error('Error fetching staff record:', error)
@@ -38,19 +50,32 @@ export async function PUT(request, { params }) {
       return NextResponse.json({ error: 'Staff record not found' }, { status: 404 })
     }
     
+    // Map frontend field names to database column names
     const updateData = {
-      ...body,
-      updated_at: new Date()
+      fullName: body.full_name || body.fullName || existing.fullName,
+      mobile: body.mobile || existing.mobile,
+      address: body.residence || body.address || existing.address,
+      gender: body.gender || existing.gender,
+      dateOfBirth: body.dateOfBirth || existing.dateOfBirth,
+      certificate: body.certificate || existing.certificate,
+      age: body.age ? parseInt(body.age) : existing.age,
+      education: body.school || body.education || existing.education,
+      attendance: body.attendance || existing.attendance,
+      date: body.date || existing.date,
+      department: body.department || existing.department,
+      bloodType: body.bloodType || existing.bloodType,
+      notes: body.notes || existing.notes,
+      pass: body.pass || existing.pass,
+      contract: body.contract || existing.contract,
+      updated_at: new Date().toISOString()
     }
     
-    // Convert pass_grade to pass for storage
-    if (updateData.pass_grade) {
-      updateData.pass = updateData.pass_grade
-      delete updateData.pass_grade
+    // Keep certificateImages and cv if they exist
+    if (body.certificateImages) {
+      updateData.certificateImages = JSON.stringify(body.certificateImages)
     }
-    
-    if (updateData.age) {
-      updateData.age = parseInt(updateData.age)
+    if (body.cv) {
+      updateData.cv = body.cv
     }
     
     await db.collection('staff_records').updateOne(
@@ -59,10 +84,23 @@ export async function PUT(request, { params }) {
     )
     
     const updatedRecord = await db.collection('staff_records').findOne({ id })
-    const { _id, pass, ...result } = updatedRecord
+    
+    // Return with frontend expected field names
     return NextResponse.json({
-      ...result,
-      pass_grade: pass || ''
+      id: updatedRecord.id,
+      full_name: updatedRecord.fullName,
+      mobile: updatedRecord.mobile,
+      residence: updatedRecord.address,
+      gender: updatedRecord.gender,
+      id_number: updatedRecord.id_number || '',
+      certificate: updatedRecord.certificate,
+      age: updatedRecord.age,
+      school: updatedRecord.education,
+      preparatory: updatedRecord.preparatory || '',
+      date: updatedRecord.date,
+      department: updatedRecord.department,
+      pass: updatedRecord.pass,
+      contract: updatedRecord.contract
     })
   } catch (error) {
     console.error('Error updating staff record:', error)
