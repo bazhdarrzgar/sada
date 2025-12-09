@@ -200,9 +200,11 @@ export default function OfficerLeavesPage() {
     })
   }
 
-  const handleCellEdit = (rowIndex, field, value) => {
-    const updatedData = [...leavesData]
-    updatedData[rowIndex][field] = value
+  const handleCellEdit = (id, field, value) => {
+    // Find the item by ID instead of using index
+    const updatedData = leavesData.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    )
     setLeavesData(updatedData)
   }
 
@@ -244,9 +246,12 @@ export default function OfficerLeavesPage() {
     }, 100)
   }
 
-  const saveRowEdit = async (rowIndex) => {
-    const entry = leavesData[rowIndex]
-    await saveEntry(entry)
+  const saveRowEdit = async (id) => {
+    // Find entry by ID instead of using index
+    const entry = leavesData.find(item => item.id === id)
+    if (entry) {
+      await saveEntry(entry)
+    }
   }
 
   const cancelEdit = () => {
