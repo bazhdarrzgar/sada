@@ -310,15 +310,26 @@ export default function TeacherInfoPage() {
     }, 100)
   }
 
-  const startEditing = (index) => {
+  const startEditing = (idOrEntry) => {
     // Scroll to center first
     scrollToCenter()
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      const entry = teacherInfoData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      // Handle both ID and entry object
+      let entry
+      if (typeof idOrEntry === 'object' && idOrEntry !== null) {
+        // It's an entry object
+        entry = idOrEntry
+      } else {
+        // It's an ID, find the entry
+        entry = teacherInfoData.find(item => item.id === idOrEntry)
+      }
+      
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      }
     }, 100)
   }
 
@@ -423,7 +434,7 @@ export default function TeacherInfoPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-3">
-                <Button size="sm" variant="outline" onClick={() => startEditing(idx)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
+                <Button size="sm" variant="outline" onClick={() => startEditing(entry)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button size="sm" variant="destructive" onClick={() => deleteEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
