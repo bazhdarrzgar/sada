@@ -430,15 +430,18 @@ export default function CalendarPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (entryId) => {
     // Scroll to center first
     scrollToCenter()
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      const entry = calendarData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      // Find the entry by ID instead of using index
+      const entry = calendarData.find(item => item.id === entryId)
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      }
     }, 100)
   }
 
@@ -574,7 +577,7 @@ export default function CalendarPage() {
                 </div>
               ))}
               <div className="flex gap-2 mt-3">
-                <Button size="sm" variant="outline" onClick={() => startEditing(idx)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
+                <Button size="sm" variant="outline" onClick={() => startEditing(entry.id)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button size="sm" variant="destructive" onClick={() => deleteEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
