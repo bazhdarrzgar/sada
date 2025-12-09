@@ -30,6 +30,9 @@ export const EditModal = ({
   useEffect(() => {
     if (isOpen && data) {
       setEditData({ ...data })
+    } else if (!isOpen) {
+      // Clear data when modal closes
+      setEditData({})
     }
   }, [isOpen, data])
 

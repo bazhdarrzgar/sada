@@ -169,7 +169,6 @@ export default function BuildingExpensesPage() {
   const saveEntry = async (entry) => {
     // Prevent multiple submissions
     if (isSaving) {
-      console.log('Save already in progress, ignoring duplicate click')
       return
     }
     
@@ -330,14 +329,18 @@ export default function BuildingExpensesPage() {
     // First scroll to center quickly, then open modal
     scrollToCenter()
     
-    // Small delay to allow smooth scroll to start before opening modal
-    setTimeout(() => {
-      const entry = expensesData.find(item => item.id === entryId)
-      if (entry) {
-        setEditingData(entry)
+    // Find the entry FIRST before any delay
+    const entry = expensesData.find(item => item.id === entryId)
+    
+    if (entry) {
+      // Set the editing data immediately - create a deep copy to avoid reference issues
+      setEditingData({...entry, images: entry.images ? [...entry.images] : []})
+      
+      // Small delay to allow smooth scroll to start before opening modal
+      setTimeout(() => {
         setIsEditModalOpen(true)
-      }
-    }, 200)
+      }, 200)
+    }
   }
 
   const handleModalSave = async (editedData) => {
