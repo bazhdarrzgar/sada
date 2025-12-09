@@ -179,7 +179,6 @@ export default function KitchenExpensesPage() {
   const saveEntry = async (entry) => {
     // Prevent multiple submissions
     if (isSaving) {
-      console.log('Save already in progress, ignoring duplicate click')
       return
     }
     
@@ -213,6 +212,7 @@ export default function KitchenExpensesPage() {
         // Update local state with the saved data - keep position for edits
         setExpensesData(prevData => {
           const existingIndex = prevData.findIndex(item => item.id === savedEntry.id)
+          
           if (existingIndex !== -1) {
             // For updates, keep in same position for instant visual feedback
             const newData = [...prevData]
@@ -229,7 +229,8 @@ export default function KitchenExpensesPage() {
         setEditingData(null)
         resetNewEntry()
       } else {
-        console.error('Failed to save entry:', response.statusText)
+        const errorText = await response.text()
+        console.error('Failed to save entry - Status:', response.status, 'Error:', errorText)
         alert('Failed to save kitchen expense. Please try again.')
       }
       
@@ -317,8 +318,15 @@ export default function KitchenExpensesPage() {
     const entry = expensesData.find(item => item.id === entryId)
     
     if (entry) {
-      // Create a deep copy to avoid reference issues
+      // Create a deep copy to avoid reference issues and ensure all fields are preserved
       const entryCopy = JSON.parse(JSON.stringify(entry))
+      
+      // Explicitly ensure critical fields are present
+      if (!entryCopy.id) {
+        console.error('CRITICAL: Entry copy missing ID!', entryCopy)
+        entryCopy.id = entry.id // Force ID to be present
+      }
+      
       setEditingData(entryCopy)
       
       // Small delay before opening to ensure state is set
@@ -338,6 +346,13 @@ export default function KitchenExpensesPage() {
   }
 
   const handleModalSave = async (editedData) => {
+    // Validation: Ensure ID is present before saving
+    if (!editedData || !editedData.id) {
+      console.error('CRITICAL ERROR: Attempting to save data without ID!', editedData)
+      alert('Error: Cannot save - missing record ID. Please close and try again.')
+      return
+    }
+    
     await saveEntry(editedData)
     setIsEditModalOpen(false)
     setEditingData(null)
@@ -1141,7 +1156,8 @@ export default function KitchenExpensesPage() {
           onSave={handleModalSave}
           title="Edit Kitchen Expense"
           titleKu="دەستکاریکردنی خەرجی خواردنگە"
-          key={editingData.id} // Force re-mount when editing different entry
+          isSaving={isSaving}
+          key={`edit-${editingData.id}-${Date.now()}`} // Force re-mount when editing different entry with timestamp
         />
       )}
 

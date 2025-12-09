@@ -30,7 +30,15 @@ export const EditModal = ({
   useEffect(() => {
     if (isOpen && data) {
       // Deep copy to ensure all fields including nested ones are preserved
-      setEditData(JSON.parse(JSON.stringify(data)))
+      const copiedData = JSON.parse(JSON.stringify(data))
+      
+      // Critical: Ensure ID is explicitly preserved
+      if (data.id && !copiedData.id) {
+        console.error('CRITICAL: ID lost during deep copy!')
+        copiedData.id = data.id
+      }
+      
+      setEditData(copiedData)
     } else if (!isOpen) {
       // Clear data when modal closes
       setEditData({})
@@ -56,14 +64,25 @@ export const EditModal = ({
   const handleSave = () => {
     if (isSaving || isSavingRef.current) return // Prevent multiple clicks with both ref and state
     isSavingRef.current = true
+    
     // Ensure critical fields like id are preserved from original data
     const dataToSave = {
       ...editData,
       // Explicitly preserve id and other system fields from original data if they exist
-      ...(data?.id && { id: data.id }),
+      // CRITICAL: Always use original data ID to ensure we're updating the right record
+      id: data?.id || editData?.id,
       ...(data?.created_at && { created_at: data.created_at }),
       ...(data?.updated_at && { updated_at: data.updated_at })
     }
+    
+    // Final validation
+    if (!dataToSave.id) {
+      console.error('CRITICAL ERROR IN MODAL: No ID in data to save!')
+      alert('Critical error: Missing record ID. Please close and try editing again.')
+      isSavingRef.current = false
+      return
+    }
+    
     onSave(dataToSave)
     // Reset ref after a delay to allow parent to handle save
     setTimeout(() => {
