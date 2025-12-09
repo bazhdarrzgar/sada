@@ -335,13 +335,20 @@ export default function MonthlyExpensesPage() {
     })
   }
 
-  const startEditing = async (index) => {
+  const startEditing = async (rowId) => {
     // Scroll to center before opening modal
     await scrollToCenter()
     
-    const entry = filteredData[index]
-    setEditingData(entry)
-    setIsEditModalOpen(true)
+    // Find the entry by ID from the original expensesData, not from filteredData
+    const entry = expensesData.find(item => item.id === rowId)
+    
+    if (entry) {
+      // Create a copy to avoid direct mutation
+      setEditingData({ ...entry })
+      setIsEditModalOpen(true)
+    } else {
+      console.error('Entry not found with id:', rowId)
+    }
   }
 
   const saveRowEdit = (rowIndex) => {
