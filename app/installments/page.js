@@ -148,6 +148,10 @@ export default function InstallmentsPage() {
     setIsSaving(true)
     
     try {
+      console.log('saveEntry called with:', entry)
+      console.log('Entry ID:', entry.id)
+      console.log('Is temporary ID?:', entry.id?.startsWith('installment-'))
+      
       // Calculate totals
       const annualAmount = parseFloat(entry.annualAmount) || 0
       const first = parseFloat(entry.firstInstallment) || 0
@@ -164,6 +168,7 @@ export default function InstallmentsPage() {
       
       if (entry.id && !entry.id.startsWith('installment-')) {
         // Update existing entry
+        console.log('Updating existing entry with ID:', entry.id)
         response = await fetch(`/api/installments/${entry.id}`, {
           method: 'PUT',
           headers: {
@@ -173,6 +178,7 @@ export default function InstallmentsPage() {
         })
       } else {
         // Create new entry
+        console.log('Creating new entry')
         const entryToSave = { ...entry }
         if (entryToSave.id && entryToSave.id.startsWith('installment-')) {
           delete entryToSave.id // Remove temporary ID for new entries
@@ -295,12 +301,45 @@ export default function InstallmentsPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (indexOrId) => {
     // First scroll to center, then open modal after a brief delay
     scrollToCenter()
     setTimeout(() => {
-      const entry = filteredData[index]
-      setEditingData(entry)
+      // Handle both index (number) and ID (string) parameters
+      let entry
+      if (typeof indexOrId === 'number') {
+        // Called from card view with index
+        entry = filteredData[indexOrId]
+      } else {
+        // Called from table view with ID
+        entry = installmentsData.find(item => item.id === indexOrId)
+      }
+      
+      console.log('Starting edit for entry:', entry)
+      console.log('Entry ID:', entry?.id)
+      
+      if (!entry) {
+        console.error('Entry not found for indexOrId:', indexOrId)
+        return
+      }
+      
+      // Create a deep copy to ensure all data is properly passed
+      const entryData = {
+        ...entry,
+        // Ensure numeric fields are properly set
+        annualAmount: entry.annualAmount || 0,
+        firstInstallment: entry.firstInstallment || 0,
+        secondInstallment: entry.secondInstallment || 0,
+        thirdInstallment: entry.thirdInstallment || 0,
+        fourthInstallment: entry.fourthInstallment || 0,
+        fifthInstallment: entry.fifthInstallment || 0,
+        sixthInstallment: entry.sixthInstallment || 0,
+        totalReceived: entry.totalReceived || 0,
+        remaining: entry.remaining || 0,
+        receiptImages: entry.receiptImages || [],
+        notes: entry.notes || ''
+      }
+      setEditingData(entryData)
       setIsEditModalOpen(true)
     }, 300) // Small delay to allow scroll to start
   }
