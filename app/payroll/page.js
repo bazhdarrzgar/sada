@@ -255,15 +255,27 @@ export default function PayrollPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (idOrIndex) => {
     // First scroll to center quickly, then open modal
     scrollToCenter()
     
     // Small delay to allow smooth scroll to start before opening modal
     setTimeout(() => {
-      const entry = filteredData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      // Check if the parameter is an index (number less than data length) or an ID (string/UUID)
+      let entry
+      if (typeof idOrIndex === 'number' && idOrIndex < filteredData.length) {
+        // It's an index from mobile card view
+        entry = filteredData[idOrIndex]
+      } else {
+        // It's an ID from table view - find the entry by ID in filteredData
+        entry = filteredData.find(item => item.id === idOrIndex)
+      }
+      
+      if (entry) {
+        // Create a deep copy of the entry to avoid reference issues
+        setEditingData({...entry})
+        setIsEditModalOpen(true)
+      }
     }, 200)
   }
 
