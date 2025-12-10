@@ -103,10 +103,6 @@ export default function SupervisionPage() {
       // UUID format is 36 characters with dashes (e.g., "550e8400-e29b-41d4-a716-446655440000")
       const isUpdate = entry.id && typeof entry.id === 'string' && entry.id.length >= 32 && !entry.id.startsWith('supervision-')
       
-      console.log('saveEntry - entry.id:', entry.id)
-      console.log('saveEntry - isUpdate:', isUpdate)
-      console.log('saveEntry - entry:', entry)
-      
       if (isUpdate) {
         // Update existing entry - preserve all fields including type
         const entryToUpdate = {
