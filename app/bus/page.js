@@ -129,14 +129,14 @@ const t = (key, lang = 'kurdish') => {
 
   const keys = key.split('.')
   let current = translations
-  
+
   for (const k of keys) {
     current = current[k]
     if (current === undefined) {
       return key // Return key if translation not found
     }
   }
-  
+
   return current[lang] || current.kurdish || key
 }
 
@@ -185,20 +185,22 @@ export default function BusPage() {
         { name: 'driverPhone', weight: 0.1 },
         { name: 'driverLicense', weight: 0.1 },
         { name: 'notes', weight: 0.1 },
-        { name: 'searchableContent', weight: 0.15, getFn: (obj) => {
-          return [
-            obj.busNumber || '',
-            obj.busType || '',
-            obj.route || '',
-            obj.capacity ? obj.capacity.toString() : '',
-            obj.studentCount ? obj.studentCount.toString() : '',
-            obj.teacherCount ? obj.teacherCount.toString() : '',
-            obj.driverName || '',
-            obj.driverPhone || '',
-            obj.driverLicense || '',
-            obj.notes || ''
-          ].join(' ').toLowerCase()
-        }}
+        {
+          name: 'searchableContent', weight: 0.15, getFn: (obj) => {
+            return [
+              obj.busNumber || '',
+              obj.busType || '',
+              obj.route || '',
+              obj.capacity ? obj.capacity.toString() : '',
+              obj.studentCount ? obj.studentCount.toString() : '',
+              obj.teacherCount ? obj.teacherCount.toString() : '',
+              obj.driverName || '',
+              obj.driverPhone || '',
+              obj.driverLicense || '',
+              obj.notes || ''
+            ].join(' ').toLowerCase()
+          }
+        }
       ],
       threshold: 0.3,
       distance: 100,
@@ -232,7 +234,7 @@ export default function BusPage() {
   const saveEntry = async (entry) => {
     try {
       let response
-      
+
       if (entry.id && !entry.id.startsWith('bus-')) {
         // Update existing entry
         response = await fetch(`/api/bus/${entry.id}`, {
@@ -248,7 +250,7 @@ export default function BusPage() {
         if (entryToSave.id && entryToSave.id.startsWith('bus-')) {
           delete entryToSave.id // Remove temporary ID for new entries
         }
-        
+
         response = await fetch('/api/bus', {
           method: 'POST',
           headers: {
@@ -260,7 +262,7 @@ export default function BusPage() {
 
       if (response.ok) {
         const savedEntry = await response.json()
-        
+
         // Update local state with the saved data - new/edited entries go to top
         setBusData(prevData => {
           const existingIndex = prevData.findIndex(item => item.id === savedEntry.id)
@@ -281,7 +283,7 @@ export default function BusPage() {
       } else {
         console.error('Failed to save entry:', response.statusText)
       }
-      
+
     } catch (error) {
       console.error('Error saving entry:', error)
     }
@@ -338,23 +340,25 @@ export default function BusPage() {
     const viewportHeight = window.innerHeight
     const documentHeight = document.documentElement.scrollHeight
     const centerPosition = Math.max(0, (documentHeight - viewportHeight) / 2)
-    
+
     window.scrollTo({
       top: centerPosition,
       behavior: 'smooth'
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (id) => {
     // First scroll to center quickly
     scrollToCenterFast()
-    
+
     // Small delay to ensure smooth scrolling starts, then open modal
     setTimeout(() => {
-      // Use filteredData instead of busData to get the correct entry
-      const entry = filteredData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      // Find the entry by ID
+      const entry = filteredData.find(item => item.id === id)
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      }
     }, 100) // Quick delay to allow scroll to start
   }
 
@@ -379,7 +383,7 @@ export default function BusPage() {
   const handleAddEntry = () => {
     // First scroll to center quickly
     scrollToCenterFast()
-    
+
     // Small delay to ensure smooth scrolling starts, then open dialog
     setTimeout(() => {
       setIsAddDialogOpen(true)
@@ -389,7 +393,7 @@ export default function BusPage() {
   const viewDetails = (index) => {
     // First scroll to center quickly
     scrollToCenterFast()
-    
+
     // Small delay to ensure smooth scrolling starts, then open modal
     setTimeout(() => {
       const entry = busData[index]
@@ -417,7 +421,7 @@ export default function BusPage() {
         onClick={() => {
           // First scroll to center quickly
           scrollToCenterFast()
-          
+
           // Small delay to ensure smooth scrolling starts, then open preview
           setTimeout(() => {
             if (onPreview) {
@@ -478,7 +482,7 @@ export default function BusPage() {
         onClick={() => {
           // First scroll to center quickly
           scrollToCenterFast()
-          
+
           // Small delay to ensure smooth scrolling starts, then open preview
           setTimeout(() => {
             setPreviewVideos(videos)
@@ -746,9 +750,9 @@ export default function BusPage() {
         editable: false,
         render: (value, row, rowIndex) => (
           <div className="flex gap-1 justify-center">
-            <Button 
-              size="sm" 
-              variant="outline" 
+            <Button
+              size="sm"
+              variant="outline"
               onClick={() => viewDetails(rowIndex)}
               className="hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors duration-200"
               title={t('buttons.viewDetails', localLanguage)}
@@ -766,10 +770,10 @@ export default function BusPage() {
         columns={columns}
         editingRow={null} // Disable inline editing
         onEdit={startEditing}
-        onSave={() => {}} // No inline save
-        onCancel={() => {}} // No inline cancel
+        onSave={() => { }} // No inline save
+        onCancel={() => { }} // No inline cancel
         onDelete={deleteEntry}
-        onCellEdit={() => {}} // No inline cell edit
+        onCellEdit={() => { }} // No inline cell edit
         maxRowsPerPage={10}
         enablePagination={true}
         className="shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -779,8 +783,8 @@ export default function BusPage() {
 
   if (loading) {
     return (
-      <PageLayout 
-        title={t('title', localLanguage)} 
+      <PageLayout
+        title={t('title', localLanguage)}
         titleKu={t('title', 'kurdish')}
         localLanguage={localLanguage}
         onLanguageChange={setLocalLanguage}
@@ -791,8 +795,8 @@ export default function BusPage() {
   }
 
   return (
-    <PageLayout 
-      title={t('title', localLanguage)} 
+    <PageLayout
+      title={t('title', localLanguage)}
       titleKu={t('title', 'kurdish')}
       localLanguage={localLanguage}
       onLanguageChange={setLocalLanguage}
@@ -809,13 +813,13 @@ export default function BusPage() {
           />
         </div>
         <div className="flex items-center gap-4">
-          <DownloadButton 
+          <DownloadButton
             data={filteredData}
             filename="bus-records"
             className="bg-green-600 hover:bg-green-700 text-white"
             language={localLanguage}
           />
-          <PrintButton 
+          <PrintButton
             data={filteredData}
             filename="bus-records"
             title={t('title', localLanguage)}
@@ -856,7 +860,7 @@ export default function BusPage() {
                       <Input
                         id="busNumber"
                         value={newEntry.busNumber}
-                        onChange={(e) => setNewEntry({...newEntry, busNumber: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, busNumber: e.target.value })}
                         placeholder="Enter bus number"
                       />
                     </div>
@@ -865,7 +869,7 @@ export default function BusPage() {
                       <Input
                         id="busType"
                         value={newEntry.busType}
-                        onChange={(e) => setNewEntry({...newEntry, busType: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, busType: e.target.value })}
                         placeholder="Enter bus type"
                       />
                     </div>
@@ -874,7 +878,7 @@ export default function BusPage() {
                       <Input
                         id="route"
                         value={newEntry.route}
-                        onChange={(e) => setNewEntry({...newEntry, route: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, route: e.target.value })}
                         placeholder="Enter route"
                       />
                     </div>
@@ -884,7 +888,7 @@ export default function BusPage() {
                         id="capacity"
                         type="number"
                         value={newEntry.capacity}
-                        onChange={(e) => setNewEntry({...newEntry, capacity: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, capacity: e.target.value })}
                         placeholder="Enter capacity"
                       />
                     </div>
@@ -894,7 +898,7 @@ export default function BusPage() {
                         id="studentCount"
                         type="number"
                         value={newEntry.studentCount}
-                        onChange={(e) => setNewEntry({...newEntry, studentCount: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, studentCount: e.target.value })}
                         placeholder="Enter student count"
                       />
                     </div>
@@ -904,7 +908,7 @@ export default function BusPage() {
                         id="teacherCount"
                         type="number"
                         value={newEntry.teacherCount}
-                        onChange={(e) => setNewEntry({...newEntry, teacherCount: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, teacherCount: e.target.value })}
                         placeholder="Enter teacher count"
                       />
                     </div>
@@ -920,7 +924,7 @@ export default function BusPage() {
                       <Input
                         id="driverName"
                         value={newEntry.driverName}
-                        onChange={(e) => setNewEntry({...newEntry, driverName: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, driverName: e.target.value })}
                         placeholder="Enter driver name"
                       />
                     </div>
@@ -929,7 +933,7 @@ export default function BusPage() {
                       <Input
                         id="driverPhone"
                         value={newEntry.driverPhone}
-                        onChange={(e) => setNewEntry({...newEntry, driverPhone: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, driverPhone: e.target.value })}
                         placeholder="Enter driver phone"
                       />
                     </div>
@@ -938,7 +942,7 @@ export default function BusPage() {
                       <Input
                         id="driverLicense"
                         value={newEntry.driverLicense}
-                        onChange={(e) => setNewEntry({...newEntry, driverLicense: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, driverLicense: e.target.value })}
                         placeholder="Enter driver license"
                       />
                     </div>
@@ -949,7 +953,7 @@ export default function BusPage() {
                     <Label>وێنەی شۆفێر / Driver Photo</Label>
                     <ImageUpload
                       images={newEntry.driverPhoto || []}
-                      onImagesChange={(images) => setNewEntry({...newEntry, driverPhoto: images})}
+                      onImagesChange={(images) => setNewEntry({ ...newEntry, driverPhoto: images })}
                       maxImages={6}
                       className="mt-2"
                     />
@@ -960,7 +964,7 @@ export default function BusPage() {
                     <Label>وێنەی مۆڵەتی شۆفێری / Driver License Photo</Label>
                     <ImageUpload
                       images={newEntry.driverLicensePhoto || []}
-                      onImagesChange={(images) => setNewEntry({...newEntry, driverLicensePhoto: images})}
+                      onImagesChange={(images) => setNewEntry({ ...newEntry, driverLicensePhoto: images })}
                       maxImages={6}
                       className="mt-2"
                     />
@@ -971,7 +975,7 @@ export default function BusPage() {
                     <Label>ڤیدیۆی شۆفێر / Driver Videos</Label>
                     <VideoUpload
                       videos={newEntry.driverVideos}
-                      onVideosChange={(videos) => setNewEntry({...newEntry, driverVideos: videos})}
+                      onVideosChange={(videos) => setNewEntry({ ...newEntry, driverVideos: videos })}
                       maxVideos={3}
                       className="mt-2"
                     />
@@ -984,14 +988,14 @@ export default function BusPage() {
                   <Textarea
                     id="notes"
                     value={newEntry.notes}
-                    onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
+                    onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
                     placeholder="تێبینی سەبارەت بە پاس..."
                     rows={3}
                   />
                 </div>
-                
+
                 <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => {setIsAddDialogOpen(false); resetNewEntry();}}>
+                  <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}>
                     {t('buttons.cancel', localLanguage)}
                   </Button>
                   <Button onClick={() => saveEntry(newEntry)}>
@@ -1042,7 +1046,7 @@ export default function BusPage() {
                     <Input
                       id="edit-busNumber"
                       value={editingData.busNumber || ''}
-                      onChange={(e) => setEditingData({...editingData, busNumber: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, busNumber: e.target.value })}
                       placeholder="Enter bus number"
                     />
                   </div>
@@ -1051,7 +1055,7 @@ export default function BusPage() {
                     <Input
                       id="edit-busType"
                       value={editingData.busType || ''}
-                      onChange={(e) => setEditingData({...editingData, busType: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, busType: e.target.value })}
                       placeholder="Enter bus type"
                     />
                   </div>
@@ -1060,7 +1064,7 @@ export default function BusPage() {
                     <Input
                       id="edit-route"
                       value={editingData.route || ''}
-                      onChange={(e) => setEditingData({...editingData, route: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, route: e.target.value })}
                       placeholder="Enter route"
                     />
                   </div>
@@ -1070,7 +1074,7 @@ export default function BusPage() {
                       id="edit-capacity"
                       type="number"
                       value={editingData.capacity || ''}
-                      onChange={(e) => setEditingData({...editingData, capacity: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, capacity: e.target.value })}
                       placeholder="Enter capacity"
                     />
                   </div>
@@ -1080,7 +1084,7 @@ export default function BusPage() {
                       id="edit-studentCount"
                       type="number"
                       value={editingData.studentCount || ''}
-                      onChange={(e) => setEditingData({...editingData, studentCount: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, studentCount: e.target.value })}
                       placeholder="Enter student count"
                     />
                   </div>
@@ -1090,7 +1094,7 @@ export default function BusPage() {
                       id="edit-teacherCount"
                       type="number"
                       value={editingData.teacherCount || ''}
-                      onChange={(e) => setEditingData({...editingData, teacherCount: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, teacherCount: e.target.value })}
                       placeholder="Enter teacher count"
                     />
                   </div>
@@ -1106,7 +1110,7 @@ export default function BusPage() {
                     <Input
                       id="edit-driverName"
                       value={editingData.driverName || ''}
-                      onChange={(e) => setEditingData({...editingData, driverName: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, driverName: e.target.value })}
                       placeholder="Enter driver name"
                     />
                   </div>
@@ -1115,7 +1119,7 @@ export default function BusPage() {
                     <Input
                       id="edit-driverPhone"
                       value={editingData.driverPhone || ''}
-                      onChange={(e) => setEditingData({...editingData, driverPhone: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, driverPhone: e.target.value })}
                       placeholder="Enter driver phone"
                     />
                   </div>
@@ -1124,7 +1128,7 @@ export default function BusPage() {
                     <Input
                       id="edit-driverLicense"
                       value={editingData.driverLicense || ''}
-                      onChange={(e) => setEditingData({...editingData, driverLicense: e.target.value})}
+                      onChange={(e) => setEditingData({ ...editingData, driverLicense: e.target.value })}
                       placeholder="Enter driver license"
                     />
                   </div>
@@ -1135,7 +1139,7 @@ export default function BusPage() {
                   <Label>وێنەی شۆفێر / Driver Photo</Label>
                   <ImageUpload
                     images={editingData.driverPhoto || []}
-                    onImagesChange={(images) => setEditingData({...editingData, driverPhoto: images})}
+                    onImagesChange={(images) => setEditingData({ ...editingData, driverPhoto: images })}
                     maxImages={6}
                     className="mt-2"
                   />
@@ -1146,7 +1150,7 @@ export default function BusPage() {
                   <Label>وێنەی مۆڵەتی شۆفێری / Driver License Photo</Label>
                   <ImageUpload
                     images={editingData.driverLicensePhoto || []}
-                    onImagesChange={(images) => setEditingData({...editingData, driverLicensePhoto: images})}
+                    onImagesChange={(images) => setEditingData({ ...editingData, driverLicensePhoto: images })}
                     maxImages={6}
                     className="mt-2"
                   />
@@ -1157,7 +1161,7 @@ export default function BusPage() {
                   <Label>ڤیدیۆی شۆفێر / Driver Videos</Label>
                   <VideoUpload
                     videos={editingData.driverVideos || []}
-                    onVideosChange={(videos) => setEditingData({...editingData, driverVideos: videos})}
+                    onVideosChange={(videos) => setEditingData({ ...editingData, driverVideos: videos })}
                     maxVideos={3}
                     className="mt-2"
                   />
@@ -1170,12 +1174,12 @@ export default function BusPage() {
                 <Textarea
                   id="edit-notes"
                   value={editingData.notes || ''}
-                  onChange={(e) => setEditingData({...editingData, notes: e.target.value})}
+                  onChange={(e) => setEditingData({ ...editingData, notes: e.target.value })}
                   placeholder="تێبینی سەبارەت بە پاس..."
                   rows={3}
                 />
               </div>
-              
+
               <div className="flex justify-end gap-2">
                 <Button variant="outline" onClick={() => {
                   setIsEditModalOpen(false)
@@ -1200,7 +1204,7 @@ export default function BusPage() {
               وردەکاری پاس {selectedRecord?.busNumber} / Bus Details {selectedRecord?.busNumber}
             </DialogTitle>
           </DialogHeader>
-          
+
           {selectedRecord && (
             <div className="space-y-6">
               {/* Bus Information */}
@@ -1290,7 +1294,7 @@ export default function BusPage() {
                       {selectedRecord.driverLicense || 'نەناسراو'}
                     </p>
                   </div>
-                  
+
                   {/* Driver Photo */}
                   <div className="text-right">
                     <Label className="text-orange-700 dark:text-orange-300 font-semibold">
@@ -1302,7 +1306,7 @@ export default function BusPage() {
                           onClick={() => {
                             // First scroll to center quickly
                             scrollToCenterFast()
-                            
+
                             // Small delay to ensure smooth scrolling starts, then open preview
                             setTimeout(() => {
                               const images = Array.isArray(selectedRecord.driverPhoto) ? selectedRecord.driverPhoto : [selectedRecord.driverPhoto]
@@ -1328,7 +1332,7 @@ export default function BusPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* License Photo */}
                   <div className="text-right">
                     <Label className="text-orange-700 dark:text-orange-300 font-semibold">
@@ -1340,7 +1344,7 @@ export default function BusPage() {
                           onClick={() => {
                             // First scroll to center quickly
                             scrollToCenterFast()
-                            
+
                             // Small delay to ensure smooth scrolling starts, then open preview
                             setTimeout(() => {
                               const images = Array.isArray(selectedRecord.driverLicensePhoto) ? selectedRecord.driverLicensePhoto : [selectedRecord.driverLicensePhoto]
@@ -1366,7 +1370,7 @@ export default function BusPage() {
                       )}
                     </div>
                   </div>
-                  
+
                   {/* Driver Videos */}
                   <div className="text-right md:col-span-2">
                     <Label className="text-orange-700 dark:text-orange-300 font-semibold">
@@ -1378,7 +1382,7 @@ export default function BusPage() {
                           onClick={() => {
                             // First scroll to center quickly
                             scrollToCenterFast()
-                            
+
                             // Small delay to ensure smooth scrolling starts, then open preview
                             setTimeout(() => {
                               setPreviewVideos(selectedRecord.driverVideos)
@@ -1421,12 +1425,11 @@ export default function BusPage() {
               {/* Action Buttons */}
               <div className="flex justify-between items-center pt-4 border-t">
                 <div className="flex gap-2">
-                  <Button 
+                  <Button
                     onClick={() => {
                       setIsDetailModalOpen(false)
-                      const recordIndex = filteredData.findIndex(item => item.id === selectedRecord.id)
-                      if (recordIndex !== -1) {
-                        startEditing(recordIndex)
+                      if (selectedRecord?.id) {
+                        startEditing(selectedRecord.id)
                       }
                     }}
                     className="bg-blue-600 hover:bg-blue-700 text-white flex items-center gap-2"
@@ -1434,7 +1437,7 @@ export default function BusPage() {
                     <Edit className="h-4 w-4" />
                     دەستکاریکردن / Edit
                   </Button>
-                  <Button 
+                  <Button
                     variant="destructive"
                     onClick={() => {
                       if (window.confirm('دڵنیایت لە سڕینەوەی ئەم تۆمارە؟ / Are you sure you want to delete this record?')) {
@@ -1448,7 +1451,7 @@ export default function BusPage() {
                     سڕینەوە / Delete
                   </Button>
                 </div>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={() => setIsDetailModalOpen(false)}
                   className="flex items-center gap-2"
@@ -1485,7 +1488,7 @@ export default function BusPage() {
                   </span>
                 </div>
               </div>
-              
+
               {/* Image Navigation - Only show if multiple images */}
               {previewImages.length > 1 && (
                 <div className="flex items-center gap-2">
@@ -1504,11 +1507,11 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </Button>
-                  
+
                   <span className="text-sm text-gray-300 px-2">
                     {currentImageIndex + 1}/{previewImages.length}
                   </span>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1528,7 +1531,7 @@ export default function BusPage() {
               )}
             </DialogTitle>
           </DialogHeader>
-          
+
           {previewImage && (
             <div className="space-y-4 p-4">
               {/* Enhanced Image Container with Zoom and Controls */}
@@ -1550,7 +1553,7 @@ export default function BusPage() {
                   }}
                   draggable={false}
                 />
-                
+
                 {/* Enhanced Image Controls Overlay */}
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   {/* Zoom In */}
@@ -1569,7 +1572,7 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" />
                     </svg>
                   </button>
-                  
+
                   {/* Reset Zoom */}
                   <button
                     className="p-2 bg-black/70 hover:bg-black/90 text-white rounded-lg transition-all duration-200 hover:scale-110"
@@ -1586,7 +1589,7 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </button>
-                  
+
                   {/* Fullscreen */}
                   <button
                     className="p-2 bg-black/70 hover:bg-black/90 text-white rounded-lg transition-all duration-200 hover:scale-110"
@@ -1606,7 +1609,7 @@ export default function BusPage() {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Enhanced Image Info Overlay */}
                 <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="flex items-center gap-2">
@@ -1616,7 +1619,7 @@ export default function BusPage() {
                     <span className="text-gray-300">{previewImage.size ? `${(previewImage.size / 1024).toFixed(1)} KB` : 'Unknown size'}</span>
                   </div>
                 </div>
-                
+
                 {/* Navigation instructions */}
                 <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="space-y-1">
@@ -1625,7 +1628,7 @@ export default function BusPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Video Thumbnails Navigation - Only show if multiple videos */}
               {previewVideos.length > 1 && (
                 <div className="bg-gray-800/80 p-4 rounded-lg">
@@ -1641,11 +1644,10 @@ export default function BusPage() {
                           setCurrentVideoIndex(index)
                           setPreviewVideo(video)
                         }}
-                        className={`flex-shrink-0 relative group transition-all duration-200 ${
-                          index === currentVideoIndex 
-                            ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-black scale-105' 
+                        className={`flex-shrink-0 relative group transition-all duration-200 ${index === currentVideoIndex
+                            ? 'ring-2 ring-purple-500 ring-offset-2 ring-offset-black scale-105'
                             : 'hover:scale-105 hover:ring-1 hover:ring-gray-400'
-                        }`}
+                          }`}
                         title={video.originalName || `Video ${index + 1}`}
                       >
                         <video
@@ -1670,7 +1672,7 @@ export default function BusPage() {
                   </div>
                 </div>
               )}
-              
+
               {/* Enhanced Action Bar with More Features */}
               <div className="bg-gray-800 p-4 rounded-lg space-y-3">
                 {/* Main Action Buttons */}
@@ -1689,7 +1691,7 @@ export default function BusPage() {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
                     {/* Download Button */}
                     <Button
@@ -1708,7 +1710,7 @@ export default function BusPage() {
                       <Download className="h-4 w-4" />
                       دابەزاندن
                     </Button>
-                    
+
                     {/* Share Button */}
                     <Button
                       variant="outline"
@@ -1738,7 +1740,7 @@ export default function BusPage() {
                       </svg>
                       هاوبەشکردن
                     </Button>
-                    
+
                     {/* Print Button */}
                     <Button
                       variant="outline"
@@ -1769,7 +1771,7 @@ export default function BusPage() {
                       </svg>
                       چاپکردن
                     </Button>
-                    
+
                     {/* Close Button */}
                     <Button
                       variant="outline"
@@ -1782,7 +1784,7 @@ export default function BusPage() {
                     </Button>
                   </div>
                 </div>
-                
+
                 {/* Image Metadata */}
                 <div className="border-t border-gray-700 pt-3">
                   <h4 className="text-white font-semibold mb-2 flex items-center gap-2">
@@ -1806,12 +1808,12 @@ export default function BusPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Quick Actions */}
                 <div className="border-t border-gray-700 pt-3">
                   <div className="text-gray-400 text-xs mb-2">Quick Actions / کردارە خێراکان:</div>
                   <div className="flex flex-wrap gap-2">
-                    <button 
+                    <button
                       onClick={() => {
                         const img = document.querySelector('.preview-main-image');
                         if (img) img.style.transform = 'scale(2)';
@@ -1820,7 +1822,7 @@ export default function BusPage() {
                     >
                       🔍 2x Zoom
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const img = document.querySelector('.preview-main-image');
                         if (img) img.style.filter = img.style.filter === 'grayscale(1)' ? 'none' : 'grayscale(1)';
@@ -1829,7 +1831,7 @@ export default function BusPage() {
                     >
                       🎨 Grayscale
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const img = document.querySelector('.preview-main-image');
                         if (img) img.style.filter = img.style.filter === 'brightness(1.5)' ? 'none' : 'brightness(1.5)';
@@ -1838,7 +1840,7 @@ export default function BusPage() {
                     >
                       💡 Bright
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const img = document.querySelector('.preview-main-image');
                         if (img) img.style.filter = img.style.filter === 'contrast(1.5)' ? 'none' : 'contrast(1.5)';
@@ -1847,7 +1849,7 @@ export default function BusPage() {
                     >
                       🌗 Contrast
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const img = document.querySelector('.preview-main-image');
                         if (img) {
@@ -1889,7 +1891,7 @@ export default function BusPage() {
                   </span>
                 </div>
               </div>
-              
+
               {/* Video Navigation - Only show if multiple videos */}
               {previewVideos.length > 1 && (
                 <div className="flex items-center gap-2">
@@ -1908,11 +1910,11 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                     </svg>
                   </Button>
-                  
+
                   <span className="text-sm text-gray-300 px-2">
                     {currentVideoIndex + 1}/{previewVideos.length}
                   </span>
-                  
+
                   <Button
                     variant="ghost"
                     size="sm"
@@ -1932,7 +1934,7 @@ export default function BusPage() {
               )}
             </DialogTitle>
           </DialogHeader>
-          
+
           {previewVideo && (
             <div className="space-y-4 p-4">
               {/* Enhanced Video Player Container */}
@@ -1953,7 +1955,7 @@ export default function BusPage() {
                     });
                   }}
                 />
-                
+
                 {/* Enhanced Video Controls Overlay */}
                 <div className="absolute top-4 right-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   {/* Playback Speed */}
@@ -1966,7 +1968,7 @@ export default function BusPage() {
                         const currentSpeed = video.playbackRate;
                         const nextSpeedIndex = (speeds.indexOf(currentSpeed) + 1) % speeds.length;
                         video.playbackRate = speeds[nextSpeedIndex];
-                        
+
                         // Show speed indicator
                         const indicator = document.createElement('div');
                         indicator.textContent = `${speeds[nextSpeedIndex]}x`;
@@ -1981,7 +1983,7 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                     </svg>
                   </button>
-                  
+
                   {/* Picture-in-Picture */}
                   <button
                     className="p-2 bg-black/70 hover:bg-black/90 text-white rounded-lg transition-all duration-200 hover:scale-110"
@@ -1997,7 +1999,7 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 4V2a1 1 0 011-1h11a1 1 0 011 1v11a1 1 0 01-1 1h-2v2a1 1 0 01-1 1H5a1 1 0 01-1-1V6a1 1 0 011-1h2z" />
                     </svg>
                   </button>
-                  
+
                   {/* Fullscreen */}
                   <button
                     className="p-2 bg-black/70 hover:bg-black/90 text-white rounded-lg transition-all duration-200 hover:scale-110"
@@ -2013,7 +2015,7 @@ export default function BusPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
                     </svg>
                   </button>
-                  
+
                   {/* Volume Control */}
                   <button
                     className="p-2 bg-black/70 hover:bg-black/90 text-white rounded-lg transition-all duration-200 hover:scale-110"
@@ -2030,7 +2032,7 @@ export default function BusPage() {
                     </svg>
                   </button>
                 </div>
-                
+
                 {/* Video Info Overlay */}
                 <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg text-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="flex items-center gap-2">
@@ -2040,7 +2042,7 @@ export default function BusPage() {
                     <span className="text-gray-300">{previewVideo.size ? `${(previewVideo.size / (1024 * 1024)).toFixed(1)} MB` : 'Unknown size'}</span>
                   </div>
                 </div>
-                
+
                 {/* Keyboard shortcuts info */}
                 <div className="absolute top-4 left-4 bg-black/70 text-white px-3 py-2 rounded-lg text-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="space-y-1">
@@ -2051,7 +2053,7 @@ export default function BusPage() {
                   </div>
                 </div>
               </div>
-              
+
               {/* Image Thumbnails Navigation - Only show if multiple images */}
               {previewImages.length > 1 && (
                 <div className="bg-gray-800/80 p-4 rounded-lg">
@@ -2067,11 +2069,10 @@ export default function BusPage() {
                           setCurrentImageIndex(index)
                           setPreviewImage(image)
                         }}
-                        className={`flex-shrink-0 relative group transition-all duration-200 ${
-                          index === currentImageIndex 
-                            ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-black scale-105' 
+                        className={`flex-shrink-0 relative group transition-all duration-200 ${index === currentImageIndex
+                            ? 'ring-2 ring-blue-500 ring-offset-2 ring-offset-black scale-105'
                             : 'hover:scale-105 hover:ring-1 hover:ring-gray-400'
-                        }`}
+                          }`}
                         title={image.originalName || `Image ${index + 1}`}
                       >
                         <img
@@ -2095,7 +2096,7 @@ export default function BusPage() {
                   </div>
                 </div>
               )}
-              
+
               {/* Enhanced Action Bar with More Features */}
               <div className="bg-gray-800 p-4 rounded-lg space-y-3">
                 {/* Main Action Buttons */}
@@ -2114,7 +2115,7 @@ export default function BusPage() {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-2">
                     {/* Download Button */}
                     <Button
@@ -2133,7 +2134,7 @@ export default function BusPage() {
                       <Download className="h-4 w-4" />
                       دابەزاندن
                     </Button>
-                    
+
                     {/* Share Button */}
                     <Button
                       variant="outline"
@@ -2162,7 +2163,7 @@ export default function BusPage() {
                       </svg>
                       هاوبەشکردن
                     </Button>
-                    
+
                     {/* Loop Toggle */}
                     <Button
                       variant="outline"
@@ -2182,7 +2183,7 @@ export default function BusPage() {
                       </svg>
                       تووژاوە
                     </Button>
-                    
+
                     {/* Close Button */}
                     <Button
                       variant="outline"
@@ -2195,7 +2196,7 @@ export default function BusPage() {
                     </Button>
                   </div>
                 </div>
-                
+
                 {/* Video Metadata */}
                 <div className="border-t border-gray-700 pt-3">
                   <h4 className="text-white font-semibold mb-2 flex items-center gap-2">
@@ -2223,12 +2224,12 @@ export default function BusPage() {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Video Playback Controls */}
                 <div className="border-t border-gray-700 pt-3">
                   <div className="text-gray-400 text-xs mb-2">Playback Controls / کۆنترۆڵی لێدان:</div>
                   <div className="flex flex-wrap gap-2">
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) video.playbackRate = 0.5;
@@ -2237,7 +2238,7 @@ export default function BusPage() {
                     >
                       🐌 0.5x
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) video.playbackRate = 0.75;
@@ -2246,7 +2247,7 @@ export default function BusPage() {
                     >
                       🚶 0.75x
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) video.playbackRate = 1;
@@ -2255,7 +2256,7 @@ export default function BusPage() {
                     >
                       ▶️ 1x
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) video.playbackRate = 1.25;
@@ -2264,7 +2265,7 @@ export default function BusPage() {
                     >
                       🏃 1.25x
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) video.playbackRate = 1.5;
@@ -2273,7 +2274,7 @@ export default function BusPage() {
                     >
                       🏃‍♂️ 1.5x
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) video.playbackRate = 2;
@@ -2282,7 +2283,7 @@ export default function BusPage() {
                     >
                       🚀 2x
                     </button>
-                    <button 
+                    <button
                       onClick={() => {
                         const video = document.querySelector('.preview-main-video');
                         if (video) {

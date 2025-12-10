@@ -448,171 +448,124 @@ export default function MonthlyExpensesPage() {
   }
 
   // Define fields for modal editing
-  // Define fields for modal editing based on active tab
-  const editFields = useMemo(() => {
-    if (activeTab === 'educational') {
-      return [
-        {
-          key: 'year',
-          label: t('monthlyExpenses.fields.year', language),
-          labelKu: t('monthlyExpenses.fields.year', 'kurdish'),
-          type: 'number',
-          placeholder: new Date().getFullYear().toString()
-        },
-        {
-          key: 'month',
-          label: t('monthlyExpenses.fields.month', language),
-          labelKu: t('monthlyExpenses.fields.month', 'kurdish'),
-          type: 'number',
-          placeholder: '1-12'
-        },
-        {
-          key: 'books',
-          label: t('monthlyExpenses.fields.books', language),
-          labelKu: t('monthlyExpenses.fields.books', 'kurdish'),
-          type: 'number',
-          placeholder: '0'
-        },
-        {
-          key: 'clothes',
-          label: t('monthlyExpenses.fields.clothes', language),
-          labelKu: t('monthlyExpenses.fields.clothes', 'kurdish'),
-          type: 'number',
-          placeholder: '0'
-        },
-        {
-          key: 'travel',
-          label: t('monthlyExpenses.fields.travel', language),
-          labelKu: t('monthlyExpenses.fields.travel', 'kurdish'),
-          type: 'number',
-          placeholder: '0'
-        },
-        {
-          key: 'transportation',
-          label: t('monthlyExpenses.fields.transportation', language),
-          labelKu: t('monthlyExpenses.fields.transportation', 'kurdish'),
-          type: 'number',
-          placeholder: '0'
-        },
-        {
-          key: 'educationalTotal',
-          label: language === 'kurdish' ? 'کۆی گشتی' : 'Total',
-          labelKu: 'کۆی گشتی',
-          type: 'number',
-          placeholder: '0',
-          readOnly: true,
-          span: 'full'
-        },
-        {
-          key: 'receiptImages',
-          label: t('monthlyExpenses.fields.receiptImages', language),
-          labelKu: t('monthlyExpenses.fields.receiptImages', 'kurdish'),
-          type: 'image-upload',
-          span: 'full'
-        },
-        {
-          key: 'notes',
-          label: t('monthlyExpenses.fields.notes', language),
-          labelKu: t('monthlyExpenses.fields.notes', 'kurdish'),
-          type: 'textarea',
-          placeholder: 'تێبینی...',
-          span: 'full'
-        }
-      ]
+  const editFields = [
+    {
+      key: 'year',
+      label: t('monthlyExpenses.fields.year', language),
+      labelKu: t('monthlyExpenses.fields.year', 'kurdish'),
+      type: 'number',
+      placeholder: new Date().getFullYear().toString()
+    },
+    {
+      key: 'month',
+      label: t('monthlyExpenses.fields.month', language),
+      labelKu: t('monthlyExpenses.fields.month', 'kurdish'),
+      type: 'number',
+      placeholder: '1-12'
+    },
+    {
+      key: 'requirement',
+      label: t('monthlyExpenses.fields.requirement', language),
+      labelKu: t('monthlyExpenses.fields.requirement', 'kurdish'),
+      type: 'textarea',
+      placeholder: 'پێداویستی و مەبەست...',
+      span: 'full'
+    },
+    {
+      key: 'staffSalary',
+      label: t('monthlyExpenses.fields.staffSalary', language),
+      labelKu: t('monthlyExpenses.fields.staffSalary', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'expenses',
+      label: t('monthlyExpenses.fields.expenses', language),
+      labelKu: t('monthlyExpenses.fields.expenses', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'buildingRent',
+      label: t('monthlyExpenses.fields.buildingRent', language),
+      labelKu: t('monthlyExpenses.fields.buildingRent', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'dramaFee',
+      label: t('monthlyExpenses.fields.dramaFee', language),
+      labelKu: t('monthlyExpenses.fields.dramaFee', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'socialSupport',
+      label: t('monthlyExpenses.fields.socialSupport', language),
+      labelKu: t('monthlyExpenses.fields.socialSupport', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'electricity',
+      label: t('monthlyExpenses.fields.electricity', language),
+      labelKu: t('monthlyExpenses.fields.electricity', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'books',
+      label: t('monthlyExpenses.fields.books', language),
+      labelKu: t('monthlyExpenses.fields.books', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'clothes',
+      label: t('monthlyExpenses.fields.clothes', language),
+      labelKu: t('monthlyExpenses.fields.clothes', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'travel',
+      label: t('monthlyExpenses.fields.travel', language),
+      labelKu: t('monthlyExpenses.fields.travel', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'transportation',
+      label: t('monthlyExpenses.fields.transportation', language),
+      labelKu: t('monthlyExpenses.fields.transportation', 'kurdish'),
+      type: 'number',
+      placeholder: '0'
+    },
+    {
+      key: 'total',
+      label: t('monthlyExpenses.fields.total', language),
+      labelKu: t('monthlyExpenses.fields.total', 'kurdish'),
+      type: 'number',
+      placeholder: '0',
+      readOnly: true,
+      span: 'full'
+    },
+    {
+      key: 'receiptImages',
+      label: t('monthlyExpenses.fields.receiptImages', language),
+      labelKu: t('monthlyExpenses.fields.receiptImages', 'kurdish'),
+      type: 'image-upload',
+      span: 'full'
+    },
+    {
+      key: 'notes',
+      label: t('monthlyExpenses.fields.notes', language),
+      labelKu: t('monthlyExpenses.fields.notes', 'kurdish'),
+      type: 'textarea',
+      placeholder: 'تێبینی...',
+      span: 'full'
     }
-
-    // Main expenses fields
-    return [
-      {
-        key: 'year',
-        label: t('monthlyExpenses.fields.year', language),
-        labelKu: t('monthlyExpenses.fields.year', 'kurdish'),
-        type: 'number',
-        placeholder: new Date().getFullYear().toString()
-      },
-      {
-        key: 'month',
-        label: t('monthlyExpenses.fields.month', language),
-        labelKu: t('monthlyExpenses.fields.month', 'kurdish'),
-        type: 'number',
-        placeholder: '1-12'
-      },
-      {
-        key: 'requirement',
-        label: t('monthlyExpenses.fields.requirement', language),
-        labelKu: t('monthlyExpenses.fields.requirement', 'kurdish'),
-        type: 'textarea',
-        placeholder: 'پێداویستی و مەبەست...',
-        span: 'full'
-      },
-      {
-        key: 'staffSalary',
-        label: t('monthlyExpenses.fields.staffSalary', language),
-        labelKu: t('monthlyExpenses.fields.staffSalary', 'kurdish'),
-        type: 'number',
-        placeholder: '0'
-      },
-      {
-        key: 'expenses',
-        label: t('monthlyExpenses.fields.expenses', language),
-        labelKu: t('monthlyExpenses.fields.expenses', 'kurdish'),
-        type: 'number',
-        placeholder: '0'
-      },
-      {
-        key: 'buildingRent',
-        label: t('monthlyExpenses.fields.buildingRent', language),
-        labelKu: t('monthlyExpenses.fields.buildingRent', 'kurdish'),
-        type: 'number',
-        placeholder: '0'
-      },
-      {
-        key: 'dramaFee',
-        label: t('monthlyExpenses.fields.dramaFee', language),
-        labelKu: t('monthlyExpenses.fields.dramaFee', 'kurdish'),
-        type: 'number',
-        placeholder: '0'
-      },
-      {
-        key: 'socialSupport',
-        label: t('monthlyExpenses.fields.socialSupport', language),
-        labelKu: t('monthlyExpenses.fields.socialSupport', 'kurdish'),
-        type: 'number',
-        placeholder: '0'
-      },
-      {
-        key: 'electricity',
-        label: t('monthlyExpenses.fields.electricity', language),
-        labelKu: t('monthlyExpenses.fields.electricity', 'kurdish'),
-        type: 'number',
-        placeholder: '0'
-      },
-      {
-        key: 'total',
-        label: t('monthlyExpenses.fields.total', language),
-        labelKu: t('monthlyExpenses.fields.total', 'kurdish'),
-        type: 'number',
-        placeholder: '0',
-        readOnly: true,
-        span: 'full'
-      },
-      {
-        key: 'receiptImages',
-        label: t('monthlyExpenses.fields.receiptImages', language),
-        labelKu: t('monthlyExpenses.fields.receiptImages', 'kurdish'),
-        type: 'image-upload',
-        span: 'full'
-      },
-      {
-        key: 'notes',
-        label: t('monthlyExpenses.fields.notes', language),
-        labelKu: t('monthlyExpenses.fields.notes', 'kurdish'),
-        type: 'textarea',
-        placeholder: 'تێبینی...',
-        span: 'full'
-      }
-    ]
-  }, [activeTab, language])
+  ]
 
   // FIRST FILTER - Controls only the summary calculation (affected by summaryYear and summaryMonth)
   const summaryExpenses = useMemo(() => {
@@ -781,107 +734,7 @@ export default function MonthlyExpensesPage() {
   // Versioned key forces table to re-render when data changes
   const tableKey = useMemo(() => `monthly-expenses-${tableVersion}`, [tableVersion])
 
-  // Filter data for display based on content (hide empty rows for specific tabs)
-  const mainExpensesData = useMemo(() => {
-    return filteredData.filter(item => {
-      const hasMainExpenses = (parseFloat(item.staffSalary) || 0) +
-        (parseFloat(item.expenses) || 0) +
-        (parseFloat(item.buildingRent) || 0) +
-        (parseFloat(item.dramaFee) || 0) +
-        (parseFloat(item.socialSupport) || 0) +
-        (parseFloat(item.electricity) || 0) > 0
-      const hasRequirement = item.requirement && item.requirement.trim().length > 0
-      return hasMainExpenses || hasRequirement
-    })
-  }, [filteredData])
-
-  const educationalExpensesData = useMemo(() => {
-    return filteredData.filter(item => {
-      const hasEducationalExpenses = (parseFloat(item.books) || 0) +
-        (parseFloat(item.clothes) || 0) +
-        (parseFloat(item.travel) || 0) +
-        (parseFloat(item.transportation) || 0) > 0
-      return hasEducationalExpenses
-    })
-  }, [filteredData])
-
-  // Prepare data for printing based on active tab
-  const printData = useMemo(() => {
-    if (activeTab === 'educational') {
-      return educationalExpensesData.map(item => ({
-        ...item,
-        educationalTotal: (parseFloat(item.books) || 0) + (parseFloat(item.clothes) || 0) + (parseFloat(item.travel) || 0) + (parseFloat(item.transportation) || 0)
-      }))
-    }
-    return mainExpensesData
-  }, [educationalExpensesData, mainExpensesData, activeTab])
-
-  // Define columns for printing based on active tab
-  const printColumns = useMemo(() => {
-    if (activeTab === 'educational') {
-      return [
-        { key: 'year', header: t('monthlyExpenses.fields.year', 'kurdish') },
-        { key: 'month', header: t('monthlyExpenses.fields.month', 'kurdish') },
-        { key: 'books', header: t('monthlyExpenses.fields.books', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-        { key: 'clothes', header: t('monthlyExpenses.fields.clothes', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-        { key: 'travel', header: t('monthlyExpenses.fields.travel', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-        { key: 'transportation', header: t('monthlyExpenses.fields.transportation', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-        { key: 'educationalTotal', header: t('monthlyExpenses.fields.total', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-        { key: 'notes', header: t('monthlyExpenses.fields.notes', 'kurdish') }
-      ]
-    }
-    // Main expenses columns
-    return [
-      { key: 'year', header: t('monthlyExpenses.fields.year', 'kurdish') },
-      { key: 'month', header: t('monthlyExpenses.fields.month', 'kurdish') },
-      { key: 'requirement', header: t('monthlyExpenses.fields.requirement', 'kurdish') },
-      { key: 'staffSalary', header: t('monthlyExpenses.fields.staffSalary', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'expenses', header: t('monthlyExpenses.fields.expenses', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'buildingRent', header: t('monthlyExpenses.fields.buildingRent', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'dramaFee', header: t('monthlyExpenses.fields.dramaFee', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'socialSupport', header: t('monthlyExpenses.fields.socialSupport', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'electricity', header: t('monthlyExpenses.fields.electricity', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'total', header: t('monthlyExpenses.fields.total', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
-      { key: 'receiptImages', header: t('monthlyExpenses.fields.receiptImages', 'kurdish') },
-      { key: 'notes', header: t('monthlyExpenses.fields.notes', 'kurdish') }
-    ]
-  }, [activeTab, language])
-
-  // Prepare data for download based on active tab (filtering columns)
-  const downloadData = useMemo(() => {
-    if (activeTab === 'educational') {
-      return educationalExpensesData.map(item => {
-        const educationalTotal = (parseFloat(item.books) || 0) + (parseFloat(item.clothes) || 0) + (parseFloat(item.travel) || 0) + (parseFloat(item.transportation) || 0)
-        return {
-          year: item.year,
-          month: item.month,
-          books: item.books,
-          clothes: item.clothes,
-          travel: item.travel,
-          transportation: item.transportation,
-          total: educationalTotal,
-          notes: item.notes
-        }
-      })
-    }
-
-    // Main expenses columns
-    return mainExpensesData.map(item => ({
-      year: item.year,
-      month: item.month,
-      requirement: item.requirement,
-      staffSalary: item.staffSalary,
-      expenses: item.expenses,
-      buildingRent: item.buildingRent,
-      dramaFee: item.dramaFee,
-      socialSupport: item.socialSupport,
-      electricity: item.electricity,
-      total: item.total,
-      notes: item.notes
-    }))
-  }, [educationalExpensesData, mainExpensesData, activeTab])
-
-  function ExpensesCardView({ data, type = 'main' }) {
+  function ExpensesCardView({ data }) {
     return (
       <div className="space-y-4">
         {data.map((entry, idx) => (
@@ -889,19 +742,11 @@ export default function MonthlyExpensesPage() {
             <div className="space-y-3">
               <div className="flex justify-between items-center">
                 <div className="font-bold text-lg group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300">{entry.year}/{entry.month}</div>
-                <div className="font-bold text-xl text-blue-600 dark:text-blue-400">
-                  {type === 'educational' ? (
-                    // Educational total
-                    ((parseFloat(entry.books) || 0) + (parseFloat(entry.clothes) || 0) + (parseFloat(entry.travel) || 0) + (parseFloat(entry.transportation) || 0)).toLocaleString()
-                  ) : (
-                    // Main total
-                    entry.total.toLocaleString()
-                  )} د.ع
-                </div>
+                <div className="font-bold text-xl text-blue-600 dark:text-blue-400">{entry.total.toLocaleString()} د.ع</div>
               </div>
 
-              {/* Requirement section - only for main expenses */}
-              {type === 'main' && entry.requirement && (
+              {/* Requirement section */}
+              {entry.requirement && (
                 <div className="border-t pt-2">
                   <div className="text-sm">
                     <span className="font-semibold">{t('monthlyExpenses.fields.requirement', language)}:</span>
@@ -910,28 +755,15 @@ export default function MonthlyExpensesPage() {
                 </div>
               )}
 
-              {/* Main expenses fields */}
-              {type === 'main' && (
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.staffSalary', language)}:</span> <span className="text-green-600 dark:text-green-400">{entry.staffSalary.toLocaleString()}</span></div>
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.expenses', language)}:</span> <span className="text-red-600 dark:text-red-400">{entry.expenses.toLocaleString()}</span></div>
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.buildingRent', language)}:</span> <span className="text-purple-600 dark:text-purple-400">{entry.buildingRent.toLocaleString()}</span></div>
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.electricity', language)}:</span> <span className="text-orange-600 dark:text-orange-400">{entry.electricity.toLocaleString()}</span></div>
-                </div>
-              )}
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div><span className="font-semibold">{t('monthlyExpenses.fields.staffSalary', language)}:</span> <span className="text-green-600 dark:text-green-400">{entry.staffSalary.toLocaleString()}</span></div>
+                <div><span className="font-semibold">{t('monthlyExpenses.fields.expenses', language)}:</span> <span className="text-red-600 dark:text-red-400">{entry.expenses.toLocaleString()}</span></div>
+                <div><span className="font-semibold">{t('monthlyExpenses.fields.buildingRent', language)}:</span> <span className="text-purple-600 dark:text-purple-400">{entry.buildingRent.toLocaleString()}</span></div>
+                <div><span className="font-semibold">{t('monthlyExpenses.fields.electricity', language)}:</span> <span className="text-orange-600 dark:text-orange-400">{entry.electricity.toLocaleString()}</span></div>
+              </div>
 
-              {/* Educational/Travel expenses fields */}
-              {type === 'educational' && (
-                <div className="grid grid-cols-2 gap-2 text-sm">
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.books', language)}:</span> <span className="text-indigo-600 dark:text-indigo-400">{(parseFloat(entry.books) || 0).toLocaleString()}</span></div>
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.clothes', language)}:</span> <span className="text-pink-600 dark:text-pink-400">{(parseFloat(entry.clothes) || 0).toLocaleString()}</span></div>
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.travel', language)}:</span> <span className="text-teal-600 dark:text-teal-400">{(parseFloat(entry.travel) || 0).toLocaleString()}</span></div>
-                  <div><span className="font-semibold">{t('monthlyExpenses.fields.transportation', language)}:</span> <span className="text-cyan-600 dark:text-cyan-400">{(parseFloat(entry.transportation) || 0).toLocaleString()}</span></div>
-                </div>
-              )}
-
-              {/* Receipt Images - only for main expenses */}
-              {type === 'main' && entry.receiptImages && entry.receiptImages.length > 0 && (
+              {/* Receipt Images */}
+              {entry.receiptImages && entry.receiptImages.length > 0 && (
                 <div className="mt-3">
                   <span className="font-semibold text-sm">{t('monthlyExpenses.fields.receiptImages', language)}:</span>
                   <div className="flex gap-2 mt-2 flex-wrap">
@@ -963,7 +795,7 @@ export default function MonthlyExpensesPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-3">
-                <Button size="sm" variant="outline" onClick={() => startEditing(entry.id)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
+                <Button size="sm" variant="outline" onClick={() => startEditing(idx)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button size="sm" variant="destructive" onClick={() => deleteEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
@@ -977,9 +809,9 @@ export default function MonthlyExpensesPage() {
     )
   }
 
-  function ExpensesTableView({ data, type = 'main' }) {
-    // Define table columns based on type
-    const mainColumns = [
+  function ExpensesTableView({ data }) {
+    // Define table columns for monthly expenses
+    const columns = [
       {
         key: 'year',
         header: t('monthlyExpenses.fields.year', language),
@@ -1053,6 +885,38 @@ export default function MonthlyExpensesPage() {
         render: (value) => <span className="font-medium text-orange-600 dark:text-orange-400">{parseFloat(value || 0).toLocaleString()}</span>
       },
       {
+        key: 'books',
+        header: t('monthlyExpenses.fields.books', language),
+        align: 'center',
+        editable: true,
+        type: 'number',
+        render: (value) => <span className="font-medium text-indigo-600 dark:text-indigo-400">{parseFloat(value || 0).toLocaleString()}</span>
+      },
+      {
+        key: 'clothes',
+        header: t('monthlyExpenses.fields.clothes', language),
+        align: 'center',
+        editable: true,
+        type: 'number',
+        render: (value) => <span className="font-medium text-pink-600 dark:text-pink-400">{parseFloat(value || 0).toLocaleString()}</span>
+      },
+      {
+        key: 'travel',
+        header: t('monthlyExpenses.fields.travel', language),
+        align: 'center',
+        editable: true,
+        type: 'number',
+        render: (value) => <span className="font-medium text-teal-600 dark:text-teal-400">{parseFloat(value || 0).toLocaleString()}</span>
+      },
+      {
+        key: 'transportation',
+        header: t('monthlyExpenses.fields.transportation', language),
+        align: 'center',
+        editable: true,
+        type: 'number',
+        render: (value) => <span className="font-medium text-cyan-600 dark:text-cyan-400">{parseFloat(value || 0).toLocaleString()}</span>
+      },
+      {
         key: 'total',
         header: t('monthlyExpenses.fields.total', language),
         align: 'center',
@@ -1122,92 +986,6 @@ export default function MonthlyExpensesPage() {
         render: (value) => <span className="text-sm text-gray-600 dark:text-gray-400">{value}</span>
       }
     ]
-
-    // Educational & Travel columns
-    const educationalColumns = [
-      {
-        key: 'year',
-        header: t('monthlyExpenses.fields.year', language),
-        align: 'center',
-        editable: true,
-        type: 'number',
-        render: (value) => <span className="font-medium">{value}</span>
-      },
-      {
-        key: 'month',
-        header: t('monthlyExpenses.fields.month', language),
-        align: 'center',
-        editable: true,
-        type: 'number',
-        render: (value) => <span className="font-medium">{value}</span>
-      },
-      {
-        key: 'books',
-        header: t('monthlyExpenses.fields.books', language),
-        align: 'center',
-        editable: true,
-        type: 'number',
-        render: (value) => <span className="font-medium text-indigo-600 dark:text-indigo-400">{parseFloat(value || 0).toLocaleString()}</span>
-      },
-      {
-        key: 'clothes',
-        header: t('monthlyExpenses.fields.clothes', language),
-        align: 'center',
-        editable: true,
-        type: 'number',
-        render: (value) => <span className="font-medium text-pink-600 dark:text-pink-400">{parseFloat(value || 0).toLocaleString()}</span>
-      },
-      {
-        key: 'travel',
-        header: t('monthlyExpenses.fields.travel', language),
-        align: 'center',
-        editable: true,
-        type: 'number',
-        render: (value) => <span className="font-medium text-teal-600 dark:text-teal-400">{parseFloat(value || 0).toLocaleString()}</span>
-      },
-      {
-        key: 'transportation',
-        header: t('monthlyExpenses.fields.transportation', language),
-        align: 'center',
-        editable: true,
-        type: 'number',
-        render: (value) => <span className="font-medium text-cyan-600 dark:text-cyan-400">{parseFloat(value || 0).toLocaleString()}</span>
-      },
-      {
-        key: 'educationalTotal',
-        header: language === 'kurdish' ? 'کۆی گشتی' : 'Total',
-        align: 'center',
-        editable: false,
-        render: (value, row) => {
-          // Calculate educational total from the 4 fields
-          const books = parseFloat(row.books) || 0
-          const clothes = parseFloat(row.clothes) || 0
-          const travel = parseFloat(row.travel) || 0
-          const transportation = parseFloat(row.transportation) || 0
-          const total = books + clothes + travel + transportation
-          return <span className="font-bold text-lg text-blue-600 dark:text-blue-400">{total.toLocaleString()}</span>
-        }
-      },
-      {
-        key: 'notes',
-        header: t('monthlyExpenses.fields.notes', language),
-        align: 'center',
-        editable: true,
-        truncate: 40,
-        editComponent: (row, onChange) => (
-          <Textarea
-            value={row.notes || ''}
-            onChange={(e) => onChange(e.target.value)}
-            className="w-full dark:bg-gray-800"
-            rows={2}
-          />
-        ),
-        render: (value) => <span className="text-sm text-gray-600 dark:text-gray-400">{value}</span>
-      }
-    ]
-
-    // Select columns based on type
-    const columns = type === 'educational' ? educationalColumns : mainColumns
 
     return (
       <>
@@ -1462,20 +1240,36 @@ export default function MonthlyExpensesPage() {
 
           <div className="flex items-center gap-4">
             <DownloadButton
-              data={downloadData}
-              filename={`monthly-expenses-${activeTab}-records`}
+              data={filteredData}
+              filename="monthly-expenses-records"
               className="bg-green-600 hover:bg-green-700 text-white"
             />
             <PrintButton
-              data={printData}
-              filename={`monthly-expenses-${activeTab}-records`}
-              title={activeTab === 'educational' ? "خەرجی کەسی و پەروەردەی" : "خەرجی گشتی"}
-              titleKu={activeTab === 'educational' ? "خەرجی کەسی و پەروەردەی" : "پوختی حساباتی مانگانە"}
+              data={filteredData}
+              filename="monthly-expenses-records"
+              title="خەرجی مانگانە"
+              titleKu="پوختی حساباتی مانگانە"
               selectedMonth={selectedMonth !== "all-months" ? selectedMonth : null}
               selectedYear={selectedYear !== "all-years" ? selectedYear : null}
-              columns={printColumns}
+              columns={[
+                { key: 'year', header: t('monthlyExpenses.fields.year', 'kurdish') },
+                { key: 'month', header: t('monthlyExpenses.fields.month', 'kurdish') },
+                { key: 'requirement', header: t('monthlyExpenses.fields.requirement', 'kurdish') },
+                { key: 'staffSalary', header: t('monthlyExpenses.fields.staffSalary', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'expenses', header: t('monthlyExpenses.fields.expenses', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'buildingRent', header: t('monthlyExpenses.fields.buildingRent', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'dramaFee', header: t('monthlyExpenses.fields.dramaFee', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'socialSupport', header: t('monthlyExpenses.fields.socialSupport', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'electricity', header: t('monthlyExpenses.fields.electricity', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'books', header: t('monthlyExpenses.fields.books', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'clothes', header: t('monthlyExpenses.fields.clothes', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'travel', header: t('monthlyExpenses.fields.travel', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'transportation', header: t('monthlyExpenses.fields.transportation', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'total', header: t('monthlyExpenses.fields.total', 'kurdish'), render: (value) => value.toLocaleString() },
+                { key: 'receiptImages', header: t('monthlyExpenses.fields.receiptImages', 'kurdish') },
+                { key: 'notes', header: t('monthlyExpenses.fields.notes', 'kurdish') }
+              ]}
               showTotal={true}
-              totalColumn={activeTab === 'educational' ? 'educationalTotal' : 'total'}
               className="bg-blue-600 hover:bg-blue-700 text-white"
             />
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
@@ -1490,339 +1284,259 @@ export default function MonthlyExpensesPage() {
                 <DialogHeader>
                   <DialogTitle>{t('monthlyExpenses.addTitle', language)}</DialogTitle>
                 </DialogHeader>
-
-                <Tabs defaultValue="main" className="w-full">
-                  <TabsList className="grid w-full grid-cols-2 mb-4">
-                    <TabsTrigger value="main">
-                      {language === 'kurdish' ? 'خەرجی گشتی' : 'General Expenses'}
-                    </TabsTrigger>
-                    <TabsTrigger value="educational">
-                      {language === 'kurdish' ? 'خەرجی کەسی و پەروەردەی' : 'Personal & Educational'}
-                    </TabsTrigger>
-                  </TabsList>
-
-                  <TabsContent value="main" className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="year">{t('monthlyExpenses.fields.year', language)}</Label>
-                        <Input
-                          id="year"
-                          type="number"
-                          value={newEntry.year}
-                          onChange={(e) => setNewEntry({ ...newEntry, year: e.target.value })}
-                          placeholder={new Date().getFullYear().toString()}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="month">{t('monthlyExpenses.fields.month', language)}</Label>
-                        <Input
-                          id="month"
-                          type="number"
-                          min="1"
-                          max="12"
-                          value={newEntry.month}
-                          onChange={(e) => setNewEntry({ ...newEntry, month: e.target.value })}
-                          placeholder="1-12"
-                        />
-                      </div>
-                    </div>
-
+                <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="requirement">{t('monthlyExpenses.fields.requirement', language)}</Label>
-                      <Textarea
-                        id="requirement"
-                        value={newEntry.requirement}
-                        onChange={(e) => setNewEntry({ ...newEntry, requirement: e.target.value })}
-                        placeholder="پێداویستی و مەبەست..."
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="staffSalary">{t('monthlyExpenses.fields.staffSalary', language)}</Label>
-                        <Input
-                          id="staffSalary"
-                          type="number"
-                          value={newEntry.staffSalary}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, staffSalary: value }
-                            const total = value + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
-                            updatedEntry.total = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="expenses">{t('monthlyExpenses.fields.expenses', language)}</Label>
-                        <Input
-                          id="expenses"
-                          type="number"
-                          value={newEntry.expenses}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, expenses: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + value + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
-                            updatedEntry.total = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="buildingRent">{t('monthlyExpenses.fields.buildingRent', language)}</Label>
-                        <Input
-                          id="buildingRent"
-                          type="number"
-                          value={newEntry.buildingRent}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, buildingRent: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + value + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
-                            updatedEntry.total = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="dramaFee">{t('monthlyExpenses.fields.dramaFee', language)}</Label>
-                        <Input
-                          id="dramaFee"
-                          type="number"
-                          value={newEntry.dramaFee}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, dramaFee: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + value + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
-                            updatedEntry.total = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="socialSupport">{t('monthlyExpenses.fields.socialSupport', language)}</Label>
-                        <Input
-                          id="socialSupport"
-                          type="number"
-                          value={newEntry.socialSupport}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, socialSupport: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + value + parseFloat(updatedEntry.electricity)
-                            updatedEntry.total = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="electricity">{t('monthlyExpenses.fields.electricity', language)}</Label>
-                        <Input
-                          id="electricity"
-                          type="number"
-                          value={newEntry.electricity}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, electricity: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + value
-                            updatedEntry.total = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="total">{t('monthlyExpenses.fields.total', language)}</Label>
+                      <Label htmlFor="year">{t('monthlyExpenses.fields.year', language)}</Label>
                       <Input
-                        id="total"
+                        id="year"
                         type="number"
-                        value={newEntry.total}
-                        readOnly
-                        className="bg-gray-100"
+                        value={newEntry.year}
+                        onChange={(e) => setNewEntry({ ...newEntry, year: e.target.value })}
+                        placeholder={new Date().getFullYear().toString()}
                       />
                     </div>
-
                     <div>
-                      <Label>{t('monthlyExpenses.fields.receiptImages', language)}</Label>
-                      <ImageUpload
-                        images={newEntry.receiptImages}
-                        onImagesChange={(images) => setNewEntry({ ...newEntry, receiptImages: images })}
-                        maxImages={6}
-                        className="mt-2"
-                      />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="notes">{t('monthlyExpenses.fields.notes', language)}</Label>
-                      <Textarea
-                        id="notes"
-                        value={newEntry.notes}
-                        onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
-                        placeholder="Additional notes..."
-                        rows={3}
-                      />
-                    </div>
-
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}>
-                        {t('monthlyExpenses.buttons.cancel', language)}
-                      </Button>
-                      <Button onClick={() => saveEntry(newEntry)}>
-                        {t('monthlyExpenses.buttons.save', language)}
-                      </Button>
-                    </div>
-                  </TabsContent>
-
-                  <TabsContent value="educational" className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="edu-year">{t('monthlyExpenses.fields.year', language)}</Label>
-                        <Input
-                          id="edu-year"
-                          type="number"
-                          value={newEntry.year}
-                          onChange={(e) => setNewEntry({ ...newEntry, year: e.target.value })}
-                          placeholder={new Date().getFullYear().toString()}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="edu-month">{t('monthlyExpenses.fields.month', language)}</Label>
-                        <Input
-                          id="edu-month"
-                          type="number"
-                          min="1"
-                          max="12"
-                          value={newEntry.month}
-                          onChange={(e) => setNewEntry({ ...newEntry, month: e.target.value })}
-                          placeholder="1-12"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="books">{t('monthlyExpenses.fields.books', language)}</Label>
-                        <Input
-                          id="books"
-                          type="number"
-                          value={newEntry.books}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, books: value }
-                            const total = value + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
-                            updatedEntry.educationalTotal = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="clothes">{t('monthlyExpenses.fields.clothes', language)}</Label>
-                        <Input
-                          id="clothes"
-                          type="number"
-                          value={newEntry.clothes}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, clothes: value }
-                            const total = parseFloat(updatedEntry.books) + value + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
-                            updatedEntry.educationalTotal = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="travel">{t('monthlyExpenses.fields.travel', language)}</Label>
-                        <Input
-                          id="travel"
-                          type="number"
-                          value={newEntry.travel}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, travel: value }
-                            const total = parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + value + parseFloat(updatedEntry.transportation)
-                            updatedEntry.educationalTotal = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="transportation">{t('monthlyExpenses.fields.transportation', language)}</Label>
-                        <Input
-                          id="transportation"
-                          type="number"
-                          value={newEntry.transportation}
-                          onChange={(e) => {
-                            const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, transportation: value }
-                            const total = parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + value
-                            updatedEntry.educationalTotal = total
-                            setNewEntry(updatedEntry)
-                          }}
-                          placeholder="0"
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <Label htmlFor="educationalTotal">{language === 'kurdish' ? 'کۆی گشتی' : 'Total'}</Label>
+                      <Label htmlFor="month">{t('monthlyExpenses.fields.month', language)}</Label>
                       <Input
-                        id="educationalTotal"
+                        id="month"
                         type="number"
-                        value={newEntry.educationalTotal || 0}
-                        readOnly
-                        className="bg-gray-100"
+                        min="1"
+                        max="12"
+                        value={newEntry.month}
+                        onChange={(e) => setNewEntry({ ...newEntry, month: e.target.value })}
+                        placeholder="1-12"
                       />
                     </div>
+                  </div>
 
+                  <div>
+                    <Label htmlFor="requirement">{t('monthlyExpenses.fields.requirement', language)}</Label>
+                    <Textarea
+                      id="requirement"
+                      value={newEntry.requirement}
+                      onChange={(e) => setNewEntry({ ...newEntry, requirement: e.target.value })}
+                      placeholder="پێداویستی و مەبەست..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <Label>{t('monthlyExpenses.fields.receiptImages', language)}</Label>
-                      <ImageUpload
-                        images={newEntry.receiptImages}
-                        onImagesChange={(images) => setNewEntry({ ...newEntry, receiptImages: images })}
-                        maxImages={6}
-                        className="mt-2"
+                      <Label htmlFor="staffSalary">{t('monthlyExpenses.fields.staffSalary', language)}</Label>
+                      <Input
+                        id="staffSalary"
+                        type="number"
+                        value={newEntry.staffSalary}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, staffSalary: value }
+                          const total = value + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
                       />
                     </div>
-
                     <div>
-                      <Label htmlFor="edu-notes">{t('monthlyExpenses.fields.notes', language)}</Label>
-                      <Textarea
-                        id="edu-notes"
-                        value={newEntry.notes}
-                        onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
-                        placeholder="Additional notes..."
-                        rows={3}
+                      <Label htmlFor="expenses">{t('monthlyExpenses.fields.expenses', language)}</Label>
+                      <Input
+                        id="expenses"
+                        type="number"
+                        value={newEntry.expenses}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, expenses: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + value + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
                       />
                     </div>
+                  </div>
 
-                    <div className="flex justify-end gap-2">
-                      <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}>
-                        {t('monthlyExpenses.buttons.cancel', language)}
-                      </Button>
-                      <Button onClick={() => saveEntry(newEntry)}>
-                        {t('monthlyExpenses.buttons.save', language)}
-                      </Button>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="buildingRent">{t('monthlyExpenses.fields.buildingRent', language)}</Label>
+                      <Input
+                        id="buildingRent"
+                        type="number"
+                        value={newEntry.buildingRent}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, buildingRent: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + value + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
                     </div>
-                  </TabsContent>
-                </Tabs>
+                    <div>
+                      <Label htmlFor="dramaFee">{t('monthlyExpenses.fields.dramaFee', language)}</Label>
+                      <Input
+                        id="dramaFee"
+                        type="number"
+                        value={newEntry.dramaFee}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, dramaFee: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + value + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="socialSupport">{t('monthlyExpenses.fields.socialSupport', language)}</Label>
+                      <Input
+                        id="socialSupport"
+                        type="number"
+                        value={newEntry.socialSupport}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, socialSupport: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + value + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="electricity">{t('monthlyExpenses.fields.electricity', language)}</Label>
+                      <Input
+                        id="electricity"
+                        type="number"
+                        value={newEntry.electricity}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, electricity: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + value + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="books">{t('monthlyExpenses.fields.books', language)}</Label>
+                      <Input
+                        id="books"
+                        type="number"
+                        value={newEntry.books}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, books: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + value + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="clothes">{t('monthlyExpenses.fields.clothes', language)}</Label>
+                      <Input
+                        id="clothes"
+                        type="number"
+                        value={newEntry.clothes}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, clothes: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + value + parseFloat(updatedEntry.travel) + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="travel">{t('monthlyExpenses.fields.travel', language)}</Label>
+                      <Input
+                        id="travel"
+                        type="number"
+                        value={newEntry.travel}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, travel: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + value + parseFloat(updatedEntry.transportation)
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="transportation">{t('monthlyExpenses.fields.transportation', language)}</Label>
+                      <Input
+                        id="transportation"
+                        type="number"
+                        value={newEntry.transportation}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value) || 0
+                          const updatedEntry = { ...newEntry, transportation: value }
+                          const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity) + parseFloat(updatedEntry.books) + parseFloat(updatedEntry.clothes) + parseFloat(updatedEntry.travel) + value
+                          updatedEntry.total = total
+                          setNewEntry(updatedEntry)
+                        }}
+                        placeholder="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <Label htmlFor="total">{t('monthlyExpenses.fields.total', language)}</Label>
+                    <Input
+                      id="total"
+                      type="number"
+                      value={newEntry.total}
+                      readOnly
+                      className="bg-gray-100"
+                    />
+                  </div>
+
+                  <div>
+                    <Label>{t('monthlyExpenses.fields.receiptImages', language)}</Label>
+                    <ImageUpload
+                      images={newEntry.receiptImages}
+                      onImagesChange={(images) => setNewEntry({ ...newEntry, receiptImages: images })}
+                      maxImages={6}
+                      className="mt-2"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="notes">{t('monthlyExpenses.fields.notes', language)}</Label>
+                    <Textarea
+                      id="notes"
+                      value={newEntry.notes}
+                      onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
+                      placeholder="Additional notes..."
+                      rows={3}
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-2">
+                    <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}>
+                      {t('monthlyExpenses.buttons.cancel', language)}
+                    </Button>
+                    <Button onClick={() => saveEntry(newEntry)}>
+                      {t('monthlyExpenses.buttons.save', language)}
+                    </Button>
+                  </div>
+                </div>
               </DialogContent>
             </Dialog>
           </div>
@@ -1844,34 +1558,13 @@ export default function MonthlyExpensesPage() {
         titleKu={t('monthlyExpenses.buttons.edit', 'kurdish')}
       />
 
-      {/* Expenses Table/Cards with Tabs */}
+      {/* Expenses Table/Cards */}
       <div className="mt-6">
-        <Tabs defaultValue="main" className="w-full" onValueChange={setActiveTab}>
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="main">
-              {language === 'kurdish' ? 'خەرجی گشتی' : 'General Expenses / خەرجی گشتی'}
-            </TabsTrigger>
-            <TabsTrigger value="educational">
-              {language === 'kurdish' ? 'خەرجی کەسی و پەروەردەی' : 'Personal & Educational / خەرجی کەسی و پەروەردەی'}
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="main" className="mt-6">
-            {isMobile ? (
-              <ExpensesCardView data={mainExpensesData} type="main" />
-            ) : (
-              <ExpensesTableView data={mainExpensesData} type="main" />
-            )}
-          </TabsContent>
-
-          <TabsContent value="educational" className="mt-6">
-            {isMobile ? (
-              <ExpensesCardView data={educationalExpensesData} type="educational" />
-            ) : (
-              <ExpensesTableView data={educationalExpensesData} type="educational" />
-            )}
-          </TabsContent>
-        </Tabs>
+        {isMobile ? (
+          <ExpensesCardView data={filteredData} />
+        ) : (
+          <ExpensesTableView data={filteredData} />
+        )}
       </div>
 
       {/* Enhanced Image Preview Dialog */}

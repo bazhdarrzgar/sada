@@ -93,16 +93,16 @@ export default function SupervisionPage() {
   const saveEntry = async (entry) => {
     // Prevent multiple submissions with both ref and state
     if (isSaving || isSavingRef.current) return
-    
+
     isSavingRef.current = true
     setIsSaving(true)
     try {
       let response
-      
+
       // Check if this is an update (has existing ID from database) or a new entry
       // UUID format is 36 characters with dashes (e.g., "550e8400-e29b-41d4-a716-446655440000")
       const isUpdate = entry.id && typeof entry.id === 'string' && entry.id.length >= 32 && !entry.id.startsWith('supervision-')
-      
+
       if (isUpdate) {
         // Update existing entry - preserve all fields including type
         const entryToUpdate = {
@@ -117,7 +117,7 @@ export default function SupervisionPage() {
           supervisionLocation: entry.supervisionLocation || '',
           notes: entry.notes || ''
         }
-        
+
         response = await fetch(`/api/supervision/${entry.id}`, {
           method: 'PUT',
           headers: {
@@ -138,13 +138,13 @@ export default function SupervisionPage() {
           supervisionLocation: entry.supervisionLocation || '',
           notes: entry.notes || ''
         }
-        
+
         if (!entryToSave.name.trim()) {
           alert('Name is required!')
           setIsSaving(false)
           return
         }
-        
+
         response = await fetch('/api/supervision', {
           method: 'POST',
           headers: {
@@ -156,7 +156,7 @@ export default function SupervisionPage() {
 
       if (response.ok) {
         const savedEntry = await response.json()
-        
+
         // Update local state with the saved data - new/edited entries go to top
         setSupervisionData(prevData => {
           const existingIndex = prevData.findIndex(item => item.id === savedEntry.id)
@@ -177,7 +177,7 @@ export default function SupervisionPage() {
       } else {
         console.error('Failed to save entry:', response.statusText)
       }
-      
+
     } catch (error) {
       console.error('Error saving entry:', error)
     } finally {
@@ -211,7 +211,7 @@ export default function SupervisionPage() {
   const handleAddEntry = () => {
     // First scroll to center quickly
     scrollToCenterFast()
-    
+
     // Small delay to ensure smooth scrolling starts, then open dialog
     setTimeout(() => {
       setIsAddDialogOpen(true)
@@ -243,22 +243,35 @@ export default function SupervisionPage() {
     const viewportHeight = window.innerHeight
     const documentHeight = document.documentElement.scrollHeight
     const centerPosition = Math.max(0, (documentHeight - viewportHeight) / 2)
-    
+
     window.scrollTo({
       top: centerPosition,
       behavior: 'smooth'
     })
   }
 
-  const startEditing = (index, dataSource = null) => {
+  const startEditing = (identifier, dataSource = null) => {
     // First scroll to center quickly
     scrollToCenterFast()
-    
+
     // Small delay to ensure smooth scrolling starts, then open modal
     setTimeout(() => {
       // Always use the provided dataSource if available, otherwise use supervisionData
-      const entry = dataSource ? dataSource[index] : supervisionData[index]
-      
+      const source = dataSource || supervisionData
+
+      let entry
+      if (typeof identifier === 'number') {
+        entry = source[identifier]
+      } else {
+        // Assume identifier is an ID
+        entry = source.find(item => item.id === identifier)
+      }
+
+      if (!entry) {
+        console.error('Entry not found for editing', identifier)
+        return
+      }
+
       // Create a deep copy of the entry to avoid reference issues
       const entryCopy = {
         id: entry.id,
@@ -272,7 +285,7 @@ export default function SupervisionPage() {
         supervisionLocation: entry.supervisionLocation || '',
         notes: entry.notes || ''
       }
-      
+
       // Determine the editing type based on the entry's type field
       setEditingType(entryCopy.type)
       setEditingData(entryCopy)
@@ -293,7 +306,7 @@ export default function SupervisionPage() {
   const handleModalSave = async (editedData) => {
     // Prevent multiple submissions with both ref and state
     if (isSaving || isSavingRef.current) return
-    
+
     // Ensure the ID from the original editingData is preserved
     const dataToSave = {
       ...editedData,
@@ -306,11 +319,11 @@ export default function SupervisionPage() {
 
   const handleTranslateInterface = () => {
     setIsTranslating(true)
-    
+
     setTimeout(() => {
       toggleLanguage()
       setIsTranslating(false)
-      
+
       const notification = document.createElement('div')
       notification.className = 'fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0'
       notification.innerHTML = `
@@ -324,7 +337,7 @@ export default function SupervisionPage() {
         </div>
       `
       document.body.appendChild(notification)
-      
+
       setTimeout(() => {
         notification.style.transform = 'translateX(100%)'
         setTimeout(() => document.body.removeChild(notification), 300)
@@ -475,7 +488,7 @@ export default function SupervisionPage() {
                 <div><span className="font-semibold">{t('supervision.fields.violationType', language)}:</span> {entry.violationType}</div>
               </div>
               <div className="text-sm">
-                <span className="font-semibold">{t('supervision.fields.punishmentType', language)}:</span> 
+                <span className="font-semibold">{t('supervision.fields.punishmentType', language)}:</span>
                 <span className="ml-2 px-2 py-1 bg-red-100 text-red-800 rounded text-xs">{entry.punishmentType}</span>
               </div>
               {entry.notes && (
@@ -626,10 +639,10 @@ export default function SupervisionPage() {
         columns={columns}
         editingRow={null}
         onEdit={(index) => startEditing(index, data)}
-        onSave={() => {}}
-        onCancel={() => {}}
+        onSave={() => { }}
+        onCancel={() => { }}
         onDelete={deleteEntry}
-        onCellEdit={() => {}}
+        onCellEdit={() => { }}
         maxRowsPerPage={10}
         enablePagination={true}
         className="shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -750,10 +763,10 @@ export default function SupervisionPage() {
         columns={columns}
         editingRow={null}
         onEdit={(index) => startEditing(index, data)}
-        onSave={() => {}}
-        onCancel={() => {}}
+        onSave={() => { }}
+        onCancel={() => { }}
         onDelete={deleteEntry}
-        onCellEdit={() => {}}
+        onCellEdit={() => { }}
         maxRowsPerPage={10}
         enablePagination={true}
         className="shadow-lg hover:shadow-xl transition-shadow duration-300"
@@ -783,19 +796,19 @@ export default function SupervisionPage() {
           />
         </div>
         <div className="flex items-center gap-4">
-          <DownloadButton 
-            data={filteredData}
-            filename="supervision-records"
+          <DownloadButton
+            data={filteredData.filter(item => item.type === activeTab)}
+            filename={`supervision-records-${activeTab}`}
             className="bg-green-600 hover:bg-green-700 text-white"
           />
-          <PrintButton 
-            data={filteredData}
-            filename="supervision-records"
-            title={t('supervision.title', language)}
-            titleKu={t('supervision.title', 'kurdish')}
+          <PrintButton
+            data={filteredData.filter(item => item.type === activeTab)}
+            filename={`supervision-records-${activeTab}`}
+            title={activeTab === 'teacher' ? t('supervision.tabs.teacher', language) : t('supervision.tabs.student', language)}
+            titleKu={activeTab === 'teacher' ? t('supervision.tabs.teacher', 'kurdish') : t('supervision.tabs.student', 'kurdish')}
             columns={[
-              { key: 'name', header: t('supervision.fields.name', 'kurdish') },
-              { key: 'subject', header: t('supervision.fields.subject', 'kurdish') },
+              { key: 'name', header: activeTab === 'teacher' ? t('supervision.fields.teacherName', 'kurdish') : t('supervision.fields.studentName', 'kurdish') },
+              ...(activeTab === 'teacher' ? [{ key: 'subject', header: t('supervision.fields.subject', 'kurdish') }] : []),
               { key: 'department', header: t('supervision.fields.department', 'kurdish') },
               { key: 'grade', header: t('supervision.fields.grade', 'kurdish') },
               { key: 'supervisionLocation', header: t('supervision.fields.supervisionLocation', 'kurdish') },
@@ -821,7 +834,7 @@ export default function SupervisionPage() {
                   <TabsTrigger value="teacher">{t('supervision.tabs.teacher', language)} / {t('supervision.tabs.teacher', 'kurdish')}</TabsTrigger>
                   <TabsTrigger value="student">{t('supervision.tabs.student', language)} / {t('supervision.tabs.student', 'kurdish')}</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="teacher" className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -829,7 +842,7 @@ export default function SupervisionPage() {
                       <Input
                         id="name"
                         value={newEntry.name}
-                        onChange={(e) => setNewEntry({...newEntry, name: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })}
                         placeholder="Enter teacher name"
                       />
                     </div>
@@ -838,7 +851,7 @@ export default function SupervisionPage() {
                       <Input
                         id="subject"
                         value={newEntry.subject}
-                        onChange={(e) => setNewEntry({...newEntry, subject: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, subject: e.target.value })}
                         placeholder="Enter subject"
                       />
                     </div>
@@ -847,7 +860,7 @@ export default function SupervisionPage() {
                       <Input
                         id="department"
                         value={newEntry.department}
-                        onChange={(e) => setNewEntry({...newEntry, department: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, department: e.target.value })}
                         placeholder="Enter department"
                       />
                     </div>
@@ -856,7 +869,7 @@ export default function SupervisionPage() {
                       <Input
                         id="grade"
                         value={newEntry.grade}
-                        onChange={(e) => setNewEntry({...newEntry, grade: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, grade: e.target.value })}
                         placeholder="Enter grade"
                       />
                     </div>
@@ -865,7 +878,7 @@ export default function SupervisionPage() {
                       <Input
                         id="supervisionLocation"
                         value={newEntry.supervisionLocation}
-                        onChange={(e) => setNewEntry({...newEntry, supervisionLocation: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, supervisionLocation: e.target.value })}
                         placeholder="Enter supervision location"
                       />
                     </div>
@@ -874,7 +887,7 @@ export default function SupervisionPage() {
                       <Input
                         id="violationType"
                         value={newEntry.violationType}
-                        onChange={(e) => setNewEntry({...newEntry, violationType: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, violationType: e.target.value })}
                         placeholder="Enter violation type"
                       />
                     </div>
@@ -883,7 +896,7 @@ export default function SupervisionPage() {
                       <Input
                         id="punishmentType"
                         value={newEntry.punishmentType}
-                        onChange={(e) => setNewEntry({...newEntry, punishmentType: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, punishmentType: e.target.value })}
                         placeholder="Enter punishment type"
                       />
                     </div>
@@ -892,14 +905,14 @@ export default function SupervisionPage() {
                       <Textarea
                         id="notes"
                         value={newEntry.notes}
-                        onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
                         placeholder="تێبینی سەبارەت بە چاودێری..."
                         rows={3}
                       />
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <TabsContent value="student" className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -907,7 +920,7 @@ export default function SupervisionPage() {
                       <Input
                         id="name"
                         value={newEntry.name}
-                        onChange={(e) => setNewEntry({...newEntry, name: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, name: e.target.value })}
                         placeholder="Enter student name"
                       />
                     </div>
@@ -916,7 +929,7 @@ export default function SupervisionPage() {
                       <Input
                         id="department"
                         value={newEntry.department}
-                        onChange={(e) => setNewEntry({...newEntry, department: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, department: e.target.value })}
                         placeholder="Enter department"
                       />
                     </div>
@@ -925,7 +938,7 @@ export default function SupervisionPage() {
                       <Input
                         id="grade"
                         value={newEntry.grade}
-                        onChange={(e) => setNewEntry({...newEntry, grade: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, grade: e.target.value })}
                         placeholder="Enter grade"
                       />
                     </div>
@@ -934,7 +947,7 @@ export default function SupervisionPage() {
                       <Input
                         id="supervisionLocation"
                         value={newEntry.supervisionLocation}
-                        onChange={(e) => setNewEntry({...newEntry, supervisionLocation: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, supervisionLocation: e.target.value })}
                         placeholder="Enter supervision location"
                       />
                     </div>
@@ -943,7 +956,7 @@ export default function SupervisionPage() {
                       <Input
                         id="violationType"
                         value={newEntry.violationType}
-                        onChange={(e) => setNewEntry({...newEntry, violationType: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, violationType: e.target.value })}
                         placeholder="Enter violation type"
                       />
                     </div>
@@ -952,7 +965,7 @@ export default function SupervisionPage() {
                       <Input
                         id="punishmentType"
                         value={newEntry.punishmentType}
-                        onChange={(e) => setNewEntry({...newEntry, punishmentType: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, punishmentType: e.target.value })}
                         placeholder="Enter punishment type"
                       />
                     </div>
@@ -961,30 +974,30 @@ export default function SupervisionPage() {
                       <Textarea
                         id="notes"
                         value={newEntry.notes}
-                        onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
+                        onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
                         placeholder="تێبینی سەبارەت بە چاودێری..."
                         rows={3}
                       />
                     </div>
                   </div>
                 </TabsContent>
-                
+
                 <div className="flex justify-end gap-2 mt-6">
-                  <Button 
+                  <Button
                     type="button"
-                    variant="outline" 
-                    onClick={() => {setIsAddDialogOpen(false); resetNewEntry();}} 
+                    variant="outline"
+                    onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}
                     disabled={isSaving}
                   >
                     {t('supervision.buttons.cancel', language)}
                   </Button>
-                  <Button 
+                  <Button
                     type="button"
                     onClick={() => {
                       if (!isSaving && !isSavingRef.current) {
                         saveEntry(newEntry);
                       }
-                    }} 
+                    }}
                     disabled={isSaving}
                     className={isSaving ? 'pointer-events-none opacity-70' : ''}
                   >
@@ -1015,21 +1028,21 @@ export default function SupervisionPage() {
 
       {/* Supervision Table/Cards */}
       <div className="mt-6">
-        <Tabs defaultValue="teachers" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="teachers">{t('supervision.tabs.teachers', language)}</TabsTrigger>
-            <TabsTrigger value="students">{t('supervision.tabs.students', language)}</TabsTrigger>
+            <TabsTrigger value="teacher">{t('supervision.tabs.teachers', language)}</TabsTrigger>
+            <TabsTrigger value="student">{t('supervision.tabs.students', language)}</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="teachers" className="mt-6">
+
+          <TabsContent value="teacher" className="mt-6">
             {isMobile ? (
               <SupervisionCardView data={filteredData.filter(entry => entry.type === 'teacher')} type="teacher" />
             ) : (
               <TeacherSupervisionTableView data={filteredData.filter(entry => entry.type === 'teacher')} />
             )}
           </TabsContent>
-          
-          <TabsContent value="students" className="mt-6">
+
+          <TabsContent value="student" className="mt-6">
             {isMobile ? (
               <SupervisionCardView data={filteredData.filter(entry => entry.type === 'student')} type="student" />
             ) : (
