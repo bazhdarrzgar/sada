@@ -279,15 +279,23 @@ export default function CalendarPage() {
     
     setIsSaving(true)
     try {
-      console.log('Saving entry:', entry)
+      console.log('=== SAVE ENTRY CALLED ===')
+      console.log('Entry being saved:', JSON.stringify(entry, null, 2))
+      console.log('Entry ID:', entry.id)
+      console.log('Entry ID type:', typeof entry.id)
+      console.log('Entry ID length:', entry.id ? entry.id.length : 'no ID')
+      
       let response
       
       // Check if this is an update (has existing ID from database) or a new entry
       const isUpdate = entry.id && !entry.id.startsWith('local-') && entry.id.length > 10
       
+      console.log('Is this an update?', isUpdate)
+      console.log('ID check - exists:', !!entry.id, ', not local:', !entry.id?.startsWith('local-'), ', length > 10:', entry.id ? entry.id.length > 10 : false)
+      
       if (isUpdate) {
         // Update existing entry - preserve the ID
-        console.log('Updating existing entry with ID:', entry.id)
+        console.log('✅ UPDATING existing entry with ID:', entry.id)
         const entryToUpdate = {
           ...entry,
           id: entry.id // Ensure ID is preserved
@@ -302,11 +310,15 @@ export default function CalendarPage() {
         })
       } else {
         // Create new entry
-        console.log('Creating new entry')
+        console.log('❌ CREATING NEW entry (should only happen for new entries!)')
+        console.log('This might be a bug if you expected to UPDATE an existing entry')
         const entryToSave = { ...entry }
         if (entryToSave.id && entryToSave.id.startsWith('local-')) {
+          console.log('Removing local ID:', entryToSave.id)
           delete entryToSave.id // Remove temporary ID for new entries
         }
+        
+        console.log('Entry to save (POST):', JSON.stringify(entryToSave, null, 2))
         
         response = await fetch('/api/calendar', {
           method: 'POST',
@@ -439,8 +451,27 @@ export default function CalendarPage() {
       // Find the entry by ID instead of using index
       const entry = calendarData.find(item => item.id === entryId)
       if (entry) {
-        setEditingData(entry)
+        console.log('Starting edit for entry:', entry)
+        console.log('Entry ID:', entry.id)
+        console.log('Entry data:', JSON.stringify(entry, null, 2))
+        
+        // Create a deep copy of the entry to avoid reference issues
+        const entryCopy = {
+          ...entry,
+          id: entry.id, // Explicitly preserve ID
+          month: entry.month,
+          year: entry.year || new Date().getFullYear(),
+          week1: entry.week1 ? [...entry.week1] : ['', '', '', ''],
+          week2: entry.week2 ? [...entry.week2] : ['', '', '', ''],
+          week3: entry.week3 ? [...entry.week3] : ['', '', '', ''],
+          week4: entry.week4 ? [...entry.week4] : ['', '', '', '']
+        }
+        
+        console.log('Setting editing data with copy:', entryCopy)
+        setEditingData(entryCopy)
         setIsEditModalOpen(true)
+      } else {
+        console.error('Could not find entry with ID:', entryId)
       }
     }, 100)
   }
