@@ -313,17 +313,31 @@ export default function StaffPage() {
     }, 100)
   }
 
-  const startEditing = (index) => {
+  const startEditing = (idOrIndex) => {
     // Scroll to center first
     scrollToCenter()
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      // Get entry from filteredData (which is displayed) using the index
-      const entry = filteredData[index]
+      // Check if the parameter is an ID (string) or an index (number)
+      let entry
+      if (typeof idOrIndex === 'string') {
+        // It's an ID from the table, find the entry by ID
+        entry = filteredData.find(item => item.id === idOrIndex)
+      } else {
+        // It's an index from mobile view, use it directly
+        entry = filteredData[idOrIndex]
+      }
+      
       console.log('Starting edit for entry:', entry)
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      console.log('Entry ID:', entry?.id)
+      
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      } else {
+        console.error('Could not find entry to edit!')
+      }
     }, 100)
   }
 
