@@ -100,7 +100,12 @@ export default function SupervisionPage() {
       let response
       
       // Check if this is an update (has existing ID from database) or a new entry
-      const isUpdate = entry.id && !entry.id.startsWith('supervision-') && entry.id.length > 10
+      // UUID format is 36 characters with dashes (e.g., "550e8400-e29b-41d4-a716-446655440000")
+      const isUpdate = entry.id && typeof entry.id === 'string' && entry.id.length >= 32 && !entry.id.startsWith('supervision-')
+      
+      console.log('saveEntry - entry.id:', entry.id)
+      console.log('saveEntry - isUpdate:', isUpdate)
+      console.log('saveEntry - entry:', entry)
       
       if (isUpdate) {
         // Update existing entry - preserve all fields including type
@@ -258,9 +263,23 @@ export default function SupervisionPage() {
       // Always use the provided dataSource if available, otherwise use supervisionData
       const entry = dataSource ? dataSource[index] : supervisionData[index]
       
+      // Create a deep copy of the entry to avoid reference issues
+      const entryCopy = {
+        id: entry.id,
+        type: entry.type || 'teacher',
+        name: entry.name || '',
+        subject: entry.subject || '',
+        department: entry.department || '',
+        grade: entry.grade || '',
+        violationType: entry.violationType || '',
+        punishmentType: entry.punishmentType || '',
+        supervisionLocation: entry.supervisionLocation || '',
+        notes: entry.notes || ''
+      }
+      
       // Determine the editing type based on the entry's type field
-      setEditingType(entry.type || 'teacher')
-      setEditingData(entry)
+      setEditingType(entryCopy.type)
+      setEditingData(entryCopy)
       setIsEditModalOpen(true)
     }, 100) // Quick delay to allow scroll to start
   }
