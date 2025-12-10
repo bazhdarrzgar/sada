@@ -230,8 +230,16 @@ export default function StudentPermissionsPage() {
   }
 
   const handleCellEdit = (rowIndex, field, value) => {
-    const updatedData = [...permissionsData]
-    updatedData[rowIndex][field] = value
+    // Use filteredData to find the correct entry when search is active
+    const entryToEdit = filteredData[rowIndex]
+    if (!entryToEdit) return
+    
+    // Find and update the entry in the main permissionsData array
+    const updatedData = permissionsData.map(item => 
+      item.id === entryToEdit.id 
+        ? { ...item, [field]: value }
+        : item
+    )
     setPermissionsData(updatedData)
   }
 
@@ -245,20 +253,41 @@ export default function StudentPermissionsPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (indexOrIdOrEntry) => {
     // First scroll to center quickly, then open modal
     scrollToCenter()
     
     // Small delay to allow smooth scroll to start before opening modal
     setTimeout(() => {
-      const entry = permissionsData[index]
+      // Support multiple parameter types: index (number), id (string), or entry (object)
+      let entry
+      
+      if (typeof indexOrIdOrEntry === 'object' && indexOrIdOrEntry !== null) {
+        // Already an entry object
+        entry = indexOrIdOrEntry
+      } else if (typeof indexOrIdOrEntry === 'number') {
+        // It's an index
+        entry = filteredData[indexOrIdOrEntry]
+      } else if (typeof indexOrIdOrEntry === 'string') {
+        // It's an ID - find the entry by ID from filteredData
+        entry = filteredData.find(item => item.id === indexOrIdOrEntry)
+      }
+      
+      console.log('Starting edit for entry:', entry)
       setEditingData(entry)
       setIsEditModalOpen(true)
     }, 200)
   }
 
-  const saveRowEdit = (rowIndex) => {
-    const entry = permissionsData[rowIndex]
+  const saveRowEdit = (indexOrId) => {
+    // Support both index (number) and id (string) parameters
+    let entry
+    if (typeof indexOrId === 'number') {
+      entry = filteredData[indexOrId]
+    } else if (typeof indexOrId === 'string') {
+      entry = filteredData.find(item => item.id === indexOrId)
+    }
+    console.log('Saving row edit for entry:', entry)
     saveEntry(entry)
   }
 
@@ -409,7 +438,7 @@ export default function StudentPermissionsPage() {
                 </div>
               </div>
               <div className="flex gap-2 mt-3">
-                <Button size="sm" variant="outline" onClick={() => startEditing(idx)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
+                <Button size="sm" variant="outline" onClick={() => startEditing(entry)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button size="sm" variant="destructive" onClick={() => deleteEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
