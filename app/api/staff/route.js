@@ -36,27 +36,8 @@ export async function GET(request) {
       .limit(1000)
       .toArray()
     
-    // Map database column names to frontend expected field names
-    const result = records.map(record => {
-      return {
-        id: record.id,
-        full_name: record.fullName || '',
-        mobile: record.mobile || '',
-        residence: record.address || '',
-        gender: record.gender || '',
-        id_number: record.id_number || '',
-        certificate: record.certificate || '',
-        age: record.age || '',
-        school: record.education || '',
-        preparatory: record.preparatory || '',
-        date: record.date || '',
-        department: record.department || '',
-        pass: record.pass || '',
-        contract: record.contract || ''
-      }
-    })
-    
-    return NextResponse.json(result)
+    // Return records with correct field names (matching database schema)
+    return NextResponse.json(records)
   } catch (error) {
     console.error('Error fetching تۆمارەکانی ستاف:', error)
     return NextResponse.json({ error: 'Failed to fetch تۆمارەکانی ستاف' }, { status: 500 })
@@ -72,14 +53,14 @@ export async function POST(request) {
     
     const staffRecord = {
       id: uuidv4(),
-      fullName: body.full_name || body.fullName || '',
+      fullName: body.fullName || '',
       mobile: body.mobile || '',
-      address: body.residence || body.address || '',
+      address: body.address || '',
       gender: body.gender || '',
       dateOfBirth: body.dateOfBirth || '',
       certificate: body.certificate || '',
       age: body.age ? parseInt(body.age) : 0,
-      education: body.school || body.education || '',
+      education: body.education || '',
       attendance: body.attendance || 'Present',
       date: body.date || new Date().toISOString().split('T')[0],
       department: body.department || '',
@@ -95,23 +76,13 @@ export async function POST(request) {
     
     await db.collection('staff_records').insertOne(staffRecord)
     
-    // Return with frontend expected field names
-    return NextResponse.json({
-      id: staffRecord.id,
-      full_name: staffRecord.fullName,
-      mobile: staffRecord.mobile,
-      residence: staffRecord.address,
-      gender: staffRecord.gender,
-      id_number: staffRecord.id_number || '',
-      certificate: staffRecord.certificate,
-      age: staffRecord.age,
-      school: staffRecord.education,
-      preparatory: staffRecord.preparatory || '',
-      date: staffRecord.date,
-      department: staffRecord.department,
-      pass: staffRecord.pass,
-      contract: staffRecord.contract
-    })
+    // Parse certificateImages back to array for response
+    const responseRecord = {
+      ...staffRecord,
+      certificateImages: body.certificateImages || []
+    }
+    
+    return NextResponse.json(responseRecord)
   } catch (error) {
     console.error('Error creating staff record:', error)
     return NextResponse.json({ error: 'Failed to create staff record' }, { status: 500 })
@@ -136,17 +107,17 @@ export async function PUT(request) {
       gender: body.gender,
       dateOfBirth: body.dateOfBirth,
       certificate: body.certificate,
-      age: parseInt(body.age),
+      age: body.age ? parseInt(body.age) : 0,
       education: body.education,
       attendance: body.attendance || 'Present',
       department: body.department,
       bloodType: body.bloodType || '',
-      certificateImages: body.certificateImages || [],
+      certificateImages: JSON.stringify(body.certificateImages || []),
       notes: body.notes || '',
-      pass: body.pass_grade || body.pass || '',
+      pass: body.pass || '',
       contract: body.contract || 'Permanent',
       cv: body.cv || null,
-      updated_at: new Date()
+      updated_at: new Date().toISOString()
     }
     
     const result = await db.collection('staff_records').updateOne(
@@ -158,13 +129,12 @@ export async function PUT(request) {
       return NextResponse.json({ error: 'Staff record not found' }, { status: 404 })
     }
     
-    // Return updated record
+    // Return updated record with parsed fields
     const updatedRecord = await db.collection('staff_records').findOne({ id: body.id })
-    const { _id, pass, ...responseData } = updatedRecord
     
     return NextResponse.json({
-      ...responseData,
-      pass_grade: pass
+      ...updatedRecord,
+      certificateImages: body.certificateImages || []
     })
   } catch (error) {
     console.error('Error updating staff record:', error)

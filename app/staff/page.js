@@ -319,7 +319,9 @@ export default function StaffPage() {
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      const entry = staffData[index]
+      // Get entry from filteredData (which is displayed) using the index
+      const entry = filteredData[index]
+      console.log('Starting edit for entry:', entry)
       setEditingData(entry)
       setIsEditModalOpen(true)
     }, 100)
