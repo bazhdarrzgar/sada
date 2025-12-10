@@ -36,8 +36,35 @@ export async function GET(request) {
       .limit(1000)
       .toArray()
     
+    // Parse certificateImages from JSON string to array for each record
+    const parsedRecords = records.map(record => {
+      let certificateImages = []
+      
+      // Handle various formats of certificateImages
+      if (record.certificateImages) {
+        if (Array.isArray(record.certificateImages)) {
+          // Already an array
+          certificateImages = record.certificateImages
+        } else if (typeof record.certificateImages === 'string') {
+          try {
+            // Try to parse JSON string
+            const parsed = JSON.parse(record.certificateImages)
+            certificateImages = Array.isArray(parsed) ? parsed : []
+          } catch (e) {
+            // If parsing fails, it might be a malformed string
+            certificateImages = []
+          }
+        }
+      }
+      
+      return {
+        ...record,
+        certificateImages
+      }
+    })
+    
     // Return records with correct field names (matching database schema)
-    return NextResponse.json(records)
+    return NextResponse.json(parsedRecords)
   } catch (error) {
     console.error('Error fetching تۆمارەکانی ستاف:', error)
     return NextResponse.json({ error: 'Failed to fetch تۆمارەکانی ستاف' }, { status: 500 })

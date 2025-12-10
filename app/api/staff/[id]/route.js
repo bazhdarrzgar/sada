@@ -14,8 +14,27 @@ export async function GET(request, { params }) {
       return NextResponse.json({ error: 'Staff record not found' }, { status: 404 })
     }
     
-    // Return record with correct field names
-    return NextResponse.json(record)
+    // Parse certificateImages from JSON string to array
+    let certificateImages = []
+    
+    if (record.certificateImages) {
+      if (Array.isArray(record.certificateImages)) {
+        certificateImages = record.certificateImages
+      } else if (typeof record.certificateImages === 'string') {
+        try {
+          const parsed = JSON.parse(record.certificateImages)
+          certificateImages = Array.isArray(parsed) ? parsed : []
+        } catch (e) {
+          // Parsing failed, use empty array
+          certificateImages = []
+        }
+      }
+    }
+    
+    return NextResponse.json({
+      ...record,
+      certificateImages
+    })
   } catch (error) {
     console.error('Error fetching staff record:', error)
     return NextResponse.json({ error: 'Failed to fetch staff record' }, { status: 500 })
