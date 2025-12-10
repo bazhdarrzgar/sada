@@ -231,16 +231,18 @@ export default function ActivitiesPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (rowId) => {
     // Scroll to center first
     scrollToCenter()
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      // Use filteredData instead of activitiesData to get the correct entry
-      const entry = filteredData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      // Find the entry by ID instead of using index
+      const entry = activitiesData.find(item => item.id === rowId)
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      }
     }, 100)
   }
 
