@@ -226,16 +226,32 @@ export default function ExamSupervisionPage() {
     })
   }
 
-  const startEditing = (index) => {
+  const startEditing = (idOrIndex) => {
     // Scroll to center first
     scrollToCenter()
     
     // Small delay to ensure scroll starts before modal opens
     setTimeout(() => {
-      // Use filteredData instead of supervisionData to get the correct entry
-      const entry = filteredData[index]
-      setEditingData(entry)
-      setIsEditModalOpen(true)
+      // Handle both ID (from table) and index (legacy support)
+      let entry
+      if (typeof idOrIndex === 'string' && !idOrIndex.match(/^\d+$/)) {
+        // It's an ID string (UUID), find the entry by ID
+        entry = filteredData.find(item => item.id === idOrIndex)
+      } else {
+        // It's an index number, use array access
+        entry = filteredData[idOrIndex]
+      }
+      
+      console.log('startEditing - idOrIndex:', idOrIndex)
+      console.log('startEditing - found entry:', entry)
+      console.log('startEditing - entry ID:', entry?.id)
+      
+      if (entry) {
+        setEditingData(entry)
+        setIsEditModalOpen(true)
+      } else {
+        console.error('startEditing - Could not find entry for:', idOrIndex)
+      }
     }, 100)
   }
 
