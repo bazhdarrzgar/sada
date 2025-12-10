@@ -29,22 +29,28 @@ export const EditModal = ({
 
   useEffect(() => {
     if (isOpen && data) {
-      console.log('EditModal received data:', data)
-      console.log('Data has ID:', data.id)
+      console.log('=== EditModal useEffect triggered ===')
+      console.log('Received data:', data)
+      console.log('Data ID:', data?.id, 'Type:', typeof data?.id)
       
-      // Deep copy to ensure all fields including nested ones are preserved
-      const copiedData = JSON.parse(JSON.stringify(data))
+      // Create a shallow copy first to preserve all properties
+      const copiedData = { ...data }
       
-      // Critical: Ensure ID is explicitly preserved
-      if (data.id && !copiedData.id) {
-        console.error('CRITICAL: ID lost during deep copy!')
+      // CRITICAL: Double-check ID preservation
+      if (data.id) {
         copiedData.id = data.id
+        console.log('✓ ID explicitly preserved:', copiedData.id)
+      } else {
+        console.error('✗ CRITICAL WARNING: No ID in received data!')
+        console.error('✗ Data received:', data)
       }
       
-      console.log('EditModal setting editData with ID:', copiedData.id)
+      console.log('EditModal setting editData:', copiedData)
+      console.log('EditModal editData ID:', copiedData.id, 'Type:', typeof copiedData.id)
       setEditData(copiedData)
     } else if (!isOpen) {
       // Clear data when modal closes
+      console.log('EditModal closing - clearing editData')
       setEditData({})
     }
   }, [isOpen, data])
@@ -66,35 +72,46 @@ export const EditModal = ({
   }
 
   const handleSave = () => {
-    if (isSaving || isSavingRef.current) return // Prevent multiple clicks with both ref and state
+    if (isSaving || isSavingRef.current) {
+      console.log('Save already in progress, ignoring duplicate click')
+      return // Prevent multiple clicks with both ref and state
+    }
+    
     isSavingRef.current = true
     
-    console.log('EditModal handleSave - editData:', editData)
-    console.log('EditModal handleSave - original data:', data)
+    console.log('=== EditModal handleSave ===')
+    console.log('editData:', editData)
+    console.log('editData ID:', editData?.id, 'Type:', typeof editData?.id)
+    console.log('original data:', data)
+    console.log('original data ID:', data?.id, 'Type:', typeof data?.id)
     
-    // Ensure critical fields like id are preserved from original data
+    // CRITICAL: Preserve ID from original data as primary source of truth
+    // This ensures we never lose the ID even if editData loses it somehow
     const dataToSave = {
       ...editData,
-      // Explicitly preserve id and other system fields from original data if they exist
-      // CRITICAL: Always use original data ID to ensure we're updating the right record
+      // Explicitly preserve id - use original data ID as primary source
       id: data?.id || editData?.id,
+      // Preserve system fields
       ...(data?.created_at && { created_at: data.created_at }),
       ...(data?.updated_at && { updated_at: data.updated_at })
     }
     
-    console.log('EditModal dataToSave with ID:', dataToSave.id)
+    console.log('dataToSave:', dataToSave)
+    console.log('dataToSave ID:', dataToSave.id, 'Type:', typeof dataToSave.id)
     
     // Final validation
     if (!dataToSave.id) {
-      console.error('CRITICAL ERROR IN MODAL: No ID in data to save!')
+      console.error('✗✗✗ CRITICAL ERROR IN MODAL: No ID in data to save! ✗✗✗')
       console.error('editData:', editData)
       console.error('original data:', data)
-      alert('Critical error: Missing record ID. Please close and try editing again.')
+      alert('خەتای گرنگ: ناسنامەی تۆمار ون بووە / Critical error: Missing record ID. Please close and try editing again.')
       isSavingRef.current = false
       return
     }
     
+    console.log('✓ Sending data to parent onSave with ID:', dataToSave.id)
     onSave(dataToSave)
+    
     // Reset ref after a delay to allow parent to handle save
     setTimeout(() => {
       isSavingRef.current = false

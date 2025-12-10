@@ -239,27 +239,43 @@ export default function OfficerLeavesPage() {
   }
 
   const startEditing = (id) => {
-    // Scroll to center first
-    scrollToCenter()
+    console.log('=== startEditing called ===')
+    console.log('Searching for ID:', id, 'Type:', typeof id)
+    console.log('Total entries in leavesData:', leavesData.length)
     
-    // Small delay to ensure scroll starts before modal opens
-    setTimeout(() => {
-      // Find entry by ID from the complete leavesData array
-      const entry = leavesData.find(item => item.id === id)
-      if (entry) {
-        console.log('Starting edit for entry:', entry)
-        // Create a deep copy to ensure all data is preserved
-        const entryToEdit = JSON.parse(JSON.stringify(entry))
-        console.log('Entry to edit with ID:', entryToEdit.id)
-        setEditingData(entryToEdit)
-        // Additional delay to ensure state is updated before modal opens
-        setTimeout(() => {
-          setIsEditModalOpen(true)
-        }, 50)
-      } else {
-        console.error('Entry not found with ID:', id)
+    // Find entry by ID from the complete leavesData array
+    const entry = leavesData.find(item => item.id === id)
+    
+    if (entry) {
+      console.log('✓ Found entry:', entry)
+      console.log('✓ Entry ID:', entry.id, 'Type:', typeof entry.id)
+      
+      // Create a deep copy to ensure all data is preserved
+      const entryToEdit = {
+        ...entry,
+        // Explicitly preserve the ID to ensure it's not lost
+        id: entry.id
       }
-    }, 100)
+      
+      console.log('✓ Entry to edit:', entryToEdit)
+      console.log('✓ Entry to edit ID:', entryToEdit.id, 'Type:', typeof entryToEdit.id)
+      
+      // Scroll to center first for better UX
+      scrollToCenter()
+      
+      // Set editing data
+      setEditingData(entryToEdit)
+      
+      // Small delay to ensure state update and scroll complete before opening modal
+      setTimeout(() => {
+        console.log('✓ Opening edit modal')
+        setIsEditModalOpen(true)
+      }, 150)
+    } else {
+      console.error('✗ Entry NOT found with ID:', id)
+      console.error('✗ Available IDs:', leavesData.map(item => ({ id: item.id, name: item.teacherName })))
+      alert('خەتا: تۆمارەکە نەدۆزرایەوە / Error: Could not find the record to edit. Please refresh the page and try again.')
+    }
   }
 
   const saveRowEdit = async (id) => {
@@ -276,14 +292,37 @@ export default function OfficerLeavesPage() {
   }
 
   const handleModalSave = async (editedData) => {
-    // Ensure the ID from the original editingData is preserved
+    console.log('=== handleModalSave called ===')
+    console.log('Edited data received:', editedData)
+    console.log('Edited data ID:', editedData?.id, 'Type:', typeof editedData?.id)
+    console.log('Original editingData:', editingData)
+    console.log('Original editingData ID:', editingData?.id, 'Type:', typeof editingData?.id)
+    
+    // CRITICAL: Ensure the ID is preserved - use original editingData.id as the source of truth
     const dataToSave = {
       ...editedData,
-      id: editingData?.id || editedData.id
+      id: editingData?.id || editedData?.id
     }
+    
+    console.log('Data to save:', dataToSave)
+    console.log('Data to save ID:', dataToSave.id, 'Type:', typeof dataToSave.id)
+    
+    // Final validation
+    if (!dataToSave.id) {
+      console.error('✗ CRITICAL ERROR: No ID in dataToSave!')
+      console.error('✗ editedData:', editedData)
+      console.error('✗ editingData:', editingData)
+      alert('خەتای گرنگ: ناسنامەی تۆمار ون بووە / Critical Error: Missing record ID. Cannot save changes. Please close this dialog and try editing again.')
+      return
+    }
+    
+    console.log('✓ Calling saveEntry with ID:', dataToSave.id)
     await saveEntry(dataToSave)
+    
+    // Close modal and clear editing data
     setIsEditModalOpen(false)
     setEditingData(null)
+    console.log('=== handleModalSave completed ===')
   }
 
   // Define fields for modal editing
