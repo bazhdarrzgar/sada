@@ -122,13 +122,14 @@ export default function EmployeeLeavesPage() {
       return
     }
     
-    console.log('saveEntry called with:', entry)
-    console.log('Entry has ID:', entry.id)
+    console.log('=== saveEntry called ===')
+    console.log('Entry data:', entry)
+    console.log('Entry ID:', entry.id, 'Type:', typeof entry.id)
     
     setIsSaving(true)
     try {
       if (!entry.id) {
-        console.log('Creating new entry (no ID found)')
+        console.log('➕ Creating new entry (no ID found)')
         // Create new entry
         const response = await fetch('/api/employee-leaves', {
           method: 'POST',
@@ -137,34 +138,44 @@ export default function EmployeeLeavesPage() {
         })
         if (response.ok) {
           const newLeave = await response.json()
-          console.log('Created new leave:', newLeave)
+          console.log('✅ Created new leave:', newLeave)
           setLeavesData(prev => [newLeave, ...prev])
         } else {
-          console.error('Failed to create entry, status:', response.status)
+          console.error('❌ Failed to create entry, status:', response.status)
+          const errorText = await response.text()
+          console.error('Error details:', errorText)
         }
       } else {
-        console.log('Updating existing entry with ID:', entry.id)
+        console.log('✏️ Updating existing entry with ID:', entry.id)
         // Update existing entry
-        const response = await fetch(`/api/employee-leaves/${entry.id}`, {
+        const url = `/api/employee-leaves/${entry.id}`
+        console.log('PUT request to:', url)
+        const response = await fetch(url, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(entry)
         })
+        console.log('Response status:', response.status, response.statusText)
         if (response.ok) {
           const updatedLeave = await response.json()
-          console.log('Updated leave:', updatedLeave)
+          console.log('✅ Updated leave:', updatedLeave)
           // For updates, keep in same position for instant visual feedback
           setLeavesData(prev => {
             const existingIndex = prev.findIndex(item => item.id === entry.id)
+            console.log('Found existing entry at index:', existingIndex)
             if (existingIndex !== -1) {
               const newData = [...prev]
               newData[existingIndex] = updatedLeave
+              console.log('Updated entry in array at index:', existingIndex)
               return newData
             }
+            console.warn('Entry not found in current data array!')
             return prev
           })
         } else {
-          console.error('Failed to update entry, status:', response.status)
+          console.error('❌ Failed to update entry, status:', response.status)
+          const errorText = await response.text()
+          console.error('Error details:', errorText)
         }
       }
 
@@ -174,9 +185,11 @@ export default function EmployeeLeavesPage() {
       setEditingData(null)
       resetNewEntry()
     } catch (error) {
-      console.error('Failed to save entry:', error)
+      console.error('❌ Failed to save entry:', error)
+      console.error('Error stack:', error.stack)
     } finally {
       setIsSaving(false)
+      console.log('=== saveEntry completed ===')
     }
   }
 
@@ -215,20 +228,21 @@ export default function EmployeeLeavesPage() {
   }
 
   const startEditing = (id) => {
+    console.log('startEditing called with ID:', id)
     // Find entry by ID from the complete leavesData array
     const entry = leavesData.find(item => item.id === id)
     if (entry) {
       console.log('Starting edit for entry:', entry)
+      console.log('Entry ID type:', typeof entry.id, 'Value:', entry.id)
       // Create a deep copy to ensure all data is preserved
       const entryToEdit = JSON.parse(JSON.stringify(entry))
       console.log('Entry to edit with ID:', entryToEdit.id)
+      console.log('Copy ID type:', typeof entryToEdit.id, 'Value:', entryToEdit.id)
       setEditingData(entryToEdit)
-      // Use setTimeout to ensure state is updated before modal opens
-      setTimeout(() => {
-        setIsEditModalOpen(true)
-      }, 50)
+      setIsEditModalOpen(true)
     } else {
       console.error('Entry not found with ID:', id)
+      console.error('Available IDs in leavesData:', leavesData.map(item => item.id))
     }
   }
 
@@ -246,11 +260,24 @@ export default function EmployeeLeavesPage() {
   }
 
   const handleModalSave = async (editedData) => {
+    console.log('handleModalSave called with editedData:', editedData)
+    console.log('handleModalSave - editingData:', editingData)
+    
     // Ensure the ID from the original editingData is preserved
+    // CRITICAL: Use editingData.id first as it's the original source of truth
     const dataToSave = {
       ...editedData,
       id: editingData?.id || editedData.id
     }
+    
+    console.log('handleModalSave - dataToSave with ID:', dataToSave.id)
+    
+    if (!dataToSave.id) {
+      console.error('CRITICAL: No ID in dataToSave!')
+      alert('Error: Cannot save without record ID. Please try again.')
+      return
+    }
+    
     await saveEntry(dataToSave)
     setIsEditModalOpen(false)
     setEditingData(null)
