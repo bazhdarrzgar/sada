@@ -23,7 +23,7 @@ import ImageCarousel from '@/components/ui/image-carousel'
 export default function BuildingExpensesPage() {
   const isMobile = useIsMobile()
   const { language, toggleLanguage } = useLanguage()
-  
+
   // Password protection states
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authUsername, setAuthUsername] = useState('')
@@ -37,7 +37,7 @@ export default function BuildingExpensesPage() {
       setIsAuthenticated(true)
     }
   }, [])
-  
+
   const [expensesData, setExpensesData] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -115,27 +115,29 @@ export default function BuildingExpensesPage() {
         // Include ID for technical searches
         { name: 'id', weight: 0.05 },
         // Custom comprehensive search field
-        { name: 'searchableContent', weight: 0.3, getFn: (obj) => {
-          return [
-            obj.item || '',
-            obj.year || '',
-            // Add numeric values as strings for better searching
-            obj.cost ? obj.cost.toString() : '',
-            obj.month ? obj.month.toString() : '',
-            obj.notes || '',
-            // Add formatted cost for localized searching
-            obj.cost ? parseFloat(obj.cost).toLocaleString() : '',
-            // Add date combinations for better date searching
-            obj.year && obj.month ? `${obj.year}/${obj.month}` : '',
-            obj.year && obj.month ? `${obj.month}/${obj.year}` : '',
-            // Add month names in both English and Kurdish
-            obj.month ? getMonthName(obj.month) : '',
-            // Add cost range indicators
-            obj.cost ? getCostRange(parseFloat(obj.cost)) : '',
-            // Add seasonal indicators based on month
-            obj.month ? getSeason(obj.month) : ''
-          ].join(' ').toLowerCase()
-        }}
+        {
+          name: 'searchableContent', weight: 0.3, getFn: (obj) => {
+            return [
+              obj.item || '',
+              obj.year || '',
+              // Add numeric values as strings for better searching
+              obj.cost ? obj.cost.toString() : '',
+              obj.month ? obj.month.toString() : '',
+              obj.notes || '',
+              // Add formatted cost for localized searching
+              obj.cost ? parseFloat(obj.cost).toLocaleString() : '',
+              // Add date combinations for better date searching
+              obj.year && obj.month ? `${obj.year}/${obj.month}` : '',
+              obj.year && obj.month ? `${obj.month}/${obj.year}` : '',
+              // Add month names in both English and Kurdish
+              obj.month ? getMonthName(obj.month) : '',
+              // Add cost range indicators
+              obj.cost ? getCostRange(parseFloat(obj.cost)) : '',
+              // Add seasonal indicators based on month
+              obj.month ? getSeason(obj.month) : ''
+            ].join(' ').toLowerCase()
+          }
+        }
       ],
       threshold: 0.3, // Lower threshold = more exact matches
       distance: 100,
@@ -171,11 +173,11 @@ export default function BuildingExpensesPage() {
     if (isSaving) {
       return
     }
-    
+
     setIsSaving(true)
     try {
       let response
-      
+
       if (entry.id && !entry.id.startsWith('building-')) {
         // Update existing entry
         response = await fetch(`/api/building-expenses/${entry.id}`, {
@@ -191,7 +193,7 @@ export default function BuildingExpensesPage() {
         if (entryToSave.id && entryToSave.id.startsWith('building-')) {
           delete entryToSave.id // Remove temporary ID for new entries
         }
-        
+
         response = await fetch('/api/building-expenses', {
           method: 'POST',
           headers: {
@@ -203,7 +205,7 @@ export default function BuildingExpensesPage() {
 
       if (response.ok) {
         const savedEntry = await response.json()
-        
+
         // Update local state with the saved data - instant update without reload
         setExpensesData(prevData => {
           const existingIndex = prevData.findIndex(item => item.id === savedEntry.id)
@@ -220,7 +222,7 @@ export default function BuildingExpensesPage() {
 
         setIsAddDialogOpen(false)
         resetNewEntry()
-        
+
         // Add a small delay before resetting isSaving to prevent rapid double-clicks
         setTimeout(() => {
           setIsSaving(false)
@@ -230,7 +232,7 @@ export default function BuildingExpensesPage() {
         alert('Failed to save entry. Please try again.')
         setIsSaving(false)
       }
-      
+
     } catch (error) {
       console.error('Error saving entry:', error)
       alert('Error saving entry. Please check your connection and try again.')
@@ -244,7 +246,7 @@ export default function BuildingExpensesPage() {
       console.log('Delete already in progress, ignoring duplicate click')
       return
     }
-    
+
     setIsDeleting(true)
     try {
       if (id.startsWith('building-')) {
@@ -286,7 +288,7 @@ export default function BuildingExpensesPage() {
   }
 
   const handleCellEdit = (entryId, field, value) => {
-    const updatedData = expensesData.map(item => 
+    const updatedData = expensesData.map(item =>
       item.id === entryId ? { ...item, [field]: value } : item
     )
     setExpensesData(updatedData)
@@ -302,7 +304,7 @@ export default function BuildingExpensesPage() {
       console.log('Save already in progress, ignoring duplicate click')
       return
     }
-    
+
     const entry = expensesData.find(item => item.id === entryId)
     if (entry) {
       saveEntry(entry)
@@ -318,7 +320,7 @@ export default function BuildingExpensesPage() {
   const scrollToCenter = () => {
     const viewport = window.innerHeight
     const centerPosition = document.documentElement.scrollHeight / 2 - viewport / 2
-    
+
     window.scrollTo({
       top: Math.max(0, centerPosition),
       behavior: 'smooth'
@@ -328,14 +330,14 @@ export default function BuildingExpensesPage() {
   const startEditing = (entryId) => {
     // First scroll to center quickly, then open modal
     scrollToCenter()
-    
+
     // Find the entry FIRST before any delay
     const entry = expensesData.find(item => item.id === entryId)
-    
+
     if (entry) {
       // Set the editing data immediately - create a deep copy to avoid reference issues
-      setEditingData({...entry, images: entry.images ? [...entry.images] : []})
-      
+      setEditingData({ ...entry, images: entry.images ? [...entry.images] : [] })
+
       // Small delay to allow smooth scroll to start before opening modal
       setTimeout(() => {
         setIsEditModalOpen(true)
@@ -349,7 +351,7 @@ export default function BuildingExpensesPage() {
       console.log('Save already in progress from modal, ignoring duplicate click')
       return
     }
-    
+
     await saveEntry(editedData)
     setIsEditModalOpen(false)
     setEditingData(null)
@@ -359,12 +361,12 @@ export default function BuildingExpensesPage() {
   // Enhanced translation function with visual feedback
   const handleTranslateInterface = () => {
     setIsTranslating(true)
-    
+
     // Add visual feedback
     setTimeout(() => {
       toggleLanguage()
       setIsTranslating(false)
-      
+
       // Show brief success feedback
       const notification = document.createElement('div')
       notification.className = 'fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0'
@@ -379,7 +381,7 @@ export default function BuildingExpensesPage() {
         </div>
       `
       document.body.appendChild(notification)
-      
+
       setTimeout(() => {
         notification.style.transform = 'translateX(100%)'
         setTimeout(() => document.body.removeChild(notification), 300)
@@ -472,21 +474,23 @@ export default function BuildingExpensesPage() {
         { name: 'month', weight: 0.15 },
         { name: 'notes', weight: 0.1 },
         { name: 'id', weight: 0.05 },
-        { name: 'searchableContent', weight: 0.3, getFn: (obj) => {
-          return [
-            obj.item || '',
-            obj.year || '',
-            obj.cost ? obj.cost.toString() : '',
-            obj.month ? obj.month.toString() : '',
-            obj.notes || '',
-            obj.cost ? parseFloat(obj.cost).toLocaleString() : '',
-            obj.year && obj.month ? `${obj.year}/${obj.month}` : '',
-            obj.year && obj.month ? `${obj.month}/${obj.year}` : '',
-            obj.month ? getMonthName(obj.month) : '',
-            obj.cost ? getCostRange(parseFloat(obj.cost)) : '',
-            obj.month ? getSeason(obj.month) : ''
-          ].join(' ').toLowerCase()
-        }}
+        {
+          name: 'searchableContent', weight: 0.3, getFn: (obj) => {
+            return [
+              obj.item || '',
+              obj.year || '',
+              obj.cost ? obj.cost.toString() : '',
+              obj.month ? obj.month.toString() : '',
+              obj.notes || '',
+              obj.cost ? parseFloat(obj.cost).toLocaleString() : '',
+              obj.year && obj.month ? `${obj.year}/${obj.month}` : '',
+              obj.year && obj.month ? `${obj.month}/${obj.year}` : '',
+              obj.month ? getMonthName(obj.month) : '',
+              obj.cost ? getCostRange(parseFloat(obj.cost)) : '',
+              obj.month ? getSeason(obj.month) : ''
+            ].join(' ').toLowerCase()
+          }
+        }
       ],
       threshold: 0.3,
       distance: 100,
@@ -525,21 +529,23 @@ export default function BuildingExpensesPage() {
           { name: 'month', weight: 0.15 },
           { name: 'notes', weight: 0.1 },
           { name: 'id', weight: 0.05 },
-          { name: 'searchableContent', weight: 0.3, getFn: (obj) => {
-            return [
-              obj.item || '',
-              obj.year || '',
-              obj.cost ? obj.cost.toString() : '',
-              obj.month ? obj.month.toString() : '',
-              obj.notes || '',
-              obj.cost ? parseFloat(obj.cost).toLocaleString() : '',
-              obj.year && obj.month ? `${obj.year}/${obj.month}` : '',
-              obj.year && obj.month ? `${obj.month}/${obj.year}` : '',
-              obj.month ? getMonthName(obj.month) : '',
-              obj.cost ? getCostRange(parseFloat(obj.cost)) : '',
-              obj.month ? getSeason(obj.month) : ''
-            ].join(' ').toLowerCase()
-          }}
+          {
+            name: 'searchableContent', weight: 0.3, getFn: (obj) => {
+              return [
+                obj.item || '',
+                obj.year || '',
+                obj.cost ? obj.cost.toString() : '',
+                obj.month ? obj.month.toString() : '',
+                obj.notes || '',
+                obj.cost ? parseFloat(obj.cost).toLocaleString() : '',
+                obj.year && obj.month ? `${obj.year}/${obj.month}` : '',
+                obj.year && obj.month ? `${obj.month}/${obj.year}` : '',
+                obj.month ? getMonthName(obj.month) : '',
+                obj.cost ? getCostRange(parseFloat(obj.cost)) : '',
+                obj.month ? getSeason(obj.month) : ''
+              ].join(' ').toLowerCase()
+            }
+          }
         ],
         threshold: 0.3,
         distance: 100,
@@ -587,13 +593,13 @@ export default function BuildingExpensesPage() {
               </div>
               <div className="flex gap-4 text-sm">
                 <div>
-                  <span className="font-semibold">{t('buildingExpenses.fields.year', language)}:</span> 
+                  <span className="font-semibold">{t('buildingExpenses.fields.year', language)}:</span>
                   <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded text-xs font-medium">
                     {entry.year || 'N/A'}
                   </span>
                 </div>
                 <div>
-                  <span className="font-semibold">{t('buildingExpenses.fields.month', language)}:</span> 
+                  <span className="font-semibold">{t('buildingExpenses.fields.month', language)}:</span>
                   <span className="ml-2 px-2 py-1 bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400 rounded text-xs font-medium">
                     {entry.month || 'N/A'}
                   </span>
@@ -601,7 +607,7 @@ export default function BuildingExpensesPage() {
               </div>
               {entry.notes && (
                 <div className="text-sm">
-                  <span className="font-semibold">{t('buildingExpenses.fields.notes', language)}:</span> 
+                  <span className="font-semibold">{t('buildingExpenses.fields.notes', language)}:</span>
                   <span className="ml-2 text-gray-600 dark:text-gray-400">
                     {entry.notes}
                   </span>
@@ -616,19 +622,19 @@ export default function BuildingExpensesPage() {
                 </div>
               )}
               <div className="flex gap-2 mt-3">
-                <Button 
-                  size="sm" 
-                  variant="outline" 
-                  onClick={() => startEditing(entry.id)} 
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => startEditing(entry.id)}
                   disabled={isSaving || isDeleting}
                   className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
-                <Button 
-                  size="sm" 
-                  variant="destructive" 
-                  onClick={() => deleteEntry(entry.id)} 
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  onClick={() => deleteEntry(entry.id)}
                   disabled={isSaving || isDeleting}
                   className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200"
                 >
@@ -703,7 +709,7 @@ export default function BuildingExpensesPage() {
             return <span className="text-gray-400 text-xs">-</span>
           }
           return (
-            <ImageCarousel 
+            <ImageCarousel
               images={value}
               scrollToCenter={true}
             />
@@ -728,7 +734,7 @@ export default function BuildingExpensesPage() {
           enablePagination={true}
           className="shadow-lg hover:shadow-xl transition-shadow duration-300"
         />
-        
+
         {/* Summary footer */}
         <Card className="mt-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600">
           <CardContent className="p-6">
@@ -768,7 +774,7 @@ export default function BuildingExpensesPage() {
   const handleLogin = (e) => {
     e.preventDefault()
     setAuthError('')
-    
+
     if (authUsername === 'berdoz' && authPassword === 'berdoz@private') {
       setIsAuthenticated(true)
       // Save authentication to localStorage
@@ -796,7 +802,7 @@ export default function BuildingExpensesPage() {
                 <h2 className="text-2xl font-bold mb-2">مەسروفی بینا</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">تکایە ناوی بەکارهێنەر و وشەی تێپەڕ بنووسە</p>
               </div>
-              
+
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <Label htmlFor="username">ناوی بەکارهێنەر / Username</Label>
@@ -810,7 +816,7 @@ export default function BuildingExpensesPage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="password">وشەی تێپەڕ / Password</Label>
                   <Input
@@ -823,13 +829,13 @@ export default function BuildingExpensesPage() {
                     required
                   />
                 </div>
-                
+
                 {authError && (
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
                     {authError}
                   </div>
                 )}
-                
+
                 <Button type="submit" className="w-full">
                   چوونەژوورەوە / Sign In
                 </Button>
@@ -858,7 +864,7 @@ export default function BuildingExpensesPage() {
             <div className="flex items-center gap-4 flex-wrap">
               <div className="flex items-center gap-2">
                 <Label className="font-semibold text-red-700 dark:text-red-300">
-                  {t('buildingExpenses.summary.totalBuildingExpenses', language)} Filter / 
+                  {t('buildingExpenses.summary.totalBuildingExpenses', language)} Filter /
                   {t('buildingExpenses.summary.totalBuildingExpenses', 'kurdish')} فلتەر:
                 </Label>
               </div>
@@ -876,7 +882,7 @@ export default function BuildingExpensesPage() {
                   </SelectContent>
                 </Select>
               </div>
-              
+
               <div className="flex items-center gap-2">
                 <Label className="text-sm font-medium whitespace-nowrap">{t('buildingExpenses.fields.month', language)}:</Label>
                 <Select value={summaryMonth} onValueChange={setSummaryMonth}>
@@ -902,7 +908,7 @@ export default function BuildingExpensesPage() {
                 {summaryExpenses.toLocaleString()} د.ع
               </p>
               <p className="text-xs text-red-500">
-                {(summaryYear && summaryYear !== "all-years") || (summaryMonth && summaryMonth !== "all-months") 
+                {(summaryYear && summaryYear !== "all-years") || (summaryMonth && summaryMonth !== "all-months")
                   ? `Filtered: ${summaryYear !== "all-years" ? summaryYear : 'All Years'} - ${summaryMonth !== "all-months" ? getMonthName(summaryMonth)?.split(' ')[1] || summaryMonth : 'All Months'}`
                   : 'All Time Total'
                 }
@@ -925,7 +931,7 @@ export default function BuildingExpensesPage() {
               className="pl-10"
             />
           </div>
-          
+
           {/* Year and Month Filters - Controls both table AND total */}
           <div className="flex items-center gap-3 border border-blue-200 dark:border-blue-700 rounded-lg p-2 bg-blue-50/50 dark:bg-blue-900/20">
             <div className="text-xs text-blue-600 dark:text-blue-400 font-medium whitespace-nowrap">
@@ -945,7 +951,7 @@ export default function BuildingExpensesPage() {
                 </SelectContent>
               </Select>
             </div>
-            
+
             <div className="flex items-center gap-2">
               <Label className="text-sm font-medium whitespace-nowrap">{t('buildingExpenses.fields.month', language)}:</Label>
               <Select value={selectedMonth} onValueChange={setSelectedMonth}>
@@ -963,14 +969,14 @@ export default function BuildingExpensesPage() {
               </Select>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-4">
-            <DownloadButton 
+            <DownloadButton
               data={filteredData}
               filename="building-expenses-records"
               className="bg-green-600 hover:bg-green-700 text-white"
             />
-            <PrintButton 
+            <PrintButton
               data={filteredData}
               filename="building-expenses-records"
               title={t('buildingExpenses.title', language)}
@@ -986,11 +992,13 @@ export default function BuildingExpensesPage() {
                 { key: 'images', header: 'وەسڵ', render: (value) => value && value.length > 0 ? `${value.length} وێنە` : '-' }
               ]}
               showTotal={true}
+              totalColumn="cost"
+              totalLabel="کۆی گشتی"
               className="bg-blue-600 hover:bg-blue-700 text-white"
             />
             <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
               <DialogTrigger asChild>
-                <Button 
+                <Button
                   className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                   onClick={() => {
                     // First scroll to center quickly, then open modal
@@ -1004,106 +1012,106 @@ export default function BuildingExpensesPage() {
                   {t('buildingExpenses.addButton', language)}
                 </Button>
               </DialogTrigger>
-            <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] max-w-5xl max-h-[95vh] overflow-y-auto z-[100] w-[95vw] sm:w-[85vw]">
-              <DialogHeader>
-                <DialogTitle className="text-xl font-bold">
-                  {t('buildingExpenses.addTitle', language)}
-                </DialogTitle>
-              </DialogHeader>
-              <div className="space-y-6 mt-4 pb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="item" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.item', language)}</Label>
-                    <Input
-                      id="item"
-                      value={newEntry.item}
-                      onChange={(e) => setNewEntry({...newEntry, item: e.target.value})}
-                      placeholder="Enter building expense item"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="cost" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.cost', language)}</Label>
-                    <Input
-                      id="cost"
-                      type="number"
-                      value={newEntry.cost}
-                      onChange={(e) => setNewEntry({...newEntry, cost: parseFloat(e.target.value) || 0})}
-                      placeholder="0"
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="year" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.year', language)}</Label>
-                    <Input
-                      id="year"
-                      type="number"
-                      value={newEntry.year}
-                      onChange={(e) => setNewEntry({...newEntry, year: e.target.value})}
-                      placeholder={new Date().getFullYear().toString()}
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="month" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.month', language)}</Label>
-                    <Input
-                      id="month"
-                      type="number"
-                      min="1"
-                      max="12"
-                      value={newEntry.month}
-                      onChange={(e) => setNewEntry({...newEntry, month: parseInt(e.target.value) || 1})}
-                      placeholder="1-12"
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <Label htmlFor="notes" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.notes', language)}</Label>
-                    <Input
-                      id="notes"
-                      value={newEntry.notes}
-                      onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
-                      placeholder="تێبینی..."
-                    />
-                  </div>
-
-                  <div className="md:col-span-2">
-                    <Label htmlFor="images" className="text-sm font-medium mb-2 block">وەسڵ (Images)</Label>
-                    <div className="min-h-[200px]">
-                      <ImageUpload
-                        images={newEntry.images}
-                        onImagesChange={(images) => setNewEntry({...newEntry, images})}
-                        maxImages={6}
+              <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] max-w-5xl max-h-[95vh] overflow-y-auto z-[100] w-[95vw] sm:w-[85vw]">
+                <DialogHeader>
+                  <DialogTitle className="text-xl font-bold">
+                    {t('buildingExpenses.addTitle', language)}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-6 mt-4 pb-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="item" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.item', language)}</Label>
+                      <Input
+                        id="item"
+                        value={newEntry.item}
+                        onChange={(e) => setNewEntry({ ...newEntry, item: e.target.value })}
+                        placeholder="Enter building expense item"
                       />
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                      {language === 'english' ? 'Upload up to 6 images (max 5MB each)' : 'تا ٦ وێنە باربکە (هەر یەکێک زۆرترین ٥ مێگابایت)'}
-                    </p>
+
+                    <div>
+                      <Label htmlFor="cost" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.cost', language)}</Label>
+                      <Input
+                        id="cost"
+                        type="number"
+                        value={newEntry.cost}
+                        onChange={(e) => setNewEntry({ ...newEntry, cost: parseFloat(e.target.value) || 0 })}
+                        placeholder="0"
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="year" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.year', language)}</Label>
+                      <Input
+                        id="year"
+                        type="number"
+                        value={newEntry.year}
+                        onChange={(e) => setNewEntry({ ...newEntry, year: e.target.value })}
+                        placeholder={new Date().getFullYear().toString()}
+                      />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="month" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.month', language)}</Label>
+                      <Input
+                        id="month"
+                        type="number"
+                        min="1"
+                        max="12"
+                        value={newEntry.month}
+                        onChange={(e) => setNewEntry({ ...newEntry, month: parseInt(e.target.value) || 1 })}
+                        placeholder="1-12"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <Label htmlFor="notes" className="text-sm font-medium mb-2 block">{t('buildingExpenses.fields.notes', language)}</Label>
+                      <Input
+                        id="notes"
+                        value={newEntry.notes}
+                        onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
+                        placeholder="تێبینی..."
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <Label htmlFor="images" className="text-sm font-medium mb-2 block">وەسڵ (Images)</Label>
+                      <div className="min-h-[200px]">
+                        <ImageUpload
+                          images={newEntry.images}
+                          onImagesChange={(images) => setNewEntry({ ...newEntry, images })}
+                          maxImages={6}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                        {language === 'english' ? 'Upload up to 6 images (max 5MB each)' : 'تا ٦ وێنە باربکە (هەر یەکێک زۆرترین ٥ مێگابایت)'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-4 border-t sticky bottom-0 bg-white dark:bg-gray-900 z-10">
+                    <Button
+                      variant="outline"
+                      onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}
+                      className={`px-6 ${isSaving ? 'pointer-events-none opacity-50' : ''}`}
+                      disabled={isSaving}
+                    >
+                      {t('buildingExpenses.buttons.cancel', language)}
+                    </Button>
+                    <Button
+                      onClick={() => saveEntry(newEntry)}
+                      disabled={isSaving}
+                      className={`px-6 bg-blue-600 hover:bg-blue-700 ${isSaving ? 'pointer-events-none opacity-50' : ''}`}
+                    >
+                      {isSaving ? 'پاشەکەوتکردن... / Saving...' : t('buildingExpenses.buttons.save', language)}
+                    </Button>
                   </div>
                 </div>
-                
-                <div className="flex justify-end gap-3 pt-4 border-t sticky bottom-0 bg-white dark:bg-gray-900 z-10">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {setIsAddDialogOpen(false); resetNewEntry();}} 
-                    className={`px-6 ${isSaving ? 'pointer-events-none opacity-50' : ''}`}
-                    disabled={isSaving}
-                  >
-                    {t('buildingExpenses.buttons.cancel', language)}
-                  </Button>
-                  <Button 
-                    onClick={() => saveEntry(newEntry)} 
-                    disabled={isSaving} 
-                    className={`px-6 bg-blue-600 hover:bg-blue-700 ${isSaving ? 'pointer-events-none opacity-50' : ''}`}
-                  >
-                    {isSaving ? 'پاشەکەوتکردن... / Saving...' : t('buildingExpenses.buttons.save', language)}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
-      </div>
       </div>
 
       {/* Building Expenses Table/Cards */}
@@ -1141,10 +1149,10 @@ export default function BuildingExpensesPage() {
         titleKu={t('buildingExpenses.buttons.edit', 'kurdish')}
         isSaving={isSaving}
       />
-      
+
       {/* Bottom spacing for smooth filter dropdown opening */}
       <div className="h-64"></div>
-      
+
       {/* CSS to prevent dropdown scroll issues */}
       <style jsx>{`
         /* Ensure dropdowns don't cause page jumping */

@@ -7,8 +7,8 @@ import { Printer } from 'lucide-react'
 import { useLanguage } from '@/components/ui/language-toggle'
 import { t } from '@/lib/translations'
 
-export function PrintButton({ 
-  data, 
+export function PrintButton({
+  data,
   filename = 'table-data',
   title = 'Table Data',
   titleKu = '',
@@ -19,13 +19,14 @@ export function PrintButton({
   language: propLanguage, // Accept language as prop
   showTotal = false, // New prop to enable total row
   totalColumn = 'total', // Column key to calculate total for (default: 'total')
+  totalLabel = '', // Custom label for the total row
   selectedMonth = null, // Month to display in print header
   selectedYear = null // Year to display in print header
 }) {
   const [isLoading, setIsLoading] = useState(false)
   const [showOrientationDialog, setShowOrientationDialog] = useState(false)
   const { language: globalLanguage } = useLanguage()
-  
+
   // Use prop language if provided, fallback to global language
   const currentLanguage = propLanguage || globalLanguage
 
@@ -75,11 +76,11 @@ export function PrintButton({
 
     setIsLoading(true)
     setShowOrientationDialog(false)
-    
+
     try {
       // Prepare table data
       let tableColumns, tableRows, totalRow = null
-      
+
       if (columns.length > 0) {
         // Use provided columns configuration
         tableColumns = columns.map(col => col.header || col.key)
@@ -92,30 +93,30 @@ export function PrintButton({
           }
           return value || ''
         }))
-        
+
         // Calculate totals if showTotal is enabled
         if (showTotal && data.length > 0) {
           // Find the specified column to calculate total for
           const targetColumnIndex = columns.findIndex(col => col.key === totalColumn)
-          
+
           if (targetColumnIndex !== -1) {
             // Calculate sum for the specified column
             const totalSum = data.reduce((acc, row) => {
               const value = parseFloat(row[totalColumn]) || 0
               return acc + value
             }, 0)
-            
+
             // Apply the same render function if available
             const targetColumn = columns[targetColumnIndex]
             let displaySum = totalSum.toLocaleString()
-            
+
             if (targetColumn.render && typeof targetColumn.render === 'function') {
               displaySum = targetColumn.render(totalSum)
             }
-            
+
             totalRow = {
               columnIndex: targetColumnIndex,
-              columnHeader: targetColumn.header,
+              columnHeader: totalLabel || targetColumn.header,
               sum: displaySum
             }
           }
@@ -362,16 +363,16 @@ export function PrintButton({
                 </tr>
               </thead>
               <tbody>
-                ${tableRows.map((row, rowIndex) => 
-                  `<tr>
+                ${tableRows.map((row, rowIndex) =>
+        `<tr>
                     <td class="row-number-cell">${rowIndex + 1}</td>
                     ${row.map((cell, index) => {
-                      // Check if this is a number column by looking at the cell content
-                      const isNumber = !isNaN(parseFloat(cell.toString().replace(/,/g, ''))) && cell.toString().match(/[\d,]+/);
-                      return `<td class="${isNumber ? 'number' : ''}">${cell}</td>`
-                    }).join('')}
+          // Check if this is a number column by looking at the cell content
+          const isNumber = !isNaN(parseFloat(cell.toString().replace(/,/g, ''))) && cell.toString().match(/[\d,]+/);
+          return `<td class="${isNumber ? 'number' : ''}">${cell}</td>`
+        }).join('')}
                   </tr>`
-                ).join('')}
+      ).join('')}
               </tbody>
             </table>
           </div>
@@ -391,7 +392,7 @@ export function PrintButton({
       if (printWindow) {
         printWindow.document.write(printContent)
         printWindow.document.close()
-        
+
         // Wait for content to load then trigger print
         printWindow.addEventListener('load', () => {
           setTimeout(() => {
@@ -405,7 +406,7 @@ export function PrintButton({
       } else {
         alert(t('common.popupBlockerWarning', currentLanguage))
       }
-      
+
     } catch (error) {
       console.error('Print generation error:', error)
       alert(t('common.printError', currentLanguage))
@@ -424,8 +425,8 @@ export function PrintButton({
 
   return (
     <>
-      <Button 
-        variant={variant} 
+      <Button
+        variant={variant}
         size={size}
         className={`flex items-center gap-2 ${className}`}
         disabled={isLoading || !data || data.length === 0}
@@ -455,7 +456,7 @@ export function PrintButton({
                 </span>
               </div>
             </Button>
-            
+
             <Button
               onClick={() => generatePrintablePage('landscape')}
               className="w-full h-20 text-lg font-semibold bg-green-600 hover:bg-green-700 text-white"

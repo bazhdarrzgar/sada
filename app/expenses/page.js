@@ -63,6 +63,7 @@ export default function MonthlyExpensesPage() {
     staffSalary: 0,
     expenses: 0,
     buildingRent: 0,
+    buildingExpenses: 0,
     dramaFee: 0,
     socialSupport: 0,
     electricity: 0,
@@ -121,6 +122,7 @@ export default function MonthlyExpensesPage() {
         { name: 'staffSalary', weight: 0.1 },
         { name: 'expenses', weight: 0.1 },
         { name: 'buildingRent', weight: 0.1 },
+        { name: 'buildingExpenses', weight: 0.1 },
         { name: 'dramaFee', weight: 0.05 },
         { name: 'socialSupport', weight: 0.05 },
         { name: 'electricity', weight: 0.1 },
@@ -136,6 +138,7 @@ export default function MonthlyExpensesPage() {
               obj.staffSalary ? obj.staffSalary.toString() : '',
               obj.expenses ? obj.expenses.toString() : '',
               obj.buildingRent ? obj.buildingRent.toString() : '',
+              obj.buildingExpenses ? obj.buildingExpenses.toString() : '',
               obj.dramaFee ? obj.dramaFee.toString() : '',
               obj.socialSupport ? obj.socialSupport.toString() : '',
               obj.electricity ? obj.electricity.toString() : '',
@@ -307,15 +310,16 @@ export default function MonthlyExpensesPage() {
 
     // Auto-calculate total when expense amounts change
     // Main total excludes books, clothes, travel, transportation
-    if (['staffSalary', 'expenses', 'buildingRent', 'dramaFee', 'socialSupport', 'electricity'].includes(field)) {
+    if (['staffSalary', 'expenses', 'buildingRent', 'buildingExpenses', 'dramaFee', 'socialSupport', 'electricity'].includes(field)) {
       const staffSalary = parseFloat(updatedData[rowIndex].staffSalary) || 0
       const expenses = parseFloat(updatedData[rowIndex].expenses) || 0
       const buildingRent = parseFloat(updatedData[rowIndex].buildingRent) || 0
+      const buildingExpenses = parseFloat(updatedData[rowIndex].buildingExpenses) || 0
       const dramaFee = parseFloat(updatedData[rowIndex].dramaFee) || 0
       const socialSupport = parseFloat(updatedData[rowIndex].socialSupport) || 0
       const electricity = parseFloat(updatedData[rowIndex].electricity) || 0
 
-      updatedData[rowIndex].total = staffSalary + expenses + buildingRent + dramaFee + socialSupport + electricity
+      updatedData[rowIndex].total = staffSalary + expenses + buildingRent + buildingExpenses + dramaFee + socialSupport + electricity
     }
 
     // Educational/travel total is calculated separately when needed
@@ -392,15 +396,16 @@ export default function MonthlyExpensesPage() {
   // Handle field changes in edit modal with auto-calculation
   const handleModalFieldChange = (newData, fieldKey, value) => {
     // Auto-calculate main total when any main expense field changes (excluding educational/travel)
-    if (['staffSalary', 'expenses', 'buildingRent', 'dramaFee', 'socialSupport', 'electricity'].includes(fieldKey)) {
+    if (['staffSalary', 'expenses', 'buildingRent', 'buildingExpenses', 'dramaFee', 'socialSupport', 'electricity'].includes(fieldKey)) {
       const staffSalary = parseFloat(newData.staffSalary) || 0
       const expenses = parseFloat(newData.expenses) || 0
       const buildingRent = parseFloat(newData.buildingRent) || 0
+      const buildingExpenses = parseFloat(newData.buildingExpenses) || 0
       const dramaFee = parseFloat(newData.dramaFee) || 0
       const socialSupport = parseFloat(newData.socialSupport) || 0
       const electricity = parseFloat(newData.electricity) || 0
 
-      newData.total = staffSalary + expenses + buildingRent + dramaFee + socialSupport + electricity
+      newData.total = staffSalary + expenses + buildingRent + buildingExpenses + dramaFee + socialSupport + electricity
     }
 
     // Auto-calculate educational total when any educational/travel field changes
@@ -567,6 +572,13 @@ export default function MonthlyExpensesPage() {
         placeholder: '0'
       },
       {
+        key: 'buildingExpenses',
+        label: t('monthlyExpenses.fields.buildingExpenses', language),
+        labelKu: t('monthlyExpenses.fields.buildingExpenses', 'kurdish'),
+        type: 'number',
+        placeholder: '0'
+      },
+      {
         key: 'dramaFee',
         label: t('monthlyExpenses.fields.dramaFee', language),
         labelKu: t('monthlyExpenses.fields.dramaFee', 'kurdish'),
@@ -625,8 +637,25 @@ export default function MonthlyExpensesPage() {
       data = data.filter(item => item.month === summaryMonth)
     }
 
-    return data.reduce((sum, entry) => sum + (entry.total || 0), 0)
-  }, [expensesData, summaryYear, summaryMonth])
+    return data.reduce((sum, entry) => {
+      if (activeTab === 'educational') {
+        const eduSum = (parseFloat(entry.books) || 0) +
+          (parseFloat(entry.clothes) || 0) +
+          (parseFloat(entry.travel) || 0) +
+          (parseFloat(entry.transportation) || 0)
+        return sum + eduSum
+      } else {
+        const mainSum = (parseFloat(entry.staffSalary) || 0) +
+          (parseFloat(entry.expenses) || 0) +
+          (parseFloat(entry.buildingRent) || 0) +
+          (parseFloat(entry.buildingExpenses) || 0) +
+          (parseFloat(entry.dramaFee) || 0) +
+          (parseFloat(entry.socialSupport) || 0) +
+          (parseFloat(entry.electricity) || 0)
+        return sum + mainSum
+      }
+    }, 0)
+  }, [expensesData, summaryYear, summaryMonth, activeTab])
 
   // SECOND FILTER - Controls both table and Total Monthly Expenses (Main filters + search)
   const filteredData = useMemo(() => {
@@ -654,6 +683,7 @@ export default function MonthlyExpensesPage() {
         { name: 'staffSalary', weight: 0.1 },
         { name: 'expenses', weight: 0.1 },
         { name: 'buildingRent', weight: 0.1 },
+        { name: 'buildingExpenses', weight: 0.1 },
         { name: 'dramaFee', weight: 0.05 },
         { name: 'socialSupport', weight: 0.05 },
         { name: 'electricity', weight: 0.1 },
@@ -669,6 +699,7 @@ export default function MonthlyExpensesPage() {
               obj.staffSalary ? obj.staffSalary.toString() : '',
               obj.expenses ? obj.expenses.toString() : '',
               obj.buildingRent ? obj.buildingRent.toString() : '',
+              obj.buildingExpenses ? obj.buildingExpenses.toString() : '',
               obj.dramaFee ? obj.dramaFee.toString() : '',
               obj.socialSupport ? obj.socialSupport.toString() : '',
               obj.electricity ? obj.electricity.toString() : '',
@@ -697,7 +728,7 @@ export default function MonthlyExpensesPage() {
   }, [fuse, searchTerm, expensesData, selectedYear, selectedMonth])
 
   // Calculate total expenses from filtered data (affected by second filter)
-  const totalExpenses = filteredData.reduce((sum, entry) => sum + (entry.total || 0), 0)
+
 
   // NEW: Total Monthly Expenses calculation (affected by second filter: search + main filters)
   const totalMonthlyExpenses = useMemo(() => {
@@ -722,6 +753,7 @@ export default function MonthlyExpensesPage() {
           { name: 'staffSalary', weight: 0.1 },
           { name: 'expenses', weight: 0.1 },
           { name: 'buildingRent', weight: 0.1 },
+          { name: 'buildingExpenses', weight: 0.1 },
           { name: 'dramaFee', weight: 0.05 },
           { name: 'socialSupport', weight: 0.05 },
           { name: 'electricity', weight: 0.1 },
@@ -737,6 +769,7 @@ export default function MonthlyExpensesPage() {
                 obj.staffSalary ? obj.staffSalary.toString() : '',
                 obj.expenses ? obj.expenses.toString() : '',
                 obj.buildingRent ? obj.buildingRent.toString() : '',
+                obj.buildingExpenses ? obj.buildingExpenses.toString() : '',
                 obj.dramaFee ? obj.dramaFee.toString() : '',
                 obj.socialSupport ? obj.socialSupport.toString() : '',
                 obj.electricity ? obj.electricity.toString() : '',
@@ -764,8 +797,25 @@ export default function MonthlyExpensesPage() {
       data = results.map(result => result.item)
     }
 
-    return data.reduce((sum, entry) => sum + (entry.total || 0), 0)
-  }, [expensesData, selectedYear, selectedMonth, searchTerm])
+    return data.reduce((sum, entry) => {
+      if (activeTab === 'educational') {
+        const eduSum = (parseFloat(entry.books) || 0) +
+          (parseFloat(entry.clothes) || 0) +
+          (parseFloat(entry.travel) || 0) +
+          (parseFloat(entry.transportation) || 0)
+        return sum + eduSum
+      } else {
+        const mainSum = (parseFloat(entry.staffSalary) || 0) +
+          (parseFloat(entry.expenses) || 0) +
+          (parseFloat(entry.buildingRent) || 0) +
+          (parseFloat(entry.buildingExpenses) || 0) +
+          (parseFloat(entry.dramaFee) || 0) +
+          (parseFloat(entry.socialSupport) || 0) +
+          (parseFloat(entry.electricity) || 0)
+        return sum + mainSum
+      }
+    }, 0)
+  }, [expensesData, selectedYear, selectedMonth, searchTerm, activeTab])
 
   // Get unique years and months for dropdowns
   const availableYears = useMemo(() => {
@@ -787,6 +837,7 @@ export default function MonthlyExpensesPage() {
       const hasMainExpenses = (parseFloat(item.staffSalary) || 0) +
         (parseFloat(item.expenses) || 0) +
         (parseFloat(item.buildingRent) || 0) +
+        (parseFloat(item.buildingExpenses) || 0) +
         (parseFloat(item.dramaFee) || 0) +
         (parseFloat(item.socialSupport) || 0) +
         (parseFloat(item.electricity) || 0) > 0
@@ -813,7 +864,17 @@ export default function MonthlyExpensesPage() {
         educationalTotal: (parseFloat(item.books) || 0) + (parseFloat(item.clothes) || 0) + (parseFloat(item.travel) || 0) + (parseFloat(item.transportation) || 0)
       }))
     }
-    return mainExpensesData
+    // Recalculate total for main expenses
+    return mainExpensesData.map(item => ({
+      ...item,
+      total: (parseFloat(item.staffSalary) || 0) +
+        (parseFloat(item.expenses) || 0) +
+        (parseFloat(item.buildingRent) || 0) +
+        (parseFloat(item.buildingExpenses) || 0) +
+        (parseFloat(item.dramaFee) || 0) +
+        (parseFloat(item.socialSupport) || 0) +
+        (parseFloat(item.electricity) || 0)
+    }))
   }, [educationalExpensesData, mainExpensesData, activeTab])
 
   // Define columns for printing based on active tab
@@ -838,6 +899,7 @@ export default function MonthlyExpensesPage() {
       { key: 'staffSalary', header: t('monthlyExpenses.fields.staffSalary', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
       { key: 'expenses', header: t('monthlyExpenses.fields.expenses', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
       { key: 'buildingRent', header: t('monthlyExpenses.fields.buildingRent', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
+      { key: 'buildingExpenses', header: t('monthlyExpenses.fields.buildingExpenses', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
       { key: 'dramaFee', header: t('monthlyExpenses.fields.dramaFee', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
       { key: 'socialSupport', header: t('monthlyExpenses.fields.socialSupport', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
       { key: 'electricity', header: t('monthlyExpenses.fields.electricity', 'kurdish'), render: (value) => (parseFloat(value) || 0).toLocaleString() },
@@ -870,13 +932,20 @@ export default function MonthlyExpensesPage() {
       year: item.year,
       month: item.month,
       requirement: item.requirement,
-      staffSalary: item.staffSalary,
-      expenses: item.expenses,
-      buildingRent: item.buildingRent,
-      dramaFee: item.dramaFee,
-      socialSupport: item.socialSupport,
-      electricity: item.electricity,
-      total: item.total,
+      staffSalary: item.staffSalary || 0,
+      expenses: item.expenses || 0,
+      buildingRent: item.buildingRent || 0,
+      buildingExpenses: item.buildingExpenses || 0,
+      dramaFee: item.dramaFee || 0,
+      socialSupport: item.socialSupport || 0,
+      electricity: item.electricity || 0,
+      total: (parseFloat(item.staffSalary) || 0) +
+        (parseFloat(item.expenses) || 0) +
+        (parseFloat(item.buildingRent) || 0) +
+        (parseFloat(item.buildingExpenses) || 0) +
+        (parseFloat(item.dramaFee) || 0) +
+        (parseFloat(item.socialSupport) || 0) +
+        (parseFloat(item.electricity) || 0),
       notes: item.notes
     }))
   }, [educationalExpensesData, mainExpensesData, activeTab])
@@ -895,7 +964,7 @@ export default function MonthlyExpensesPage() {
                     ((parseFloat(entry.books) || 0) + (parseFloat(entry.clothes) || 0) + (parseFloat(entry.travel) || 0) + (parseFloat(entry.transportation) || 0)).toLocaleString()
                   ) : (
                     // Main total
-                    entry.total.toLocaleString()
+                    ((parseFloat(entry.staffSalary) || 0) + (parseFloat(entry.expenses) || 0) + (parseFloat(entry.buildingRent) || 0) + (parseFloat(entry.buildingExpenses) || 0) + (parseFloat(entry.dramaFee) || 0) + (parseFloat(entry.socialSupport) || 0) + (parseFloat(entry.electricity) || 0)).toLocaleString()
                   )} د.ع
                 </div>
               </div>
@@ -916,6 +985,7 @@ export default function MonthlyExpensesPage() {
                   <div><span className="font-semibold">{t('monthlyExpenses.fields.staffSalary', language)}:</span> <span className="text-green-600 dark:text-green-400">{entry.staffSalary.toLocaleString()}</span></div>
                   <div><span className="font-semibold">{t('monthlyExpenses.fields.expenses', language)}:</span> <span className="text-red-600 dark:text-red-400">{entry.expenses.toLocaleString()}</span></div>
                   <div><span className="font-semibold">{t('monthlyExpenses.fields.buildingRent', language)}:</span> <span className="text-purple-600 dark:text-purple-400">{entry.buildingRent.toLocaleString()}</span></div>
+                  <div><span className="font-semibold">{t('monthlyExpenses.fields.buildingExpenses', language)}:</span> <span className="text-purple-600 dark:text-purple-400">{(parseFloat(entry.buildingExpenses) || 0).toLocaleString()}</span></div>
                   <div><span className="font-semibold">{t('monthlyExpenses.fields.electricity', language)}:</span> <span className="text-orange-600 dark:text-orange-400">{entry.electricity.toLocaleString()}</span></div>
                 </div>
               )}
@@ -1029,6 +1099,14 @@ export default function MonthlyExpensesPage() {
         render: (value) => <span className="font-medium text-purple-600 dark:text-purple-400">{parseFloat(value || 0).toLocaleString()}</span>
       },
       {
+        key: 'buildingExpenses',
+        header: t('monthlyExpenses.fields.buildingExpenses', language),
+        align: 'center',
+        editable: true,
+        type: 'number',
+        render: (value) => <span className="font-medium text-purple-600 dark:text-purple-400">{parseFloat(value || 0).toLocaleString()}</span>
+      },
+      {
         key: 'dramaFee',
         header: t('monthlyExpenses.fields.dramaFee', language),
         align: 'center',
@@ -1057,7 +1135,16 @@ export default function MonthlyExpensesPage() {
         header: t('monthlyExpenses.fields.total', language),
         align: 'center',
         editable: false,
-        render: (value) => <span className="font-bold text-lg text-blue-600 dark:text-blue-400">{parseFloat(value || 0).toLocaleString()}</span>
+        render: (value, row) => {
+          const total = (parseFloat(row.staffSalary) || 0) +
+            (parseFloat(row.expenses) || 0) +
+            (parseFloat(row.buildingRent) || 0) +
+            (parseFloat(row.buildingExpenses) || 0) +
+            (parseFloat(row.dramaFee) || 0) +
+            (parseFloat(row.socialSupport) || 0) +
+            (parseFloat(row.electricity) || 0)
+          return <span className="font-bold text-lg text-blue-600 dark:text-blue-400">{total.toLocaleString()}</span>
+        }
       },
       {
         key: 'receiptImages',
@@ -1548,7 +1635,7 @@ export default function MonthlyExpensesPage() {
                           onChange={(e) => {
                             const value = parseFloat(e.target.value) || 0
                             const updatedEntry = { ...newEntry, staffSalary: value }
-                            const total = value + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
+                            const total = value + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + (parseFloat(updatedEntry.buildingExpenses) || 0) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
                             updatedEntry.total = total
                             setNewEntry(updatedEntry)
                           }}
@@ -1564,7 +1651,7 @@ export default function MonthlyExpensesPage() {
                           onChange={(e) => {
                             const value = parseFloat(e.target.value) || 0
                             const updatedEntry = { ...newEntry, expenses: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + value + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
+                            const total = parseFloat(updatedEntry.staffSalary) + value + parseFloat(updatedEntry.buildingRent) + (parseFloat(updatedEntry.buildingExpenses) || 0) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
                             updatedEntry.total = total
                             setNewEntry(updatedEntry)
                           }}
@@ -1583,7 +1670,7 @@ export default function MonthlyExpensesPage() {
                           onChange={(e) => {
                             const value = parseFloat(e.target.value) || 0
                             const updatedEntry = { ...newEntry, buildingRent: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + value + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
+                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + value + (parseFloat(updatedEntry.buildingExpenses) || 0) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
                             updatedEntry.total = total
                             setNewEntry(updatedEntry)
                           }}
@@ -1591,15 +1678,15 @@ export default function MonthlyExpensesPage() {
                         />
                       </div>
                       <div>
-                        <Label htmlFor="dramaFee">{t('monthlyExpenses.fields.dramaFee', language)}</Label>
+                        <Label htmlFor="buildingExpenses">{t('monthlyExpenses.fields.buildingExpenses', language)}</Label>
                         <Input
-                          id="dramaFee"
+                          id="buildingExpenses"
                           type="number"
-                          value={newEntry.dramaFee}
+                          value={newEntry.buildingExpenses || 0}
                           onChange={(e) => {
                             const value = parseFloat(e.target.value) || 0
-                            const updatedEntry = { ...newEntry, dramaFee: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + value + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
+                            const updatedEntry = { ...newEntry, buildingExpenses: value }
+                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + value + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
                             updatedEntry.total = total
                             setNewEntry(updatedEntry)
                           }}
@@ -1610,6 +1697,22 @@ export default function MonthlyExpensesPage() {
 
                     <div className="grid grid-cols-2 gap-4">
                       <div>
+                        <Label htmlFor="dramaFee">{t('monthlyExpenses.fields.dramaFee', language)}</Label>
+                        <Input
+                          id="dramaFee"
+                          type="number"
+                          value={newEntry.dramaFee}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value) || 0
+                            const updatedEntry = { ...newEntry, dramaFee: value }
+                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + (parseFloat(updatedEntry.buildingExpenses) || 0) + value + parseFloat(updatedEntry.socialSupport) + parseFloat(updatedEntry.electricity)
+                            updatedEntry.total = total
+                            setNewEntry(updatedEntry)
+                          }}
+                          placeholder="0"
+                        />
+                      </div>
+                      <div>
                         <Label htmlFor="socialSupport">{t('monthlyExpenses.fields.socialSupport', language)}</Label>
                         <Input
                           id="socialSupport"
@@ -1618,13 +1721,16 @@ export default function MonthlyExpensesPage() {
                           onChange={(e) => {
                             const value = parseFloat(e.target.value) || 0
                             const updatedEntry = { ...newEntry, socialSupport: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + value + parseFloat(updatedEntry.electricity)
+                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + (parseFloat(updatedEntry.buildingExpenses) || 0) + parseFloat(updatedEntry.dramaFee) + value + parseFloat(updatedEntry.electricity)
                             updatedEntry.total = total
                             setNewEntry(updatedEntry)
                           }}
                           placeholder="0"
                         />
                       </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
                       <div>
                         <Label htmlFor="electricity">{t('monthlyExpenses.fields.electricity', language)}</Label>
                         <Input
@@ -1634,7 +1740,7 @@ export default function MonthlyExpensesPage() {
                           onChange={(e) => {
                             const value = parseFloat(e.target.value) || 0
                             const updatedEntry = { ...newEntry, electricity: value }
-                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + value
+                            const total = parseFloat(updatedEntry.staffSalary) + parseFloat(updatedEntry.expenses) + parseFloat(updatedEntry.buildingRent) + (parseFloat(updatedEntry.buildingExpenses) || 0) + parseFloat(updatedEntry.dramaFee) + parseFloat(updatedEntry.socialSupport) + value
                             updatedEntry.total = total
                             setNewEntry(updatedEntry)
                           }}
