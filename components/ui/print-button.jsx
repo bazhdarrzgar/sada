@@ -20,6 +20,7 @@ export function PrintButton({
   showTotal = false, // New prop to enable total row
   totalColumn = 'total', // Column key to calculate total for (default: 'total')
   totalLabel = '', // Custom label for the total row
+  summaryItems = [], // New prop for multiple summary items
   selectedMonth = null, // Month to display in print header
   selectedYear = null // Year to display in print header
 }) {
@@ -79,7 +80,7 @@ export function PrintButton({
 
     try {
       // Prepare table data
-      let tableColumns, tableRows, totalRow = null
+      let tableColumns, tableRows, summaryData = []
 
       if (columns.length > 0) {
         // Use provided columns configuration
@@ -94,19 +95,35 @@ export function PrintButton({
           return value || ''
         }))
 
-        // Calculate totals if showTotal is enabled
-        if (showTotal && data.length > 0) {
-          // Find the specified column to calculate total for
+        // Calculate summary items if provided
+        if (summaryItems && summaryItems.length > 0) {
+          summaryData = summaryItems.map(item => {
+            const totalSum = data.reduce((acc, row) => {
+              const value = parseFloat(row[item.key]) || 0
+              return acc + value
+            }, 0)
+
+            const col = columns.find(c => c.key === item.key)
+            let displaySum = totalSum.toLocaleString()
+            if (col && col.render && typeof col.render === 'function') {
+              displaySum = col.render(totalSum)
+            }
+
+            return {
+              label: item.label,
+              value: displaySum
+            }
+          })
+        } else if (showTotal && data.length > 0) {
+          // Fallback to existing showTotal logic
           const targetColumnIndex = columns.findIndex(col => col.key === totalColumn)
 
           if (targetColumnIndex !== -1) {
-            // Calculate sum for the specified column
             const totalSum = data.reduce((acc, row) => {
               const value = parseFloat(row[totalColumn]) || 0
               return acc + value
             }, 0)
 
-            // Apply the same render function if available
             const targetColumn = columns[targetColumnIndex]
             let displaySum = totalSum.toLocaleString()
 
@@ -114,11 +131,10 @@ export function PrintButton({
               displaySum = targetColumn.render(totalSum)
             }
 
-            totalRow = {
-              columnIndex: targetColumnIndex,
-              columnHeader: totalLabel || targetColumn.header,
-              sum: displaySum
-            }
+            summaryData = [{
+              label: totalLabel || targetColumn.header,
+              value: displaySum
+            }]
           }
         }
       } else {
@@ -288,8 +304,17 @@ export function PrintButton({
               background-color: #e0f2fe;
             }
             
-            .total-summary {
+            .summary-container {
               margin-top: 20px;
+              display: flex;
+              flex-wrap: wrap;
+              gap: 15px;
+              justify-content: center;
+            }
+            
+            .total-summary {
+              flex: 1;
+              min-width: 180px;
               padding: 15px;
               background-color: #dbeafe;
               border: 2px solid #2563eb;
@@ -343,6 +368,10 @@ export function PrintButton({
               .no-print {
                 display: none;
               }
+              
+              .summary-container {
+                page-break-inside: avoid;
+              }
             }
           </style>
         </head>
@@ -377,10 +406,14 @@ export function PrintButton({
             </table>
           </div>
           
-          ${totalRow ? `
-            <div class="total-summary">
-              <div class="total-summary-label">${totalRow.columnHeader}</div>
-              <div class="total-summary-value">${totalRow.sum}</div>
+          ${summaryData.length > 0 ? `
+            <div class="summary-container">
+              ${summaryData.map(item => `
+                <div class="total-summary">
+                  <div class="total-summary-label">${item.label}</div>
+                  <div class="total-summary-value">${item.value}</div>
+                </div>
+              `).join('')}
             </div>
           ` : ''}
         </body>

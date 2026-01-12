@@ -21,7 +21,7 @@ import Fuse from 'fuse.js'
 export default function InstallmentsPage() {
   const isMobile = useIsMobile()
   const { language, toggleLanguage } = useLanguage()
-  
+
   // Password protection states
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [authUsername, setAuthUsername] = useState('')
@@ -35,7 +35,7 @@ export default function InstallmentsPage() {
       setIsAuthenticated(true)
     }
   }, [])
-  
+
   const [installmentsData, setInstallmentsData] = useState([])
   const [loading, setLoading] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
@@ -83,32 +83,34 @@ export default function InstallmentsPage() {
         // Include ID for technical searches
         { name: 'id', weight: 0.05 },
         // Custom comprehensive search field
-        { name: 'searchableContent', weight: 0.25, getFn: (obj) => {
-          return [
-            obj.fullName || '',
-            obj.grade || '',
-            obj.installmentType || '',
-            // Add all numeric values as strings for better searching
-            obj.annualAmount ? obj.annualAmount.toString() : '',
-            obj.firstInstallment ? obj.firstInstallment.toString() : '',
-            obj.secondInstallment ? obj.secondInstallment.toString() : '',
-            obj.thirdInstallment ? obj.thirdInstallment.toString() : '',
-            obj.fourthInstallment ? obj.fourthInstallment.toString() : '',
-            obj.fifthInstallment ? obj.fifthInstallment.toString() : '',
-            obj.sixthInstallment ? obj.sixthInstallment.toString() : '',
-            obj.totalReceived ? obj.totalReceived.toString() : '',
-            obj.remaining ? obj.remaining.toString() : '',
-            // Add formatted amounts for localized searching
-            obj.annualAmount ? parseFloat(obj.annualAmount).toLocaleString() : '',
-            obj.totalReceived ? parseFloat(obj.totalReceived).toLocaleString() : '',
-            obj.remaining ? parseFloat(obj.remaining).toLocaleString() : '',
-            // Add payment status indicators
-            obj.remaining ? (parseFloat(obj.remaining) > 0 ? 'unpaid نەدراو باقی' : parseFloat(obj.remaining) === 0 ? 'paid تەواو درا' : 'overpaid زیاد درا') : '',
-            // Add progress indicators
-            obj.annualAmount && obj.totalReceived ? 
-              `${Math.round((parseFloat(obj.totalReceived) / parseFloat(obj.annualAmount)) * 100)}% پەرسەند percent` : ''
-          ].join(' ').toLowerCase()
-        }}
+        {
+          name: 'searchableContent', weight: 0.25, getFn: (obj) => {
+            return [
+              obj.fullName || '',
+              obj.grade || '',
+              obj.installmentType || '',
+              // Add all numeric values as strings for better searching
+              obj.annualAmount ? obj.annualAmount.toString() : '',
+              obj.firstInstallment ? obj.firstInstallment.toString() : '',
+              obj.secondInstallment ? obj.secondInstallment.toString() : '',
+              obj.thirdInstallment ? obj.thirdInstallment.toString() : '',
+              obj.fourthInstallment ? obj.fourthInstallment.toString() : '',
+              obj.fifthInstallment ? obj.fifthInstallment.toString() : '',
+              obj.sixthInstallment ? obj.sixthInstallment.toString() : '',
+              obj.totalReceived ? obj.totalReceived.toString() : '',
+              obj.remaining ? obj.remaining.toString() : '',
+              // Add formatted amounts for localized searching
+              obj.annualAmount ? parseFloat(obj.annualAmount).toLocaleString() : '',
+              obj.totalReceived ? parseFloat(obj.totalReceived).toLocaleString() : '',
+              obj.remaining ? parseFloat(obj.remaining).toLocaleString() : '',
+              // Add payment status indicators
+              obj.remaining ? (parseFloat(obj.remaining) > 0 ? 'unpaid نەدراو باقی' : parseFloat(obj.remaining) === 0 ? 'paid تەواو درا' : 'overpaid زیاد درا') : '',
+              // Add progress indicators
+              obj.annualAmount && obj.totalReceived ?
+                `${Math.round((parseFloat(obj.totalReceived) / parseFloat(obj.annualAmount)) * 100)}% پەرسەند percent` : ''
+            ].join(' ').toLowerCase()
+          }
+        }
       ],
       threshold: 0.3, // Lower threshold = more exact matches
       distance: 100,
@@ -144,14 +146,14 @@ export default function InstallmentsPage() {
     if (isSaving) {
       return false
     }
-    
+
     setIsSaving(true)
-    
+
     try {
       console.log('saveEntry called with:', entry)
       console.log('Entry ID:', entry.id)
       console.log('Is temporary ID?:', entry.id?.startsWith('installment-'))
-      
+
       // Calculate totals
       const annualAmount = parseFloat(entry.annualAmount) || 0
       const first = parseFloat(entry.firstInstallment) || 0
@@ -160,12 +162,12 @@ export default function InstallmentsPage() {
       const fourth = parseFloat(entry.fourthInstallment) || 0
       const fifth = parseFloat(entry.fifthInstallment) || 0
       const sixth = parseFloat(entry.sixthInstallment) || 0
-      
+
       entry.totalReceived = first + second + third + fourth + fifth + sixth
       entry.remaining = annualAmount - entry.totalReceived
 
       let response
-      
+
       if (entry.id && !entry.id.startsWith('installment-')) {
         // Update existing entry
         console.log('Updating existing entry with ID:', entry.id)
@@ -183,7 +185,7 @@ export default function InstallmentsPage() {
         if (entryToSave.id && entryToSave.id.startsWith('installment-')) {
           delete entryToSave.id // Remove temporary ID for new entries
         }
-        
+
         response = await fetch('/api/installments', {
           method: 'POST',
           headers: {
@@ -195,7 +197,7 @@ export default function InstallmentsPage() {
 
       if (response.ok) {
         const savedEntry = await response.json()
-        
+
         // Update local state with the saved data - keep position for edits
         setInstallmentsData(prevData => {
           const existingIndex = prevData.findIndex(item => item.id === savedEntry.id)
@@ -218,7 +220,7 @@ export default function InstallmentsPage() {
         console.error('Failed to save entry:', response.statusText)
         return false
       }
-      
+
     } catch (error) {
       console.error('Error saving entry:', error)
       return false
@@ -271,7 +273,7 @@ export default function InstallmentsPage() {
   const handleCellEdit = (rowIndex, field, value) => {
     const updatedData = [...installmentsData]
     updatedData[rowIndex][field] = value
-    
+
     // Auto-calculate totals when installment amounts change
     if (['annualAmount', 'firstInstallment', 'secondInstallment', 'thirdInstallment', 'fourthInstallment', 'fifthInstallment', 'sixthInstallment'].includes(field)) {
       const annualAmount = parseFloat(updatedData[rowIndex].annualAmount) || 0
@@ -281,11 +283,11 @@ export default function InstallmentsPage() {
       const fourth = parseFloat(updatedData[rowIndex].fourthInstallment) || 0
       const fifth = parseFloat(updatedData[rowIndex].fifthInstallment) || 0
       const sixth = parseFloat(updatedData[rowIndex].sixthInstallment) || 0
-      
+
       updatedData[rowIndex].totalReceived = first + second + third + fourth + fifth + sixth
       updatedData[rowIndex].remaining = annualAmount - updatedData[rowIndex].totalReceived
     }
-    
+
     setInstallmentsData(updatedData)
   }
 
@@ -294,7 +296,7 @@ export default function InstallmentsPage() {
     const windowHeight = window.innerHeight
     const documentHeight = document.documentElement.scrollHeight
     const targetScrollPosition = (documentHeight - windowHeight) / 2
-    
+
     window.scrollTo({
       top: targetScrollPosition,
       behavior: 'smooth'
@@ -314,15 +316,15 @@ export default function InstallmentsPage() {
         // Called from table view with ID
         entry = installmentsData.find(item => item.id === indexOrId)
       }
-      
+
       console.log('Starting edit for entry:', entry)
       console.log('Entry ID:', entry?.id)
-      
+
       if (!entry) {
         console.error('Entry not found for indexOrId:', indexOrId)
         return
       }
-      
+
       // Create a deep copy to ensure all data is properly passed
       const entryData = {
         ...entry,
@@ -373,23 +375,23 @@ export default function InstallmentsPage() {
       const fourth = parseFloat(newData.fourthInstallment) || 0
       const fifth = parseFloat(newData.fifthInstallment) || 0
       const sixth = parseFloat(newData.sixthInstallment) || 0
-      
+
       newData.totalReceived = first + second + third + fourth + fifth + sixth
       newData.remaining = annualAmount - newData.totalReceived
     }
-    
+
     return newData
   }
 
   // Enhanced translation function with visual feedback
   const handleTranslateInterface = () => {
     setIsTranslating(true)
-    
+
     // Add visual feedback
     setTimeout(() => {
       toggleLanguage()
       setIsTranslating(false)
-      
+
       // Show brief success feedback
       const notification = document.createElement('div')
       notification.className = 'fixed top-4 right-4 z-50 bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform translate-x-0'
@@ -404,7 +406,7 @@ export default function InstallmentsPage() {
         </div>
       `
       document.body.appendChild(notification)
-      
+
       setTimeout(() => {
         notification.style.transform = 'translateX(100%)'
         setTimeout(() => document.body.removeChild(notification), 300)
@@ -550,7 +552,7 @@ export default function InstallmentsPage() {
                   {entry.notes && (
                     <div><span className="font-semibold">{t('annualInstallments.fields.notes', language)}:</span> {entry.notes}</div>
                   )}
-                  
+
                   {/* Receipt Images */}
                   {entry.receiptImages && entry.receiptImages.length > 0 && (
                     <div>
@@ -765,15 +767,15 @@ export default function InstallmentsPage() {
           columns={columns}
           editingRow={null} // Disable inline editing
           onEdit={startEditing}
-          onSave={() => {}} // No inline save
-          onCancel={() => {}} // No inline cancel
+          onSave={() => { }} // No inline save
+          onCancel={() => { }} // No inline cancel
           onDelete={deleteEntry}
-          onCellEdit={() => {}} // No inline cell edit
+          onCellEdit={() => { }} // No inline cell edit
           maxRowsPerPage={10}
           enablePagination={true}
           className="shadow-lg hover:shadow-xl transition-shadow duration-300"
         />
-        
+
         {/* Summary footer */}
         <Card className="mt-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600">
           <CardContent className="p-4">
@@ -801,7 +803,7 @@ export default function InstallmentsPage() {
   const handleLogin = (e) => {
     e.preventDefault()
     setAuthError('')
-    
+
     if (authUsername === 'berdoz' && authPassword === 'berdoz@private') {
       setIsAuthenticated(true)
       // Save authentication to localStorage
@@ -829,7 +831,7 @@ export default function InstallmentsPage() {
                 <h2 className="text-2xl font-bold mb-2">قیستی ساڵانە</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">تکایە ناوی بەکارهێنەر و وشەی تێپەڕ بنووسە</p>
               </div>
-              
+
               <form onSubmit={handleLogin} className="space-y-4">
                 <div>
                   <Label htmlFor="username">ناوی بەکارهێنەر / Username</Label>
@@ -843,7 +845,7 @@ export default function InstallmentsPage() {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor="password">وشەی تێپەڕ / Password</Label>
                   <Input
@@ -856,13 +858,13 @@ export default function InstallmentsPage() {
                     required
                   />
                 </div>
-                
+
                 {authError && (
                   <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded">
                     {authError}
                   </div>
                 )}
-                
+
                 <Button type="submit" className="w-full">
                   چوونەژوورەوە / Sign In
                 </Button>
@@ -896,12 +898,12 @@ export default function InstallmentsPage() {
           />
         </div>
         <div className="flex items-center gap-4">
-          <DownloadButton 
+          <DownloadButton
             data={filteredData}
             filename="installments-records"
             className="bg-green-600 hover:bg-green-700 text-white"
           />
-          <PrintButton 
+          <PrintButton
             data={filteredData}
             filename="installments-records"
             title={t('annualInstallments.title', language)}
@@ -922,12 +924,16 @@ export default function InstallmentsPage() {
               { key: 'receiptImages', header: t('annualInstallments.fields.receiptImages', 'kurdish') },
               { key: 'notes', header: t('annualInstallments.fields.notes', 'kurdish') }
             ]}
-            showTotal={true}
+            summaryItems={[
+              { key: 'annualAmount', label: 'کۆی ساڵانە' },
+              { key: 'totalReceived', label: 'کۆی وەرگیراو' },
+              { key: 'remaining', label: 'کۆی ماوە' }
+            ]}
             className="bg-blue-600 hover:bg-blue-700 text-white"
           />
           <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button 
+              <Button
                 className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
                 onClick={() => {
                   // First scroll to center, then open modal
@@ -951,7 +957,7 @@ export default function InstallmentsPage() {
                   <Input
                     id="fullName"
                     value={newEntry.fullName}
-                    onChange={(e) => setNewEntry({...newEntry, fullName: e.target.value})}
+                    onChange={(e) => setNewEntry({ ...newEntry, fullName: e.target.value })}
                     placeholder="Enter student name"
                   />
                 </div>
@@ -962,7 +968,7 @@ export default function InstallmentsPage() {
                     <Input
                       id="grade"
                       value={newEntry.grade}
-                      onChange={(e) => setNewEntry({...newEntry, grade: e.target.value})}
+                      onChange={(e) => setNewEntry({ ...newEntry, grade: e.target.value })}
                       placeholder="Enter grade"
                     />
                   </div>
@@ -971,7 +977,7 @@ export default function InstallmentsPage() {
                     <Input
                       id="installmentType"
                       value={newEntry.installmentType}
-                      onChange={(e) => setNewEntry({...newEntry, installmentType: e.target.value})}
+                      onChange={(e) => setNewEntry({ ...newEntry, installmentType: e.target.value })}
                       placeholder="Enter type"
                     />
                   </div>
@@ -986,7 +992,7 @@ export default function InstallmentsPage() {
                     onChange={(e) => {
                       const annualAmount = parseFloat(e.target.value) || 0
                       setNewEntry({
-                        ...newEntry, 
+                        ...newEntry,
                         annualAmount: annualAmount,
                         remaining: annualAmount - newEntry.totalReceived
                       })
@@ -1006,7 +1012,7 @@ export default function InstallmentsPage() {
                         const value = parseFloat(e.target.value) || 0
                         const totalReceived = value + newEntry.secondInstallment + newEntry.thirdInstallment + newEntry.fourthInstallment + newEntry.fifthInstallment + newEntry.sixthInstallment
                         setNewEntry({
-                          ...newEntry, 
+                          ...newEntry,
                           firstInstallment: value,
                           totalReceived: totalReceived,
                           remaining: parseFloat(newEntry.annualAmount) - totalReceived
@@ -1025,7 +1031,7 @@ export default function InstallmentsPage() {
                         const value = parseFloat(e.target.value) || 0
                         const totalReceived = newEntry.firstInstallment + value + newEntry.thirdInstallment + newEntry.fourthInstallment + newEntry.fifthInstallment + newEntry.sixthInstallment
                         setNewEntry({
-                          ...newEntry, 
+                          ...newEntry,
                           secondInstallment: value,
                           totalReceived: totalReceived,
                           remaining: parseFloat(newEntry.annualAmount) - totalReceived
@@ -1044,7 +1050,7 @@ export default function InstallmentsPage() {
                         const value = parseFloat(e.target.value) || 0
                         const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + value + newEntry.fourthInstallment + newEntry.fifthInstallment + newEntry.sixthInstallment
                         setNewEntry({
-                          ...newEntry, 
+                          ...newEntry,
                           thirdInstallment: value,
                           totalReceived: totalReceived,
                           remaining: parseFloat(newEntry.annualAmount) - totalReceived
@@ -1066,7 +1072,7 @@ export default function InstallmentsPage() {
                         const value = parseFloat(e.target.value) || 0
                         const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + newEntry.thirdInstallment + value + newEntry.fifthInstallment + newEntry.sixthInstallment
                         setNewEntry({
-                          ...newEntry, 
+                          ...newEntry,
                           fourthInstallment: value,
                           totalReceived: totalReceived,
                           remaining: parseFloat(newEntry.annualAmount) - totalReceived
@@ -1085,7 +1091,7 @@ export default function InstallmentsPage() {
                         const value = parseFloat(e.target.value) || 0
                         const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + newEntry.thirdInstallment + newEntry.fourthInstallment + value + newEntry.sixthInstallment
                         setNewEntry({
-                          ...newEntry, 
+                          ...newEntry,
                           fifthInstallment: value,
                           totalReceived: totalReceived,
                           remaining: parseFloat(newEntry.annualAmount) - totalReceived
@@ -1104,7 +1110,7 @@ export default function InstallmentsPage() {
                         const value = parseFloat(e.target.value) || 0
                         const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + newEntry.thirdInstallment + newEntry.fourthInstallment + newEntry.fifthInstallment + value
                         setNewEntry({
-                          ...newEntry, 
+                          ...newEntry,
                           sixthInstallment: value,
                           totalReceived: totalReceived,
                           remaining: parseFloat(newEntry.annualAmount) - totalReceived
@@ -1143,7 +1149,7 @@ export default function InstallmentsPage() {
                   <Input
                     id="notes"
                     value={newEntry.notes}
-                    onChange={(e) => setNewEntry({...newEntry, notes: e.target.value})}
+                    onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
                     placeholder="تێبینی..."
                   />
                 </div>
@@ -1152,21 +1158,21 @@ export default function InstallmentsPage() {
                   <Label>{t('annualInstallments.fields.receiptImages', language)}</Label>
                   <ImageUpload
                     images={newEntry.receiptImages}
-                    onImagesChange={(images) => setNewEntry({...newEntry, receiptImages: images})}
+                    onImagesChange={(images) => setNewEntry({ ...newEntry, receiptImages: images })}
                     maxImages={6}
                     className="mt-2"
                   />
                 </div>
-                
+
                 <div className="flex justify-end gap-2">
-                  <Button 
-                    variant="outline" 
-                    onClick={() => {setIsAddDialogOpen(false); resetNewEntry();}}
+                  <Button
+                    variant="outline"
+                    onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}
                     disabled={isSaving}
                   >
                     {t('annualInstallments.buttons.cancel', language)}
                   </Button>
-                  <Button 
+                  <Button
                     onClick={() => saveEntry(newEntry)}
                     disabled={isSaving}
                   >
@@ -1275,7 +1281,7 @@ export default function InstallmentsPage() {
                             container.style.minHeight = '100%'
                           }
                         }}
-                        style={{ 
+                        style={{
                           transformOrigin: 'center center',
                           transition: 'transform 0.3s ease-in-out'
                         }}
@@ -1295,9 +1301,9 @@ export default function InstallmentsPage() {
                         <div className="bg-gray-700/50 p-3 rounded-lg">
                           <div className="text-gray-400 font-medium mb-1">File Size</div>
                           <div className="text-white">
-                            {previewImage.size ? 
-                              (previewImage.size / 1024 / 1024 > 1 ? 
-                                (previewImage.size / 1024 / 1024).toFixed(2) + ' MB' : 
+                            {previewImage.size ?
+                              (previewImage.size / 1024 / 1024 > 1 ?
+                                (previewImage.size / 1024 / 1024).toFixed(2) + ' MB' :
                                 (previewImage.size / 1024).toFixed(1) + ' KB'
                               ) : 'Unknown'
                             }
@@ -1326,7 +1332,7 @@ export default function InstallmentsPage() {
                           <Download className="h-4 w-4 mr-2" />
                           Download Original
                         </Button>
-                        
+
                         <Button
                           variant="outline"
                           onClick={() => {
@@ -1464,7 +1470,7 @@ export default function InstallmentsPage() {
           )}
         </DialogContent>
       </Dialog>
-      
+
       {/* CSS to ensure modal proper positioning regardless of page scroll */}
       <style jsx>{`
         /* Force modal proper positioning regardless of page scroll */

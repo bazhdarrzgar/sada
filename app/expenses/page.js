@@ -290,6 +290,7 @@ export default function MonthlyExpensesPage() {
       staffSalary: 0,
       expenses: 0,
       buildingRent: 0,
+      buildingExpenses: 0,
       dramaFee: 0,
       socialSupport: 0,
       electricity: 0,
