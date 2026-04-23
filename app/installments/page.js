@@ -782,6 +782,9 @@ export default function InstallmentsPage() {
                 <Button size="sm" variant="outline" onClick={() => startEditing(idx)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
                   <Edit className="h-4 w-4" />
                 </Button>
+                <Button size="sm" variant="outline" onClick={() => handlePrintGeneral(entry)} className="text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200" style={{ fontFamily: 'KJino' }}>
+                  <Printer className="h-4 w-4" />
+                </Button>
                 <Button size="sm" variant="destructive" onClick={() => deleteEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -911,7 +914,6 @@ export default function InstallmentsPage() {
         align: 'center',
         editable: false,
         render: (value, row, rowIndex) => {
-          // Ensure value is an array
           const images = Array.isArray(value) ? value : (value ? JSON.parse(value) : [])
           return (
             <div className="flex items-center justify-center">
@@ -925,11 +927,10 @@ export default function InstallmentsPage() {
                         alt={`Receipt ${idx + 1}`}
                         className="w-8 h-8 rounded-full border-2 border-white object-cover cursor-pointer hover:scale-110 transition-transform"
                         onClick={() => {
-                          // First scroll to center, then open modal
                           scrollToCenter()
                           setTimeout(() => {
                             setPreviewImage(image)
-                          }, 300) // Small delay to allow scroll to start
+                          }, 300)
                         }}
                       />
                     ))}
@@ -952,6 +953,18 @@ export default function InstallmentsPage() {
             </div>
           )
         }
+      },
+      {
+        key: 'actions',
+        header: <span style={{ fontFamily: 'KJino' }}>کردارەکان</span>,
+        align: 'center',
+        render: (_, row) => (
+          <div className="flex gap-1 justify-center">
+            <Button size="sm" variant="ghost" onClick={() => startEditing(row.id)}><Edit className="h-4 w-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => handlePrintGeneral(row)} className="text-blue-600" style={{ fontFamily: 'KJino' }}><Printer className="h-4 w-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => deleteEntry(row.id)} className="text-red-600"><Trash2 className="h-4 w-4" /></Button>
+          </div>
+        )
       }
     ]
 
@@ -968,6 +981,7 @@ export default function InstallmentsPage() {
           onCellEdit={() => { }} // No inline cell edit
           maxRowsPerPage={10}
           enablePagination={true}
+          showActions={false}
           className="shadow-lg hover:shadow-xl transition-shadow duration-300"
         />
 
@@ -1004,19 +1018,25 @@ export default function InstallmentsPage() {
       <head>
         <title>بەرواری قیست - ${record.studentName}</title>
         <style>
+          @font-face {
+            font-family: 'KJino';
+            src: url('/fonts/KJino.TTF') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+          }
           @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap');
-          body { font-family: 'Noto Sans Arabic', sans-serif; direction: rtl; padding: 30px; color: #333; line-height: 1.4; }
+          body { font-family: 'KJino', 'Noto Sans Arabic', sans-serif; direction: rtl; padding: 30px; color: #333; line-height: 1.4; font-size: 18px; }
           .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; position: relative; }
           .logo { height: 100px; object-fit: contain; }
           .header-text { text-align: center; flex-grow: 1; }
-          .header-text h1 { margin: 0; font-size: 24px; color: #1e3a8a; }
-          .header-text h2 { margin: 5px 0 0 0; font-size: 18px; font-weight: normal; color: #666; }
+          .header-text h1 { margin: 0; font-size: 26px; color: #1e3a8a; }
+          .header-text h2 { margin: 5px 0 0 0; font-size: 20px; font-weight: normal; color: #666; }
           .header-right { text-align: right; }
-          .header-right h1 { font-size: 22px; margin-bottom: 5px; }
+          .header-right h1 { font-size: 24px; margin-bottom: 5px; }
           
           .student-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
           .student-table th, .student-table td { border: 1px solid #1e3a8a; padding: 8px; text-align: center; }
-          .student-table th { background-color: #dbeafe; color: #1e3a8a; font-size: 14px; }
+          .student-table th { background-color: #dbeafe; color: #1e3a8a; font-size: 16px; }
           
           .section-title { background-color: #dbeafe; color: #1e3a8a; padding: 6px 20px; font-weight: bold; border-radius: 4px; display: inline-block; margin-bottom: 10px; min-width: 150px; text-align: center; }
           .section-container { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 25px; }
@@ -1028,7 +1048,7 @@ export default function InstallmentsPage() {
           .summary-container { width: 300px; float: left; margin-bottom: 40px; }
           .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #ccc; }
           .summary-row.final { border-bottom: 2px solid #1e3a8a; font-weight: bold; }
-          .summary-label { color: #555; font-size: 14px; }
+          .summary-label { color: #555; font-size: 16px; }
           .summary-value { font-weight: bold; min-width: 100px; text-align: left; }
           
           .footer-section { clear: both; display: flex; justify-content: space-between; padding-top: 50px; margin-top: 60px; }
@@ -1036,7 +1056,7 @@ export default function InstallmentsPage() {
           .sig-image { width: 180px; position: absolute; top: -70px; left: 50%; transform: translateX(-50%); opacity: 0.9; }
           .sig-label { border-top: 1px solid #333; padding-top: 8px; font-weight: bold; position: relative; z-index: 2; display: block; }
           
-          .address-footer { position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px; color: #666; width: 100%; display: flex; justify-content: center; gap: 20px; }
+          .address-footer { position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; border-top: 1px solid #ccc; padding-top: 10px; font-size: 14px; color: #666; width: 100%; display: flex; justify-content: center; gap: 20px; }
 
           @media print {
             .address-footer { position: fixed; bottom: 10px; }
@@ -1067,7 +1087,7 @@ export default function InstallmentsPage() {
           <tbody>
             <tr>
               <td>${record.code}</td>
-              <td style="font-weight: bold; font-size: 16px;">${record.studentName}</td>
+              <td style="font-weight: bold; font-size: 18px;">${record.studentName}</td>
               <td>${record.department}</td>
               <td>${record.studyYear}</td>
               <td>${record.group}</td>
@@ -1113,9 +1133,163 @@ export default function InstallmentsPage() {
             <span class="summary-label">بڕی داشکاندن</span>
           </div>
           <div class="summary-row final">
-            <span class="summary-value" style="color: #1e3a8a; font-size: 18px;">${parseFloat(record.remainingAmount || 0).toLocaleString()}</span>
+            <span class="summary-value" style="color: #1e3a8a; font-size: 20px;">${parseFloat(record.remainingAmount || 0).toLocaleString()}</span>
             <span class="summary-label">بڕی ماوە</span>
           </div>
+        </div>
+
+        <div class="footer-section">
+          <div class="sig-box" style="width: 300px;">
+            <img src="/assets/accountant_sig.jpg" class="sig-image" style="width: 280px; top: -100px;" alt="Accountant Sig" />
+            <span class="sig-label"></span>
+          </div>
+          <div class="sig-box" style="width: 250px; margin-left: 20px;">
+            <img src="/assets/payer_sig.jpg" class="sig-image" style="width: 220px; top: -80px; opacity: 0.8;" alt="Payer Sig" />
+            <span class="sig-label"></span>
+          </div>
+        </div>
+
+        <div class="address-footer">
+          <span>کەلار - گەڕەکی بەردەسوور ، نزیک گوندی رووناکی ، فەرعی هەرزان بازاڕی دبیە</span>
+          <span>964 772 214 9710  +</span>
+          <span>964 750 710 4670  +</span>
+        </div>
+      </body>
+      </html>
+    `
+    printWindow.document.close()
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 800)
+  }
+
+  const handlePrintGeneral = (record) => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const html = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ku">
+      <head>
+        <title>زانیاری گشتی قیست - ${record.fullName}</title>
+        <style>
+          @font-face {
+            font-family: 'KJino';
+            src: url('/fonts/KJino.TTF') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+          }
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap');
+          body { font-family: 'KJino', 'Noto Sans Arabic', sans-serif; direction: rtl; padding: 30px; color: #333; line-height: 1.4; font-size: 18px; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; position: relative; }
+          .logo { height: 100px; object-fit: contain; }
+          .header-right { text-align: right; }
+          .header-right h1 { font-size: 24px; margin-bottom: 5px; color: #1e3a8a; }
+          .header-right h2 { font-size: 18px; font-weight: normal; color: #666; margin: 0; }
+          
+          .student-info-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          .student-info-table th, .student-info-table td { border: 1px solid #1e3a8a; padding: 10px; text-align: center; }
+          .student-info-table th { background-color: #dbeafe; color: #1e3a8a; font-size: 16px; }
+          
+          .section-title { background-color: #dbeafe; color: #1e3a8a; padding: 6px 20px; font-weight: bold; border-radius: 4px; display: inline-block; margin-bottom: 10px; min-width: 150px; text-align: center; }
+          .section-container { display: flex; flex-direction: column; align-items: flex-start; margin-bottom: 25px; }
+
+          .data-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          .data-table th, .data-table td { border: 1px solid #999; padding: 10px; text-align: center; }
+          .data-table th { background-color: #f8fafc; color: #333; font-size: 15px; }
+          
+          .summary-container { width: 300px; float: left; margin-bottom: 40px; }
+          .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #ccc; }
+          .summary-row.final { border-bottom: 2px solid #1e3a8a; font-weight: bold; margin-top: 5px; }
+          .summary-label { color: #555; }
+          .summary-value { font-weight: bold; text-align: left; }
+          
+          .footer-section { clear: both; display: flex; justify-content: space-between; padding-top: 50px; margin-top: 60px; }
+          .sig-box { text-align: center; width: 250px; position: relative; }
+          .sig-image { width: 180px; position: absolute; top: -70px; left: 50%; transform: translateX(-50%); opacity: 0.9; }
+          .sig-label { border-top: 1px solid #333; padding-top: 8px; font-weight: bold; position: relative; z-index: 2; display: block; }
+          
+          .address-footer { position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; border-top: 1px solid #ccc; padding-top: 10px; font-size: 14px; color: #666; width: 100%; display: flex; justify-content: center; gap: 20px; }
+
+          @media print {
+            .address-footer { position: fixed; bottom: 10px; }
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="header-right">
+            <h1>قوتابخانە و باخچەی داهێنەرانی ناحکومی</h1>
+            <h2>Dahenaran School & Kindergarten</h2>
+          </div>
+          <img src="/assets/dsk_logo.jpg" class="logo" alt="DSK Logo" />
+        </div>
+
+        <div class="section-container">
+          <div class="section-title">زانیاری خوێندکار</div>
+          <table class="student-info-table">
+            <thead>
+              <tr>
+                <th>ناوی خوێندکار</th>
+                <th>قۆناغ</th>
+                <th>جۆری قیست</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight: bold; font-size: 20px;">${record.fullName}</td>
+                <td>${record.grade}</td>
+                <td>${record.installmentType}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="section-container">
+          <div class="section-title">لیستی قیستەکان</div>
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>قیستی ١</th>
+                <th>قیستی ٢</th>
+                <th>قیستی ٣</th>
+                <th>قیستی ٤</th>
+                <th>قیستی ٥</th>
+                <th>قیستی ٦</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${parseFloat(record.firstInstallment || 0).toLocaleString()}</td>
+                <td>${parseFloat(record.secondInstallment || 0).toLocaleString()}</td>
+                <td>${parseFloat(record.thirdInstallment || 0).toLocaleString()}</td>
+                <td>${parseFloat(record.fourthInstallment || 0).toLocaleString()}</td>
+                <td>${parseFloat(record.fifthInstallment || 0).toLocaleString()}</td>
+                <td>${parseFloat(record.sixthInstallment || 0).toLocaleString()}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summary-container">
+          <div class="section-title" style="width: 100%; margin-bottom: 15px;">کۆی گشتی</div>
+          <div class="summary-row">
+            <span class="summary-value">${record.annualAmount ? parseFloat(record.annualAmount).toLocaleString() : '0'}</span>
+            <span class="summary-label">بڕی ساڵانە</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-value">${record.totalReceived ? parseFloat(record.totalReceived).toLocaleString() : '0'}</span>
+            <span class="summary-label">کۆی دراو</span>
+          </div>
+          <div class="summary-row final">
+            <span class="summary-value" style="color: #1e3a8a; font-size: 22px;">${record.remaining ? parseFloat(record.remaining).toLocaleString() : '0'}</span>
+            <span class="summary-label">بڕی ماوە</span>
+          </div>
+          ${record.notes ? `
+          <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 5px;">
+            <div style="font-weight: bold; font-size: 13px; color: #666; margin-bottom: 3px;">تێبینی:</div>
+            <div style="font-size: 14px;">${record.notes}</div>
+          </div>
+          ` : ''}
         </div>
 
         <div class="footer-section">
@@ -1159,15 +1333,72 @@ export default function InstallmentsPage() {
       { key: 'discountAmount', header: t('annualInstallments.personalFields.discount', language), align: 'center', render: v => parseFloat(v || 0).toLocaleString() },
       { key: 'remainingAmount', header: t('annualInstallments.personalFields.remaining', language), align: 'center', render: v => <span className={parseFloat(v || 0) > 0 ? "text-red-500 font-bold" : ""}>{parseFloat(v || 0).toLocaleString()}</span> },
       {
-        key: 'actions', header: 'کردار', align: 'center', render: (_, row) => (
+        key: 'actions',
+        header: <span style={{ fontFamily: 'KJino' }}>کردار</span>,
+        align: 'center',
+        render: (_, row) => (
           <div className="flex gap-1 justify-center">
             <Button size="sm" variant="ghost" onClick={() => startEditingPersonal(row.id)}><Edit className="h-4 w-4" /></Button>
-            <Button size="sm" variant="ghost" onClick={() => handlePrintPersonal(row)} className="text-blue-600"><Printer className="h-4 w-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => handlePrintPersonal(row)} className="text-blue-600" style={{ fontFamily: 'KJino' }}><Printer className="h-4 w-4" /></Button>
             <Button size="sm" variant="ghost" onClick={() => deletePersonalEntry(row.id)} className="text-red-600"><Trash2 className="h-4 w-4" /></Button>
           </div>
         )
       }
     ]
+
+    function PersonalInstallmentsCardView({ data }) {
+      return (
+        <div className="space-y-4">
+          {data.map((entry, idx) => (
+            <Card key={entry.id} className="p-4 theme-card glow-button hover:shadow-xl transition-all duration-300 border-2 hover:border-blue-300 dark:hover:border-blue-500 group">
+              <div className="space-y-3">
+                <div className="flex justify-between items-start">
+                  <div className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded text-xs font-bold">{entry.code}</div>
+                  <div className="font-bold text-lg text-right group-hover:text-blue-700 dark:group-hover:text-blue-300 transition-colors duration-300">{entry.studentName}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-sm border-b pb-2">
+                  <div><span className="font-semibold">{t('annualInstallments.personalFields.department', language)}:</span> {entry.department}</div>
+                  <div><span className="font-semibold">{t('annualInstallments.personalFields.studyYear', language)}:</span> {entry.studyYear}</div>
+                  <div><span className="font-semibold">{t('annualInstallments.personalFields.group', language)}:</span> {entry.group}</div>
+                  <div><span className="font-semibold">ژ.وەسل:</span> {entry.receiptNumber}</div>
+                </div>
+                <div className="grid grid-cols-1 gap-1 text-sm bg-gray-50 dark:bg-gray-800/50 p-2 rounded">
+                  <div className="flex justify-between px-1">
+                    <span className="font-semibold text-blue-600">{t('annualInstallments.personalFields.installmentAmount', language)}:</span>
+                    <span className="font-bold">{parseFloat(entry.installmentAmount || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between px-1">
+                    <span className="font-semibold">{t('annualInstallments.personalFields.totalPaid', language)}:</span>
+                    <span>{parseFloat(entry.totalPaidInstallments || 0).toLocaleString()}</span>
+                  </div>
+                  <div className="flex justify-between px-1 border-t pt-1 mt-1">
+                    <span className="font-bold text-red-600">{t('annualInstallments.personalFields.remaining', language)}:</span>
+                    <span className="font-bold text-red-600">{parseFloat(entry.remainingAmount || 0).toLocaleString()}</span>
+                  </div>
+                </div>
+                {entry.notes && (
+                  <div className="text-sm text-gray-600 dark:text-gray-400 italic">
+                    <span className="font-semibold not-italic">تێبینی:</span> {entry.notes}
+                  </div>
+                )}
+                <div className="flex gap-2 mt-3">
+                  <Button size="sm" variant="outline" onClick={() => startEditingPersonal(entry.id)} className="hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200">
+                    <Edit className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="outline" onClick={() => handlePrintPersonal(entry)} className="text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200" style={{ fontFamily: 'KJino' }}>
+                    <Printer className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="destructive" onClick={() => deletePersonalEntry(entry.id)} className="hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors duration-200">
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )
+    }
+
     const totalInstallmentAmount = data.reduce((sum, entry) => sum + (parseFloat(entry.installmentAmount) || 0), 0)
     const totalAnnualTuition = data.reduce((sum, entry) => sum + (parseFloat(entry.annualTuition) || 0), 0)
     const totalPaidAmount = data.reduce((sum, entry) => sum + (parseFloat(entry.totalPaidInstallments) || 0), 0)
@@ -1439,7 +1670,7 @@ export default function InstallmentsPage() {
             </div>
           </div>
           <div className="mt-6">
-            <PersonalInstallmentsTableView data={filteredPersonalData} />
+            {isMobile ? <PersonalInstallmentsCardView data={filteredPersonalData} /> : <PersonalInstallmentsTableView data={filteredPersonalData} />}
           </div>
         </TabsContent>
       </Tabs>
