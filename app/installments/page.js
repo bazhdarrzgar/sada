@@ -5,8 +5,9 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Label } from '@/components/ui/label'
-import { Search, Plus, Edit, Trash2, Save, X, Image as ImageIcon, Download, Languages, RefreshCw } from 'lucide-react'
+import { Search, Plus, Edit, Trash2, Save, X, Image as ImageIcon, Download, Languages, RefreshCw, Printer, Info } from 'lucide-react'
 import { useIsMobile } from "@/hooks/use-mobile"
 import PageLayout from '@/components/layout/PageLayout'
 import { DownloadButton } from '@/components/ui/download-button'
@@ -62,6 +63,31 @@ export default function InstallmentsPage() {
     receiptImages: [],
     notes: ''
   })
+
+  // Personal Installment Request state
+  const [personalInstallmentsData, setPersonalInstallmentsData] = useState([])
+  const [personalLoading, setPersonalLoading] = useState(true)
+  const [isPersonalAddDialogOpen, setIsPersonalAddDialogOpen] = useState(false)
+  const [editingPersonalRow, setEditingPersonalRow] = useState(null)
+  const [isPersonalEditModalOpen, setIsPersonalEditModalOpen] = useState(false)
+  const [editingPersonalData, setEditingPersonalData] = useState(null)
+  const [personalNewEntry, setPersonalNewEntry] = useState({
+    code: '',
+    studentName: '',
+    department: '',
+    studyYear: '',
+    group: '',
+    startYear: '',
+    receiptNumber: '',
+    installmentAmount: 0,
+    date: new Date().toISOString().split('T')[0],
+    notes: '',
+    annualTuition: 0,
+    totalPaidInstallments: 0,
+    discountAmount: 0,
+    remainingAmount: 0
+  })
+  const [personalSearchTerm, setPersonalSearchTerm] = useState('')
 
   // Initialize Fuse.js with comprehensive search options across ALL columns
   const fuse = useMemo(() => {
@@ -122,6 +148,24 @@ export default function InstallmentsPage() {
     return new Fuse(installmentsData, options)
   }, [installmentsData])
 
+  const personalFuse = useMemo(() => {
+    const options = {
+      keys: [
+        { name: 'code', weight: 0.1 },
+        { name: 'studentName', weight: 0.4 },
+        { name: 'department', weight: 0.2 },
+        { name: 'studyYear', weight: 0.1 },
+        { name: 'group', weight: 0.1 },
+        { name: 'receiptNumber', weight: 0.1 },
+        { name: 'startYear', weight: 0.1 },
+        { name: 'date', weight: 0.1 }
+      ],
+      threshold: 0.3,
+      minMatchCharLength: 2
+    }
+    return new Fuse(personalInstallmentsData, options)
+  }, [personalInstallmentsData])
+
   // Fetch installments data from API
   useEffect(() => {
     fetchInstallmentsData()
@@ -138,6 +182,101 @@ export default function InstallmentsPage() {
       console.error('Error fetching installments data:', error)
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchPersonalInstallmentsData = async () => {
+    try {
+      const response = await fetch('/api/personal-installments')
+      if (response.ok) {
+        const data = await response.json()
+        setPersonalInstallmentsData(data)
+      }
+    } catch (error) {
+      console.error('Error fetching personal installments data:', error)
+    } finally {
+      setPersonalLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchPersonalInstallmentsData()
+  }, [])
+
+  const savePersonalEntry = async (entry) => {
+    if (isSaving) return false
+    setIsSaving(true)
+    try {
+      const isUpdate = entry.id && !entry.id.startsWith('temp-')
+      const url = isUpdate ? `/api/personal-installments/${entry.id}` : '/api/personal-installments'
+      const method = isUpdate ? 'PUT' : 'POST'
+
+      const response = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      })
+
+      if (response.ok) {
+        const saved = await response.json()
+        setPersonalInstallmentsData(prev => {
+          const idx = prev.findIndex(p => p.id === saved.id)
+          if (idx !== -1) {
+            const next = [...prev]
+            next[idx] = saved
+            return next
+          }
+          return [saved, ...prev]
+        })
+        setIsPersonalAddDialogOpen(false)
+        setEditingPersonalRow(null)
+        resetPersonalNewEntry()
+        return true
+      }
+    } catch (error) {
+      console.error('Error saving personal installment:', error)
+    } finally {
+      setIsSaving(false)
+    }
+    return false
+  }
+
+  const deletePersonalEntry = async (id) => {
+    if (!confirm('Are you sure?')) return
+    try {
+      const response = await fetch(`/api/personal-installments/${id}`, { method: 'DELETE' })
+      if (response.ok) {
+        setPersonalInstallmentsData(prev => prev.filter(p => p.id !== id))
+      }
+    } catch (error) {
+      console.error('Error deleting personal installment:', error)
+    }
+  }
+
+  const resetPersonalNewEntry = () => {
+    setPersonalNewEntry({
+      code: '',
+      studentName: '',
+      department: '',
+      studyYear: '',
+      group: '',
+      startYear: '',
+      receiptNumber: '',
+      installmentAmount: 0,
+      date: new Date().toISOString().split('T')[0],
+      notes: '',
+      annualTuition: 0,
+      totalPaidInstallments: 0,
+      discountAmount: 0,
+      remainingAmount: 0
+    })
+  }
+
+  const handlePersonalModalSave = async (data) => {
+    const success = await savePersonalEntry(data)
+    if (success) {
+      setIsPersonalEditModalOpen(false)
+      setEditingPersonalData(null)
     }
   }
 
@@ -346,6 +485,42 @@ export default function InstallmentsPage() {
     }, 300) // Small delay to allow scroll to start
   }
 
+  const startEditingPersonal = (indexOrId) => {
+    // First scroll to center, then open modal after a brief delay
+    scrollToCenter()
+    setTimeout(() => {
+      // Handle both index (number) and ID (string) parameters
+      let entry
+      if (typeof indexOrId === 'number') {
+        // Called from card view with index (if implemented)
+        entry = filteredPersonalData[indexOrId]
+      } else {
+        // Called from table view with ID
+        entry = personalInstallmentsData.find(item => item.id === indexOrId)
+      }
+
+      if (!entry) {
+        console.error('Personal entry not found for indexOrId:', indexOrId)
+        return
+      }
+
+      // Create a deep copy to ensure all data is properly passed
+      const entryData = {
+        ...entry,
+        // Ensure numeric fields are properly set
+        installmentAmount: entry.installmentAmount || 0,
+        annualTuition: entry.annualTuition || 0,
+        totalPaidInstallments: entry.totalPaidInstallments || 0,
+        discountAmount: entry.discountAmount || 0,
+        remainingAmount: entry.remainingAmount || 0,
+        notes: entry.notes || ''
+      }
+      setEditingPersonalData(entryData)
+      setIsPersonalEditModalOpen(true)
+    }, 300) // Small delay to allow scroll to start
+  }
+
+
   const saveRowEdit = (rowIndex) => {
     const entry = installmentsData[rowIndex]
     saveEntry(entry)
@@ -518,15 +693,35 @@ export default function InstallmentsPage() {
     }
   ]
 
+  const personalEditFields = [
+    { key: 'code', label: t('annualInstallments.personalFields.code', language), labelKu: t('annualInstallments.personalFields.code', 'kurdish'), type: 'text' },
+    { key: 'studentName', label: t('annualInstallments.personalFields.studentName', language), labelKu: t('annualInstallments.personalFields.studentName', 'kurdish'), type: 'text' },
+    { key: 'department', label: t('annualInstallments.personalFields.department', language), labelKu: t('annualInstallments.personalFields.department', 'kurdish'), type: 'text' },
+    { key: 'studyYear', label: t('annualInstallments.personalFields.studyYear', language), labelKu: t('annualInstallments.personalFields.studyYear', 'kurdish'), type: 'text' },
+    { key: 'group', label: t('annualInstallments.personalFields.group', language), labelKu: t('annualInstallments.personalFields.group', 'kurdish'), type: 'text' },
+    { key: 'startYear', label: t('annualInstallments.personalFields.startYear', language), labelKu: t('annualInstallments.personalFields.startYear', 'kurdish'), type: 'text' },
+    { key: 'receiptNumber', label: t('annualInstallments.personalFields.receiptNumber', language), labelKu: t('annualInstallments.personalFields.receiptNumber', 'kurdish'), type: 'text' },
+    { key: 'installmentAmount', label: t('annualInstallments.personalFields.installmentAmount', language), labelKu: t('annualInstallments.personalFields.installmentAmount', 'kurdish'), type: 'number' },
+    { key: 'date', label: t('annualInstallments.personalFields.date', language), labelKu: t('annualInstallments.personalFields.date', 'kurdish'), type: 'date' },
+    { key: 'annualTuition', label: t('annualInstallments.personalFields.annualTuition', language), labelKu: t('annualInstallments.personalFields.annualTuition', 'kurdish'), type: 'number' },
+    { key: 'totalPaidInstallments', label: t('annualInstallments.personalFields.totalPaid', language), labelKu: t('annualInstallments.personalFields.totalPaid', 'kurdish'), type: 'number' },
+    { key: 'discountAmount', label: t('annualInstallments.personalFields.discount', language), labelKu: t('annualInstallments.personalFields.discount', 'kurdish'), type: 'number' },
+    { key: 'remainingAmount', label: t('annualInstallments.personalFields.remaining', language), labelKu: t('annualInstallments.personalFields.remaining', 'kurdish'), type: 'number' },
+    { key: 'notes', label: t('annualInstallments.personalFields.notes', language), labelKu: t('annualInstallments.personalFields.notes', 'kurdish'), type: 'text', span: 'full' }
+  ]
+
   // Implement fuzzy search
   const filteredData = useMemo(() => {
-    if (!searchTerm.trim()) {
-      return installmentsData
-    }
-
+    if (!searchTerm.trim()) return installmentsData
     const results = fuse.search(searchTerm)
     return results.map(result => result.item)
   }, [fuse, searchTerm, installmentsData])
+
+  const filteredPersonalData = useMemo(() => {
+    if (!personalSearchTerm.trim()) return personalInstallmentsData
+    const results = personalFuse.search(personalSearchTerm)
+    return results.map(r => r.item)
+  }, [personalFuse, personalSearchTerm, personalInstallmentsData])
 
   // Calculate totals
   const totalAnnual = filteredData.reduce((sum, entry) => sum + (parseFloat(entry.annualAmount) || 0), 0)
@@ -799,6 +994,221 @@ export default function InstallmentsPage() {
     )
   }
 
+  const handlePrintPersonal = (record) => {
+    const printWindow = window.open('', '_blank')
+    if (!printWindow) return
+
+    const html = `
+      <!DOCTYPE html>
+      <html dir="rtl" lang="ku">
+      <head>
+        <title>بەرواری قیست - ${record.studentName}</title>
+        <style>
+          @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@400;700&display=swap');
+          body { font-family: 'Noto Sans Arabic', sans-serif; direction: rtl; padding: 30px; color: #333; line-height: 1.4; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; position: relative; }
+          .logo { height: 100px; object-fit: contain; }
+          .header-text { text-align: center; flex-grow: 1; }
+          .header-text h1 { margin: 0; font-size: 24px; color: #1e3a8a; }
+          .header-text h2 { margin: 5px 0 0 0; font-size: 18px; font-weight: normal; color: #666; }
+          .header-right { text-align: right; }
+          .header-right h1 { font-size: 22px; margin-bottom: 5px; }
+          
+          .student-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          .student-table th, .student-table td { border: 1px solid #1e3a8a; padding: 8px; text-align: center; }
+          .student-table th { background-color: #dbeafe; color: #1e3a8a; font-size: 14px; }
+          
+          .section-title { background-color: #dbeafe; color: #1e3a8a; padding: 6px 20px; font-weight: bold; border-radius: 4px; display: inline-block; margin-bottom: 10px; min-width: 150px; text-align: center; }
+          .section-container { display: flex; flex-direction: column; align-items: flex-end; margin-bottom: 25px; }
+
+          .installments-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+          .installments-table th, .installments-table td { border: 1px solid #999; padding: 10px; text-align: center; }
+          .installments-table th { background-color: #f8fafc; color: #333; }
+          
+          .summary-container { width: 300px; float: left; margin-bottom: 40px; }
+          .summary-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px dashed #ccc; }
+          .summary-row.final { border-bottom: 2px solid #1e3a8a; font-weight: bold; }
+          .summary-label { color: #555; font-size: 14px; }
+          .summary-value { font-weight: bold; min-width: 100px; text-align: left; }
+          
+          .footer-section { clear: both; display: flex; justify-content: space-between; padding-top: 50px; margin-top: 60px; }
+          .sig-box { text-align: center; width: 250px; position: relative; }
+          .sig-image { width: 180px; position: absolute; top: -70px; left: 50%; transform: translateX(-50%); opacity: 0.9; }
+          .sig-label { border-top: 1px solid #333; padding-top: 8px; font-weight: bold; position: relative; z-index: 2; display: block; }
+          
+          .address-footer { position: fixed; bottom: 20px; left: 0; right: 0; text-align: center; border-top: 1px solid #ccc; padding-top: 10px; font-size: 12px; color: #666; width: 100%; display: flex; justify-content: center; gap: 20px; }
+
+          @media print {
+            .address-footer { position: fixed; bottom: 10px; }
+            body { padding: 0; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="header-right">
+            <h1>قوتابخانە و باخچەی داهێنەرانی ناحکومی</h1>
+            <h2>Dahenaran School & Kindergarten</h2>
+          </div>
+          <img src="/assets/dsk_logo.jpg" class="logo" alt="DSK Logo" />
+        </div>
+
+        <table class="student-table">
+          <thead>
+            <tr>
+              <th>کۆد</th>
+              <th>ناوی خوێندکار</th>
+              <th>بەش</th>
+              <th>ساڵی خوێندن</th>
+              <th>گروپ</th>
+              <th>ساڵی دەستپێکردن</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${record.code}</td>
+              <td style="font-weight: bold; font-size: 16px;">${record.studentName}</td>
+              <td>${record.department}</td>
+              <td>${record.studyYear}</td>
+              <td>${record.group}</td>
+              <td>${record.startYear}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="section-container">
+          <div class="section-title">قیستەکان</div>
+          <table class="installments-table">
+            <thead>
+              <tr>
+                <th style="width: 15%">ژ. وەسل</th>
+                <th style="width: 25%">بڕی قیست</th>
+                <th style="width: 25%">بەروار</th>
+                <th style="width: 35%">تێبینی</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>${record.receiptNumber}</td>
+                <td style="font-weight: bold;">${parseFloat(record.installmentAmount).toLocaleString()}</td>
+                <td>${record.date}</td>
+                <td>${record.notes || ''}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="summary-container" style="float: left;">
+          <div class="section-title" style="width: 100%; margin-bottom: 15px;">کۆی قیست</div>
+          <div class="summary-row">
+            <span class="summary-value">${parseFloat(record.annualTuition).toLocaleString()}</span>
+            <span class="summary-label">پارەی خوێندنی ساڵ</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-value">${parseFloat(record.totalPaidInstallments).toLocaleString()}</span>
+            <span class="summary-label">کۆی قیستی دراو</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-value">${parseFloat(record.discountAmount).toLocaleString()}</span>
+            <span class="summary-label">بڕی داشکاندن</span>
+          </div>
+          <div class="summary-row final">
+            <span class="summary-value" style="color: #1e3a8a; font-size: 18px;">${parseFloat(record.remainingAmount || 0).toLocaleString()}</span>
+            <span class="summary-label">بڕی ماوە</span>
+          </div>
+        </div>
+
+        <div class="footer-section">
+          <div class="sig-box" style="width: 300px;">
+            <img src="/assets/accountant_sig.jpg" class="sig-image" style="width: 280px; top: -100px;" alt="Accountant Sig" />
+            <span class="sig-label"></span>
+          </div>
+          <div class="sig-box" style="width: 250px; margin-left: 20px;">
+            <img src="/assets/payer_sig.jpg" class="sig-image" style="width: 220px; top: -80px; opacity: 0.8;" alt="Payer Sig" />
+            <span class="sig-label"></span>
+          </div>
+        </div>
+
+        <div class="address-footer">
+          <span>کەلار - گەڕەکی بەردەسوور ، نزیک گوندی رووناکی ، فەرعی هەرزان بازاڕی دبیە</span>
+          <span>964 772 214 9710  +</span>
+          <span>964 750 710 4670  +</span>
+        </div>
+      </body>
+      </html>
+    `
+    printWindow.document.write(html)
+    printWindow.document.close()
+    setTimeout(() => { printWindow.print(); printWindow.close(); }, 800)
+  }
+
+  function PersonalInstallmentsTableView({ data }) {
+    const columns = [
+      { key: 'code', header: t('annualInstallments.personalFields.code', language), align: 'center' },
+      { key: 'studentName', header: t('annualInstallments.personalFields.studentName', language), align: 'right' },
+      { key: 'department', header: t('annualInstallments.personalFields.department', language), align: 'center' },
+      { key: 'studyYear', header: t('annualInstallments.personalFields.studyYear', language), align: 'center' },
+      { key: 'group', header: t('annualInstallments.personalFields.group', language), align: 'center' },
+      { key: 'startYear', header: t('annualInstallments.personalFields.startYear', language), align: 'center' },
+      { key: 'receiptNumber', header: t('annualInstallments.personalFields.receiptNumber', language), align: 'center' },
+      { key: 'installmentAmount', header: t('annualInstallments.personalFields.installmentAmount', language), align: 'center', render: v => parseFloat(v || 0).toLocaleString() },
+      { key: 'date', header: t('annualInstallments.personalFields.date', language), align: 'center' },
+      { key: 'notes', header: t('annualInstallments.personalFields.notes', language), align: 'center', truncate: 20 },
+      { key: 'annualTuition', header: t('annualInstallments.personalFields.annualTuition', language), align: 'center', render: v => parseFloat(v || 0).toLocaleString() },
+      { key: 'totalPaidInstallments', header: t('annualInstallments.personalFields.totalPaid', language), align: 'center', render: v => parseFloat(v || 0).toLocaleString() },
+      { key: 'discountAmount', header: t('annualInstallments.personalFields.discount', language), align: 'center', render: v => parseFloat(v || 0).toLocaleString() },
+      { key: 'remainingAmount', header: t('annualInstallments.personalFields.remaining', language), align: 'center', render: v => <span className={parseFloat(v || 0) > 0 ? "text-red-500 font-bold" : ""}>{parseFloat(v || 0).toLocaleString()}</span> },
+      {
+        key: 'actions', header: 'کردار', align: 'center', render: (_, row) => (
+          <div className="flex gap-1 justify-center">
+            <Button size="sm" variant="ghost" onClick={() => startEditingPersonal(row.id)}><Edit className="h-4 w-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => handlePrintPersonal(row)} className="text-blue-600"><Printer className="h-4 w-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => deletePersonalEntry(row.id)} className="text-red-600"><Trash2 className="h-4 w-4" /></Button>
+          </div>
+        )
+      }
+    ]
+    const totalInstallmentAmount = data.reduce((sum, entry) => sum + (parseFloat(entry.installmentAmount) || 0), 0)
+    const totalAnnualTuition = data.reduce((sum, entry) => sum + (parseFloat(entry.annualTuition) || 0), 0)
+    const totalPaidAmount = data.reduce((sum, entry) => sum + (parseFloat(entry.totalPaidInstallments) || 0), 0)
+    const totalDiscountAmount = data.reduce((sum, entry) => sum + (parseFloat(entry.discountAmount) || 0), 0)
+    const totalRemainingAmount = data.reduce((sum, entry) => sum + (parseFloat(entry.remainingAmount) || 0), 0)
+
+    return (
+      <>
+        <EnhancedTable data={data} columns={columns} maxRowsPerPage={10} enablePagination={true} showActions={false} />
+
+        {/* Summary footer for Personal */}
+        <Card className="mt-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-700 border-gray-200 dark:border-gray-600">
+          <CardContent className="p-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium truncate">{t('annualInstallments.personalFields.installmentAmount', language)}</p>
+                <p className="text-lg font-bold text-blue-600 dark:text-blue-400">{totalInstallmentAmount.toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium truncate text-xs">{t('annualInstallments.personalFields.annualTuition', language)}</p>
+                <p className="text-lg font-bold text-indigo-600 dark:text-indigo-400">{totalAnnualTuition.toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium truncate">{t('annualInstallments.personalFields.totalPaid', language)}</p>
+                <p className="text-lg font-bold text-green-600 dark:text-green-400">{totalPaidAmount.toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium truncate">{t('annualInstallments.personalFields.discount', language)}</p>
+                <p className="text-lg font-bold text-orange-600 dark:text-orange-400">{totalDiscountAmount.toLocaleString()}</p>
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium truncate">{t('annualInstallments.personalFields.remaining', language)}</p>
+                <p className="text-lg font-bold text-red-600 dark:text-red-400">{totalRemainingAmount.toLocaleString()}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </>
+    )
+  }
+
   // Handle authentication
   const handleLogin = (e) => {
     e.preventDefault()
@@ -886,313 +1296,153 @@ export default function InstallmentsPage() {
 
   return (
     <PageLayout title={t('annualInstallments.title', language)} titleKu={t('annualInstallments.title', 'kurdish')}>
-      {/* Search and Add Controls */}
-      <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-        <div className="relative flex-1">
-          <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-          <Input
-            placeholder={t('annualInstallments.searchPlaceholder', language)}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10"
-          />
-        </div>
-        <div className="flex items-center gap-4">
-          <DownloadButton
-            data={filteredData}
-            filename="installments-records"
-            className="bg-green-600 hover:bg-green-700 text-white"
-          />
-          <PrintButton
-            data={filteredData}
-            filename="installments-records"
-            title={t('annualInstallments.title', language)}
-            titleKu={t('annualInstallments.title', 'kurdish')}
-            columns={[
-              { key: 'fullName', header: t('annualInstallments.fields.fullName', 'kurdish') },
-              { key: 'grade', header: t('annualInstallments.fields.grade', 'kurdish') },
-              { key: 'installmentType', header: t('annualInstallments.fields.installmentType', 'kurdish') },
-              { key: 'annualAmount', header: t('annualInstallments.fields.annualAmount', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
-              { key: 'firstInstallment', header: t('annualInstallments.fields.firstInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
-              { key: 'secondInstallment', header: t('annualInstallments.fields.secondInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
-              { key: 'thirdInstallment', header: t('annualInstallments.fields.thirdInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
-              { key: 'fourthInstallment', header: t('annualInstallments.fields.fourthInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
-              { key: 'fifthInstallment', header: t('annualInstallments.fields.fifthInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
-              { key: 'sixthInstallment', header: t('annualInstallments.fields.sixthInstallment', 'kurdish'), render: (value) => parseFloat(value || 0).toLocaleString() },
-              { key: 'totalReceived', header: t('annualInstallments.fields.totalReceived', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
-              { key: 'remaining', header: t('annualInstallments.fields.remaining', 'kurdish'), render: (value) => parseFloat(value).toLocaleString() },
-              { key: 'receiptImages', header: t('annualInstallments.fields.receiptImages', 'kurdish') },
-              { key: 'notes', header: t('annualInstallments.fields.notes', 'kurdish') }
-            ]}
-            summaryItems={[
-              { key: 'annualAmount', label: 'کۆی ساڵانە' },
-              { key: 'totalReceived', label: 'کۆی وەرگیراو' },
-              { key: 'remaining', label: 'کۆی ماوە' }
-            ]}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          />
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
-                onClick={() => {
-                  // First scroll to center, then open modal
-                  scrollToCenter()
-                  setTimeout(() => {
-                    setIsAddDialogOpen(true)
-                  }, 300) // Small delay to allow scroll to start
-                }}
-              >
-                <Plus className="h-4 w-4" />
-                {t('annualInstallments.addButton', language)}
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] max-w-4xl max-h-[90vh] overflow-y-auto z-[100]">
-              <DialogHeader>
-                <DialogTitle>{t('annualInstallments.addTitle', language)}</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="fullName">{t('annualInstallments.fields.fullName', language)}</Label>
-                  <Input
-                    id="fullName"
-                    value={newEntry.fullName}
-                    onChange={(e) => setNewEntry({ ...newEntry, fullName: e.target.value })}
-                    placeholder="Enter student name"
-                  />
-                </div>
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="mb-6">
+          <TabsTrigger value="general">{t('annualInstallments.tabs.generalInfo', language)}</TabsTrigger>
+          <TabsTrigger value="personal">{t('annualInstallments.tabs.personalRequest', language)}</TabsTrigger>
+        </TabsList>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="grade">{t('annualInstallments.fields.grade', language)}</Label>
-                    <Input
-                      id="grade"
-                      value={newEntry.grade}
-                      onChange={(e) => setNewEntry({ ...newEntry, grade: e.target.value })}
-                      placeholder="Enter grade"
-                    />
+        <TabsContent value="general">
+          {/* Search and Add Controls for General */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder={t('annualInstallments.searchPlaceholder', language)}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <DownloadButton data={filteredData} filename="installments-records" className="bg-green-600 hover:bg-green-700 text-white" />
+              <PrintButton
+                data={filteredData}
+                filename="installments-records"
+                title={t('annualInstallments.title', language)}
+                titleKu={t('annualInstallments.title', 'kurdish')}
+                columns={[
+                  { key: 'fullName', header: t('annualInstallments.fields.fullName', 'kurdish') },
+                  { key: 'grade', header: t('annualInstallments.fields.grade', 'kurdish') },
+                  { key: 'installmentType', header: t('annualInstallments.fields.installmentType', 'kurdish') },
+                  { key: 'annualAmount', header: t('annualInstallments.fields.annualAmount', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() },
+                  { key: 'totalReceived', header: t('annualInstallments.fields.totalReceived', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() },
+                  { key: 'remaining', header: t('annualInstallments.fields.remaining', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() }
+                ]}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              />
+              <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700" onClick={scrollToCenter}><Plus className="h-4 w-4" /> {t('annualInstallments.addButton', language)}</Button>
+                </DialogTrigger>
+                <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] max-w-4xl max-h-[90vh] overflow-y-auto z-[100]">
+                  <DialogHeader><DialogTitle>{t('annualInstallments.addTitle', language)}</DialogTitle></DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="fullName">{t('annualInstallments.fields.fullName', language)}</Label>
+                      <Input id="fullName" value={newEntry.fullName} onChange={(e) => setNewEntry({ ...newEntry, fullName: e.target.value })} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><Label htmlFor="grade">{t('annualInstallments.fields.grade', language)}</Label><Input id="grade" value={newEntry.grade} onChange={(e) => setNewEntry({ ...newEntry, grade: e.target.value })} /></div>
+                      <div><Label htmlFor="installmentType">{t('annualInstallments.fields.installmentType', language)}</Label><Input id="installmentType" value={newEntry.installmentType} onChange={(e) => setNewEntry({ ...newEntry, installmentType: e.target.value })} /></div>
+                    </div>
+                    <div><Label htmlFor="annualAmount">{t('annualInstallments.fields.annualAmount', language)}</Label><Input id="annualAmount" type="number" value={newEntry.annualAmount} onChange={(e) => { const a = parseFloat(e.target.value) || 0; setNewEntry({ ...newEntry, annualAmount: a, remaining: a - newEntry.totalReceived }) }} /></div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div><Label htmlFor="totalReceived">{t('annualInstallments.fields.totalReceived', language)}</Label><Input id="totalReceived" type="number" value={newEntry.totalReceived} readOnly className="bg-gray-100 dark:bg-gray-800" /></div>
+                      <div><Label htmlFor="remaining">{t('annualInstallments.fields.remaining', language)}</Label><Input id="remaining" type="number" value={newEntry.remaining} readOnly className="bg-gray-100 dark:bg-gray-800" /></div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button variant="outline" onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}>{t('annualInstallments.buttons.cancel', language)}</Button>
+                      <Button onClick={() => saveEntry(newEntry)} disabled={isSaving}>{isSaving ? 'Saving...' : t('annualInstallments.buttons.save', language)}</Button>
+                    </div>
                   </div>
-                  <div>
-                    <Label htmlFor="installmentType">{t('annualInstallments.fields.installmentType', language)}</Label>
-                    <Input
-                      id="installmentType"
-                      value={newEntry.installmentType}
-                      onChange={(e) => setNewEntry({ ...newEntry, installmentType: e.target.value })}
-                      placeholder="Enter type"
-                    />
-                  </div>
-                </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          <div className="mt-6">
+            {isMobile ? <InstallmentsCardView data={filteredData} /> : <InstallmentsTableView data={filteredData} />}
+          </div>
+        </TabsContent>
 
-                <div>
-                  <Label htmlFor="annualAmount">{t('annualInstallments.fields.annualAmount', language)}</Label>
-                  <Input
-                    id="annualAmount"
-                    type="number"
-                    value={newEntry.annualAmount}
-                    onChange={(e) => {
-                      const annualAmount = parseFloat(e.target.value) || 0
-                      setNewEntry({
-                        ...newEntry,
-                        annualAmount: annualAmount,
-                        remaining: annualAmount - newEntry.totalReceived
-                      })
-                    }}
-                    placeholder="0"
-                  />
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="firstInstallment">{t('annualInstallments.installmentNumbers.first', language)}</Label>
-                    <Input
-                      id="firstInstallment"
-                      type="number"
-                      value={newEntry.firstInstallment}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0
-                        const totalReceived = value + newEntry.secondInstallment + newEntry.thirdInstallment + newEntry.fourthInstallment + newEntry.fifthInstallment + newEntry.sixthInstallment
-                        setNewEntry({
-                          ...newEntry,
-                          firstInstallment: value,
-                          totalReceived: totalReceived,
-                          remaining: parseFloat(newEntry.annualAmount) - totalReceived
-                        })
-                      }}
-                      placeholder="0"
-                    />
+        <TabsContent value="personal">
+          {/* Search and Add Controls for Personal */}
+          <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mb-6">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+              <Input
+                placeholder={t('annualInstallments.searchPlaceholder', language)}
+                value={personalSearchTerm}
+                onChange={(e) => setPersonalSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+            <div className="flex items-center gap-4">
+              <DownloadButton data={filteredPersonalData} filename="personal-installments-records" className="bg-green-600 hover:bg-green-700 text-white" />
+              <PrintButton
+                data={filteredPersonalData}
+                filename="personal-installments-records"
+                title={t('annualInstallments.tabs.personalRequest', language)}
+                titleKu={t('annualInstallments.tabs.personalRequest', 'kurdish')}
+                columns={[
+                  { key: 'code', header: t('annualInstallments.personalFields.code', 'kurdish') },
+                  { key: 'studentName', header: t('annualInstallments.personalFields.studentName', 'kurdish') },
+                  { key: 'department', header: t('annualInstallments.personalFields.department', 'kurdish') },
+                  { key: 'studyYear', header: t('annualInstallments.personalFields.studyYear', 'kurdish') },
+                  { key: 'group', header: t('annualInstallments.personalFields.group', 'kurdish') },
+                  { key: 'startYear', header: t('annualInstallments.personalFields.startYear', 'kurdish') },
+                  { key: 'receiptNumber', header: t('annualInstallments.personalFields.receiptNumber', 'kurdish') },
+                  { key: 'installmentAmount', header: t('annualInstallments.personalFields.installmentAmount', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() },
+                  { key: 'date', header: t('annualInstallments.personalFields.date', 'kurdish') },
+                  { key: 'annualTuition', header: t('annualInstallments.personalFields.annualTuition', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() },
+                  { key: 'totalPaidInstallments', header: t('annualInstallments.personalFields.totalPaid', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() },
+                  { key: 'discountAmount', header: t('annualInstallments.personalFields.discount', 'kurdish'), render: (v) => parseFloat(v).toLocaleString() },
+                  { key: 'remainingAmount', header: t('annualInstallments.personalFields.remaining', 'kurdish'), render: (v) => parseFloat(v || 0).toLocaleString() }
+                ]}
+                summaryItems={[
+                  { key: 'installmentAmount', label: t('annualInstallments.personalFields.installmentAmount', 'kurdish') },
+                  { key: 'annualTuition', label: t('annualInstallments.personalFields.annualTuition', 'kurdish') },
+                  { key: 'totalPaidInstallments', label: t('annualInstallments.personalFields.totalPaid', 'kurdish') },
+                  { key: 'discountAmount', label: t('annualInstallments.personalFields.discount', 'kurdish') },
+                  { key: 'remainingAmount', label: t('annualInstallments.personalFields.remaining', 'kurdish') }
+                ]}
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+              />
+              <Dialog open={isPersonalAddDialogOpen} onOpenChange={setIsPersonalAddDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700" onClick={scrollToCenter}><Plus className="h-4 w-4" /> {t('annualInstallments.addButton', language)}</Button>
+                </DialogTrigger>
+                <DialogContent className="fixed top-[50%] left-[50%] translate-x-[-50%] translate-y-[-50%] max-w-4xl max-h-[90vh] overflow-y-auto z-[100]">
+                  <DialogHeader><DialogTitle>{t('annualInstallments.tabs.personalRequest', language)}</DialogTitle></DialogHeader>
+                  <div className="grid grid-cols-2 gap-4 pb-4">
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.code', language)}</Label><Input value={personalNewEntry.code} onChange={e => setPersonalNewEntry({ ...personalNewEntry, code: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.studentName', language)}</Label><Input value={personalNewEntry.studentName} onChange={e => setPersonalNewEntry({ ...personalNewEntry, studentName: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.department', language)}</Label><Input value={personalNewEntry.department} onChange={e => setPersonalNewEntry({ ...personalNewEntry, department: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.studyYear', language)}</Label><Input value={personalNewEntry.studyYear} onChange={e => setPersonalNewEntry({ ...personalNewEntry, studyYear: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.group', language)}</Label><Input value={personalNewEntry.group} onChange={e => setPersonalNewEntry({ ...personalNewEntry, group: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.startYear', language)}</Label><Input value={personalNewEntry.startYear} onChange={e => setPersonalNewEntry({ ...personalNewEntry, startYear: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.receiptNumber', language)}</Label><Input value={personalNewEntry.receiptNumber} onChange={e => setPersonalNewEntry({ ...personalNewEntry, receiptNumber: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.installmentAmount', language)}</Label><Input type="number" value={personalNewEntry.installmentAmount} onChange={e => setPersonalNewEntry({ ...personalNewEntry, installmentAmount: parseFloat(e.target.value) || 0 })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.date', language)}</Label><Input type="date" value={personalNewEntry.date} onChange={e => setPersonalNewEntry({ ...personalNewEntry, date: e.target.value })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.annualTuition', language)}</Label><Input type="number" value={personalNewEntry.annualTuition} onChange={e => setPersonalNewEntry({ ...personalNewEntry, annualTuition: parseFloat(e.target.value) || 0 })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.totalPaid', language)}</Label><Input type="number" value={personalNewEntry.totalPaidInstallments} onChange={e => setPersonalNewEntry({ ...personalNewEntry, totalPaidInstallments: parseFloat(e.target.value) || 0 })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.discount', language)}</Label><Input type="number" value={personalNewEntry.discountAmount} onChange={e => setPersonalNewEntry({ ...personalNewEntry, discountAmount: parseFloat(e.target.value) || 0 })} /></div>
+                    <div className="space-y-2"><Label>{t('annualInstallments.personalFields.remaining', language)}</Label><Input type="number" value={personalNewEntry.remainingAmount} onChange={e => setPersonalNewEntry({ ...personalNewEntry, remainingAmount: parseFloat(e.target.value) || 0 })} /></div>
+                    <div className="col-span-2 space-y-2"><Label>{t('annualInstallments.personalFields.notes', language)}</Label><Input value={personalNewEntry.notes} onChange={e => setPersonalNewEntry({ ...personalNewEntry, notes: e.target.value })} /></div>
                   </div>
-                  <div>
-                    <Label htmlFor="secondInstallment">{t('annualInstallments.installmentNumbers.second', language)}</Label>
-                    <Input
-                      id="secondInstallment"
-                      type="number"
-                      value={newEntry.secondInstallment}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0
-                        const totalReceived = newEntry.firstInstallment + value + newEntry.thirdInstallment + newEntry.fourthInstallment + newEntry.fifthInstallment + newEntry.sixthInstallment
-                        setNewEntry({
-                          ...newEntry,
-                          secondInstallment: value,
-                          totalReceived: totalReceived,
-                          remaining: parseFloat(newEntry.annualAmount) - totalReceived
-                        })
-                      }}
-                      placeholder="0"
-                    />
+                  <div className="flex justify-end gap-2 mt-4">
+                    <Button variant="outline" onClick={() => setIsPersonalAddDialogOpen(false)}>{t('annualInstallments.buttons.cancel', language)}</Button>
+                    <Button onClick={() => savePersonalEntry(personalNewEntry)} disabled={isSaving}>{isSaving ? 'Saving...' : t('annualInstallments.buttons.save', language)}</Button>
                   </div>
-                  <div>
-                    <Label htmlFor="thirdInstallment">{t('annualInstallments.installmentNumbers.third', language)}</Label>
-                    <Input
-                      id="thirdInstallment"
-                      type="number"
-                      value={newEntry.thirdInstallment}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0
-                        const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + value + newEntry.fourthInstallment + newEntry.fifthInstallment + newEntry.sixthInstallment
-                        setNewEntry({
-                          ...newEntry,
-                          thirdInstallment: value,
-                          totalReceived: totalReceived,
-                          remaining: parseFloat(newEntry.annualAmount) - totalReceived
-                        })
-                      }}
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4">
-                  <div>
-                    <Label htmlFor="fourthInstallment">{t('annualInstallments.installmentNumbers.fourth', language)}</Label>
-                    <Input
-                      id="fourthInstallment"
-                      type="number"
-                      value={newEntry.fourthInstallment}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0
-                        const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + newEntry.thirdInstallment + value + newEntry.fifthInstallment + newEntry.sixthInstallment
-                        setNewEntry({
-                          ...newEntry,
-                          fourthInstallment: value,
-                          totalReceived: totalReceived,
-                          remaining: parseFloat(newEntry.annualAmount) - totalReceived
-                        })
-                      }}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="fifthInstallment">{t('annualInstallments.installmentNumbers.fifth', language)}</Label>
-                    <Input
-                      id="fifthInstallment"
-                      type="number"
-                      value={newEntry.fifthInstallment}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0
-                        const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + newEntry.thirdInstallment + newEntry.fourthInstallment + value + newEntry.sixthInstallment
-                        setNewEntry({
-                          ...newEntry,
-                          fifthInstallment: value,
-                          totalReceived: totalReceived,
-                          remaining: parseFloat(newEntry.annualAmount) - totalReceived
-                        })
-                      }}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="sixthInstallment">{t('annualInstallments.installmentNumbers.sixth', language)}</Label>
-                    <Input
-                      id="sixthInstallment"
-                      type="number"
-                      value={newEntry.sixthInstallment}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value) || 0
-                        const totalReceived = newEntry.firstInstallment + newEntry.secondInstallment + newEntry.thirdInstallment + newEntry.fourthInstallment + newEntry.fifthInstallment + value
-                        setNewEntry({
-                          ...newEntry,
-                          sixthInstallment: value,
-                          totalReceived: totalReceived,
-                          remaining: parseFloat(newEntry.annualAmount) - totalReceived
-                        })
-                      }}
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="totalReceived">{t('annualInstallments.fields.totalReceived', language)}</Label>
-                    <Input
-                      id="totalReceived"
-                      type="number"
-                      value={newEntry.totalReceived}
-                      readOnly
-                      className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="remaining">{t('annualInstallments.fields.remaining', language)}</Label>
-                    <Input
-                      id="remaining"
-                      type="number"
-                      value={newEntry.remaining}
-                      readOnly
-                      className="bg-gray-100 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="notes">{t('annualInstallments.fields.notes', language)}</Label>
-                  <Input
-                    id="notes"
-                    value={newEntry.notes}
-                    onChange={(e) => setNewEntry({ ...newEntry, notes: e.target.value })}
-                    placeholder="تێبینی..."
-                  />
-                </div>
-
-                <div>
-                  <Label>{t('annualInstallments.fields.receiptImages', language)}</Label>
-                  <ImageUpload
-                    images={newEntry.receiptImages}
-                    onImagesChange={(images) => setNewEntry({ ...newEntry, receiptImages: images })}
-                    maxImages={6}
-                    className="mt-2"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => { setIsAddDialogOpen(false); resetNewEntry(); }}
-                    disabled={isSaving}
-                  >
-                    {t('annualInstallments.buttons.cancel', language)}
-                  </Button>
-                  <Button
-                    onClick={() => saveEntry(newEntry)}
-                    disabled={isSaving}
-                  >
-                    {isSaving ? 'پاشەکەوتکردن... / Saving...' : t('annualInstallments.buttons.save', language)}
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
-      </div>
-
-      {/* Installments Table/Cards */}
-      <div className="mt-6">
-        {isMobile ? (
-          <InstallmentsCardView data={filteredData} />
-        ) : (
-          <InstallmentsTableView data={filteredData} />
-        )}
-      </div>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
+          <div className="mt-6">
+            <PersonalInstallmentsTableView data={filteredPersonalData} />
+          </div>
+        </TabsContent>
+      </Tabs>
 
       {/* Edit Modal */}
       <EditModal
@@ -1204,10 +1454,29 @@ export default function InstallmentsPage() {
         data={editingData}
         fields={editFields}
         onSave={handleModalSave}
-        onFieldChange={handleModalFieldChange}
+        onFieldChange={(key, value) => {
+          setEditingData(prev => ({ ...prev, [key]: value }))
+        }}
         title={t('annualInstallments.buttons.edit', language)}
         titleKu={t('annualInstallments.buttons.edit', 'kurdish')}
         isSaving={isSaving}
+      />
+
+      <EditModal
+        isOpen={isPersonalEditModalOpen}
+        onClose={() => {
+          setIsPersonalEditModalOpen(false)
+          setEditingPersonalData(null)
+        }}
+        data={editingPersonalData}
+        fields={personalEditFields}
+        onSave={handlePersonalModalSave}
+        onFieldChange={(key, value) => {
+          setEditingPersonalData(prev => ({ ...prev, [key]: value }))
+        }}
+        isSaving={isSaving}
+        title={t('annualInstallments.buttons.edit', language)}
+        titleKu={t('annualInstallments.buttons.edit', 'kurdish')}
       />
 
       {/* Enhanced Image Preview Dialog */}
