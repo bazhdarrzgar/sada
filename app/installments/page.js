@@ -1157,6 +1157,7 @@ export default function InstallmentsPage() {
       </body>
       </html>
     `
+    printWindow.document.write(html)
     printWindow.document.close()
     setTimeout(() => { printWindow.print(); printWindow.close(); }, 800)
   }
