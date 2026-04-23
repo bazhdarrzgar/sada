@@ -32,11 +32,20 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# database
+# project specific
+trash/
+demo_data/
+*.zip
+*.tar.gz
 *.db
+*.sqlite
 *.db-journal
 *.db-shm
 *.db-wal
 
-# zip files
-*.zip
+# environment files
+.env
+.env.development
+.env.local
+.env.production
+.env.test

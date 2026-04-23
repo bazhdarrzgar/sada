@@ -1,194 +1,211 @@
-# Docker Build Fix Guide
+# Docker Build Fix for better-sqlite3
 
-## Issue: "Lockfile not found" Error
+## Problem
+The `better-sqlite3` native module was causing build failures due to Node.js version mismatches between the development environment and Docker container.
 
-### Problem
-Getting this error when running `./docker-setup-with-permissions.sh`:
-```
-❌ Lockfile not found.
-failed to solve: process "/bin/sh -c ..." did not complete successfully: exit code: 1
-```
+## Solution Applied
 
-### Root Cause
-The Docker build process cannot find the lockfiles (yarn.lock, package-lock.json) in the build context.
+### What Was Fixed
 
-## Solutions
+1. **Updated all Dockerfiles to Node.js 20**
+   - All Docker images now use `node:20-slim` or `node:20-alpine`
+   - Ensures consistent Node version across all stages
 
-### Solution 1: Clean Build (Recommended)
+2. **Added node-gyp installation**
+   - Globally installs node-gyp in both deps and builder stages
+   - Required for native module compilation
+
+3. **Force rebuild better-sqlite3 from source**
+   - Completely removes prebuilt binaries
+   - Reinstalls better-sqlite3@12.4.1 from source
+   - Uses `--build-from-source` flag to ensure clean build
+
+4. **Added verification step**
+   - Tests better-sqlite3 loads correctly before building Next.js app
+   - Fails fast if there's a problem
+
+## How to Build
+
+### Option 1: Using docker-compose (Recommended)
+
 ```bash
-# Stop all containers
-docker-compose down -v
-
-# Clean Docker cache
-docker system prune -f
-
-# Remove any build cache
-docker builder prune -f
-
-# Rebuild with no cache
+# Clean build (recommended for first time or after updates)
 docker-compose build --no-cache
-
-# Start services
 docker-compose up -d
+
+# Check logs
+docker-compose logs -f app
+
+# Check health
+docker-compose ps
 ```
 
-### Solution 2: Verify Build Context
-```bash
-# Check if lockfiles exist in project root
-ls -la | grep -E "(yarn.lock|package-lock.json)"
-
-# Should show:
-# -rw-r--r-- 1 user user 124624 date yarn.lock
-# -rw-r--r-- 1 user user 115000 date package-lock.json
-
-# If files are missing, regenerate them:
-yarn install  # This creates yarn.lock
-# OR
-npm install   # This creates package-lock.json
-```
-
-### Solution 3: Manual Docker Build
-```bash
-# Build the image manually to see detailed output
-docker build -t sada-app . --no-cache
-
-# Check what files are copied
-docker run --rm sada-app ls -la
-
-# If successful, start with docker-compose
-docker-compose up -d
-```
-
-### Solution 4: Alternative Setup Method
-If Docker build continues to fail, use local development:
+### Option 2: Using Docker directly
 
 ```bash
-# Install dependencies locally
-yarn install
+# Build with main Dockerfile (Debian-based, most compatible)
+docker build --no-cache -t sada-app .
+docker run -d -p 3000:3000 --name sada sada-app
 
-# Start development server
-yarn dev:smart
-
-# Application will be available at http://localhost:3000
+# Or build with simple Dockerfile (Alpine-based, smaller)
+docker build --no-cache -f Dockerfile.simple -t sada-app .
+docker run -d -p 3000:3000 --name sada sada-app
 ```
 
-## Debugging Steps
+### Option 3: Using production Dockerfile
 
-### Step 1: Verify Docker Installation
 ```bash
-docker --version
-docker-compose --version
-
-# Should show version numbers, not "command not found"
+# Build with optimized production Dockerfile
+docker build --no-cache -f Dockerfile.production -t sada-app .
+docker run -d -p 3000:3000 --name sada sada-app
 ```
-
-### Step 2: Check Project Files
-```bash
-# Essential files that must exist:
-ls -la package.json      # ✅ Must exist
-ls -la yarn.lock        # ✅ Should exist  
-ls -la Dockerfile       # ✅ Must exist
-ls -la docker-compose.yml # ✅ Must exist
-
-# Check .dockerignore doesn't exclude lockfiles
-cat .dockerignore | grep -E "(yarn.lock|package-lock.json)"
-# Should NOT show these files (they shouldn't be ignored)
-```
-
-### Step 3: Test Build Context
-```bash
-# Create a test Dockerfile to see what gets copied
-cat > Dockerfile.test << 'EOF'
-FROM node:18-alpine
-WORKDIR /app
-COPY . .
-RUN ls -la
-EOF
-
-# Build test image
-docker build -f Dockerfile.test -t test-context .
-
-# Check output for lockfiles
-```
-
-### Step 4: Clean Workspace
-```bash
-# Remove node_modules and lockfiles
-rm -rf node_modules
-rm -f yarn.lock package-lock.json
-
-# Reinstall with preferred package manager
-yarn install  # Creates yarn.lock
-# OR
-npm install   # Creates package-lock.json
-
-# Try Docker build again
-docker-compose build --no-cache
-```
-
-## Common Issues and Fixes
-
-| Issue | Cause | Fix |
-|-------|-------|-----|
-| `docker: command not found` | Docker not installed | Install Docker and Docker Compose |
-| `permission denied` | Docker permissions | Add user to docker group: `sudo usermod -aG docker $USER` |
-| `no space left on device` | Disk full | Clean up: `docker system prune -a` |
-| `lockfile not found` | Build context issue | Check .dockerignore, rebuild with --no-cache |
-| `network timeout` | Internet connectivity | Check network, retry build |
 
 ## Verification
 
-After fixing, verify the setup works:
+### Check if build succeeded
 
 ```bash
-# 1. Build should succeed
-docker-compose build
+# Check container is running
+docker ps | grep sada
 
-# 2. Services should start
-docker-compose up -d
+# Check logs for errors
+docker logs sada
 
-# 3. Application should respond
+# Test the application
 curl http://localhost:3000
-
-# 4. Upload should work
-./diagnose-upload-issue.sh
 ```
 
-## Alternative: Using Dockerfile.fixed
-
-If the main Dockerfile continues to have issues, try the fixed version:
+### Verify better-sqlite3 inside container
 
 ```bash
-# Use the pre-configured fixed Dockerfile
-cp Dockerfile.fixed Dockerfile
+# Enter container
+docker exec -it sada sh
 
-# Build with the fixed version
+# Test better-sqlite3
+node -e "const Database = require('better-sqlite3'); console.log('Works!');"
+
+# Check Node version
+node --version  # Should be v20.x.x
+```
+
+## Troubleshooting
+
+### Build still fails with MODULE_VERSION error
+
+```bash
+# Ensure you're building with --no-cache
 docker-compose build --no-cache
 
-# Start services
-docker-compose up -d
+# Or for Docker
+docker build --no-cache -t sada-app .
 ```
 
-## Getting Help
+### better-sqlite3 not found
 
-If issues persist:
+```bash
+# Check if package.json has better-sqlite3
+cat package.json | grep better-sqlite3
 
-1. **Collect logs**:
+# Should show: "better-sqlite3": "^12.4.1"
+```
+
+### Container crashes on startup
+
+```bash
+# Check logs
+docker logs sada
+
+# Check if database directory exists
+docker exec -it sada ls -la /app/database
+```
+
+### Slow build times
+
+The build may take 5-10 minutes due to:
+- Installing system dependencies
+- Compiling better-sqlite3 from source
+- Building Next.js production bundle
+
+This is normal. Subsequent builds will be faster with Docker layer caching.
+
+## Build Process Breakdown
+
+1. **deps stage** (2-3 minutes)
+   - Installs system dependencies (python3, make, g++, sqlite3)
+   - Installs node-gyp
+   - Installs all npm/yarn packages
+   - better-sqlite3 gets built automatically
+
+2. **builder stage** (5-7 minutes)
+   - Copies node_modules from deps
+   - Removes prebuilt better-sqlite3
+   - Rebuilds better-sqlite3 from source for Node 20
+   - Verifies better-sqlite3 works
+   - Builds Next.js production bundle
+
+3. **runner stage** (1 minute)
+   - Creates minimal production image
+   - Copies built application
+   - Sets up user permissions
+   - Configures healthcheck
+
+**Total build time**: ~8-11 minutes (first build)
+**Cached build time**: ~2-4 minutes (if only code changes)
+
+## Files Modified
+
+- ✅ `Dockerfile` - Main production Dockerfile (Debian-based)
+- ✅ `Dockerfile.simple` - Simplified production Dockerfile (Alpine-based)
+- ✅ `Dockerfile.production` - Optimized production Dockerfile
+- ✅ `package.json` - Added engines field for Node 20
+- ✅ `.nvmrc` - Node version specification
+- ✅ `.node-version` - Node version for nodenv/n
+
+## Best Practices
+
+1. **Always use --no-cache for first build**
    ```bash
-   docker-compose build --no-cache > build.log 2>&1
+   docker-compose build --no-cache
    ```
 
-2. **Check system resources**:
+2. **Check Docker version**
    ```bash
-   df -h          # Disk space
-   free -h        # Memory
-   docker info    # Docker status
+   docker --version  # Should be 20.0+ for best results
    ```
 
-3. **Share diagnostic info**:
-   - Operating system and version
-   - Docker and Docker Compose versions
-   - Build logs
-   - Output of `ls -la` in project directory
+3. **Clean up old images**
+   ```bash
+   docker system prune -a
+   ```
 
-The most common fix is using `docker-compose build --no-cache` to ensure a clean build without cached layers.
+4. **Monitor build logs**
+   ```bash
+   docker-compose build --no-cache --progress=plain
+   ```
+
+## Production Deployment Checklist
+
+- [ ] Built with --no-cache
+- [ ] Container starts successfully
+- [ ] Application accessible on port 3000
+- [ ] Database initialized at /app/database/sada.db
+- [ ] Upload directories have correct permissions
+- [ ] Healthcheck passes
+- [ ] No errors in docker logs
+- [ ] better-sqlite3 loads without errors
+
+## Support
+
+If you continue to experience issues:
+
+1. Share the complete build logs
+2. Share your Docker version: `docker --version`
+3. Share your OS: `uname -a`
+4. Try the Dockerfile.production variant
+
+## Additional Resources
+
+- [Node.js 20 Documentation](https://nodejs.org/docs/latest-v20.x/api/)
+- [better-sqlite3 Documentation](https://github.com/WiseLibs/better-sqlite3)
+- [Next.js Docker Deployment](https://nextjs.org/docs/deployment#docker-image)
+- [Docker Best Practices](https://docs.docker.com/develop/dev-best-practices/)
